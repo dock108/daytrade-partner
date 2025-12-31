@@ -365,26 +365,103 @@ struct OutlookCardView: View {
         }
     }
     
-    // MARK: - Personal Note
+    // MARK: - Personal Note (Behavioral Observation)
     
     private func personalNoteSection(_ context: String) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            sectionHeader(title: "Personal note", icon: "heart.text.square", color: Color(red: 0.85, green: 0.75, blue: 0.95))
+        VStack(alignment: .leading, spacing: 12) {
+            // Header with full label
+            HStack(spacing: 10) {
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.85, green: 0.75, blue: 0.95),
+                                    Color(red: 0.70, green: 0.55, blue: 0.85)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 28, height: 28)
+                    
+                    Image(systemName: "person.fill.viewfinder")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+                
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Personal note")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(Color(red: 0.85, green: 0.75, blue: 0.95))
+                        .textCase(.uppercase)
+                        .tracking(0.5)
+                    
+                    Text("Based on your past trades")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color.white.opacity(0.4))
+                }
+                
+                Spacer()
+            }
             
-            Text(context)
-                .font(.system(size: 14))
-                .foregroundStyle(Color.white.opacity(0.7))
-                .italic()
-                .lineSpacing(3)
-                .fixedSize(horizontal: false, vertical: true)
+            // Divider
+            Rectangle()
+                .fill(Color(red: 0.85, green: 0.75, blue: 0.95).opacity(0.15))
+                .frame(height: 1)
+            
+            // Content — reflective tone, not directive
+            HStack(alignment: .top, spacing: 10) {
+                // Subtle quote mark
+                Image(systemName: "quote.opening")
+                    .font(.system(size: 16, weight: .light))
+                    .foregroundStyle(Color(red: 0.85, green: 0.75, blue: 0.95).opacity(0.4))
+                    .padding(.top, 2)
+                
+                Text(context)
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundStyle(Color.white.opacity(0.75))
+                    .lineSpacing(4)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            
+            // Supportive footer — not judgmental
+            HStack(spacing: 6) {
+                Image(systemName: "sparkle")
+                    .font(.system(size: 9))
+                
+                Text("Reflection, not advice — you decide what's relevant")
+                    .font(.system(size: 10))
+            }
+            .foregroundStyle(Color.white.opacity(0.3))
+            .padding(.top, 4)
         }
-        .padding(14)
+        .padding(16)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(red: 0.85, green: 0.75, blue: 0.95).opacity(0.06))
+            RoundedRectangle(cornerRadius: 14)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.85, green: 0.75, blue: 0.95).opacity(0.08),
+                            Color(red: 0.70, green: 0.55, blue: 0.85).opacity(0.04)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(Color(red: 0.85, green: 0.75, blue: 0.95).opacity(0.12), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.85, green: 0.75, blue: 0.95).opacity(0.2),
+                                    Color(red: 0.70, green: 0.55, blue: 0.85).opacity(0.08)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
                 )
         )
     }

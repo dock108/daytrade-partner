@@ -401,49 +401,175 @@ final class OutlookEngine {
         metadata: TickerMetadata
     ) async -> String? {
         // Try to get user's trade history
-        guard let trades = try? tradeService.getCachedTrades() else {
+        guard let trades = try? tradeService.getCachedTrades(), trades.count >= 5 else {
             return nil
         }
         
-        // Find trades for this ticker
-        let tickerTrades = trades.filter { $0.ticker.uppercased() == ticker }
+        // Analyze behavioral patterns based on volatility and sentiment
+        // Focus on how user behaves in similar setups, not just this ticker
+        
+        let observation = generateBehavioralObservation(
+            ticker: ticker,
+            metadata: metadata,
+            allTrades: trades
+        )
+        
+        return observation
+    }
+    
+    /// Generates a gentle, behavior-focused observation based on similar setups.
+    /// Returns nil when no relevant pattern is found — not always shown.
+    private func generateBehavioralObservation(
+        ticker: String,
+        metadata: TickerMetadata,
+        allTrades: [MockTrade]
+    ) -> String? {
+        // Categorize trades by volatility similarity
+        let highVolTickers = Set(tickerMetadata.filter { $0.value.baseVolatility >= 0.10 }.map { $0.key })
+        let moderateVolTickers = Set(tickerMetadata.filter { $0.value.baseVolatility >= 0.05 && $0.value.baseVolatility < 0.10 }.map { $0.key })
+        let lowVolTickers = Set(tickerMetadata.filter { $0.value.baseVolatility < 0.05 }.map { $0.key })
+        
+        // Determine current ticker's volatility category
+        let isHighVol = metadata.baseVolatility >= 0.10
+        let isModerateVol = metadata.baseVolatility >= 0.05 && metadata.baseVolatility < 0.10
+        
+        // Get trades in similar volatility category
+        let similarVolTrades: [MockTrade]
+        if isHighVol {
+            similarVolTrades = allTrades.filter { highVolTickers.contains($0.ticker.uppercased()) }
+        } else if isModerateVol {
+            similarVolTrades = allTrades.filter { moderateVolTickers.contains($0.ticker.uppercased()) }
+        } else {
+            similarVolTrades = allTrades.filter { lowVolTickers.contains($0.ticker.uppercased()) }
+        }
+        
+        // Need enough data for a meaningful pattern
+        guard similarVolTrades.count >= 3 else {
+            return generateTickerSpecificObservation(ticker: ticker, allTrades: allTrades, metadata: metadata)
+        }
+        
+        // Analyze behavioral patterns in similar setups
+        let observations = analyzeBehavioralPatterns(trades: similarVolTrades, allTrades: allTrades, isHighVol: isHighVol)
+        
+        // Return first relevant observation, or nil
+        return observations.randomElement()
+    }
+    
+    /// Analyzes behavioral patterns and returns supportive observations
+    private func analyzeBehavioralPatterns(
+        trades: [MockTrade],
+        allTrades: [MockTrade],
+        isHighVol: Bool
+    ) -> [String] {
+        var observations: [String] = []
+        
+        // Pattern 1: Early exit tendency in volatile situations
+        let earlyExits = trades.filter { $0.holdingDays <= 3 }
+        let longerHolds = trades.filter { $0.holdingDays > 7 }
+        
+        if earlyExits.count >= 3 && longerHolds.count >= 2 {
+            let earlyWinRate = Double(earlyExits.filter { $0.realizedPnL > 0 }.count) / Double(earlyExits.count)
+            let longerWinRate = Double(longerHolds.filter { $0.realizedPnL > 0 }.count) / Double(longerHolds.count)
+            
+            if earlyWinRate < longerWinRate - 0.15 && isHighVol {
+                observations.append("In similar volatile setups, you've often sold early — your longer holds in this category have tended to work out better.")
+            } else if earlyWinRate > longerWinRate + 0.15 {
+                observations.append("You've historically timed short-term moves well in situations like this — your quick reads have been solid.")
+            }
+        }
+        
+        // Pattern 2: Performance during volatile swings
+        let volatileOutcomes = trades.filter { abs($0.returnPct) > 0.08 }
+        if volatileOutcomes.count >= 3 {
+            let bigWins = volatileOutcomes.filter { $0.returnPct > 0.08 }.count
+            let bigLosses = volatileOutcomes.filter { $0.returnPct < -0.08 }.count
+            
+            if bigWins > bigLosses * 2 {
+                observations.append("You've navigated big swings well before — this type of volatility has worked in your favor historically.")
+            } else if bigLosses > bigWins && isHighVol {
+                observations.append("When things have swung hard in this category, it's cut both ways for you — something to be aware of.")
+            }
+        }
+        
+        // Pattern 3: Recovery from dips
+        let lossingTrades = allTrades.filter { $0.realizedPnL < 0 }
+        let subsequentTrades = allTrades.enumerated().compactMap { index, trade -> MockTrade? in
+            guard trade.realizedPnL < 0, index + 1 < allTrades.count else { return nil }
+            return allTrades[index + 1]
+        }
+        
+        if subsequentTrades.count >= 3 {
+            let recoveredWell = subsequentTrades.filter { $0.realizedPnL > 0 }.count
+            let recoveryRate = Double(recoveredWell) / Double(subsequentTrades.count)
+            
+            if recoveryRate > 0.65 {
+                observations.append("You've historically bounced back well after setbacks — your next trade after a loss has often been stronger.")
+            }
+        }
+        
+        // Pattern 4: Sector comfort
+        let techTickers = Set(["NVDA", "AAPL", "MSFT", "AMD", "GOOGL", "META", "AMZN"])
+        let techTrades = allTrades.filter { techTickers.contains($0.ticker.uppercased()) }
+        let otherTrades = allTrades.filter { !techTickers.contains($0.ticker.uppercased()) }
+        
+        if techTrades.count >= 3 && otherTrades.count >= 3 {
+            let techWinRate = Double(techTrades.filter { $0.realizedPnL > 0 }.count) / Double(techTrades.count)
+            let otherWinRate = Double(otherTrades.filter { $0.realizedPnL > 0 }.count) / Double(otherTrades.count)
+            
+            if techWinRate > otherWinRate + 0.12 && techTickers.contains(trades.first?.ticker.uppercased() ?? "") {
+                observations.append("Tech has been in your wheelhouse — you've tended to read these names well.")
+            }
+        }
+        
+        // Pattern 5: Position sizing intuition (based on P&L magnitude)
+        let avgWin = trades.filter { $0.realizedPnL > 0 }.reduce(0.0) { $0 + $1.realizedPnL } / max(1.0, Double(trades.filter { $0.realizedPnL > 0 }.count))
+        let avgLoss = abs(trades.filter { $0.realizedPnL < 0 }.reduce(0.0) { $0 + $1.realizedPnL } / max(1.0, Double(trades.filter { $0.realizedPnL < 0 }.count)))
+        
+        if avgWin > avgLoss * 1.5 && trades.count >= 5 {
+            observations.append("Your winners in this category have tended to be larger than your losses — good risk management showing through.")
+        }
+        
+        return observations
+    }
+    
+    /// Fallback: ticker-specific observation when no behavioral pattern is found
+    private func generateTickerSpecificObservation(
+        ticker: String,
+        allTrades: [MockTrade],
+        metadata: TickerMetadata
+    ) -> String? {
+        // Find trades for this specific ticker
+        let tickerTrades = allTrades.filter { $0.ticker.uppercased() == ticker }
         
         guard !tickerTrades.isEmpty else {
             // Check for sector-related trades
             let sectorTickers = tickerMetadata.filter { $0.value.sector == metadata.sector }.map { $0.key }
-            let sectorTrades = trades.filter { sectorTickers.contains($0.ticker.uppercased()) }
+            let sectorTrades = allTrades.filter { sectorTickers.contains($0.ticker.uppercased()) }
             
             if sectorTrades.count >= 3 {
                 let wins = sectorTrades.filter { $0.realizedPnL > 0 }.count
                 let winRate = Double(wins) / Double(sectorTrades.count)
                 
-                if winRate > 0.6 {
-                    return "You've had good results in the \(metadata.sector) sector — \(Int(winRate * 100))% win rate across \(sectorTrades.count) trades."
-                } else if winRate < 0.4 {
-                    return "The \(metadata.sector) sector has been challenging for you — something to factor in."
+                if winRate > 0.60 {
+                    return "You've had solid results in the \(metadata.sector) sector overall — \(Int(winRate * 100))% of your trades there have been winners."
                 }
             }
             return nil
         }
         
-        // Analyze ticker-specific history
+        // Ticker-specific history with supportive framing
         let wins = tickerTrades.filter { $0.realizedPnL > 0 }.count
         let winRate = Double(wins) / Double(tickerTrades.count)
         let avgHoldDays = tickerTrades.reduce(0) { $0 + $1.holdingDays } / tickerTrades.count
-        let totalPnL = tickerTrades.reduce(0.0) { $0 + $1.realizedPnL }
         
         if tickerTrades.count >= 3 {
-            if winRate > 0.65 {
-                return "You've traded \(ticker) \(tickerTrades.count) times with a \(Int(winRate * 100))% win rate — historically one of your stronger names."
-            } else if winRate < 0.40 {
-                return "\(ticker) has been tricky for you — \(Int(winRate * 100))% win rate over \(tickerTrades.count) trades. Past results don't predict the future, but worth noting."
+            if winRate > 0.60 {
+                return "You've traded \(ticker) \(tickerTrades.count) times — this has been one of your more comfortable names historically."
             } else if avgHoldDays < 5 {
-                return "You tend to trade \(ticker) quickly (avg \(avgHoldDays) days). Your current lookback window is longer."
+                return "You've typically traded \(ticker) on shorter timeframes — averaging \(avgHoldDays) days. This outlook looks further out."
             }
         } else if tickerTrades.count >= 1 {
-            let recentTrade = tickerTrades.first!
-            let outcome = recentTrade.realizedPnL > 0 ? "profit" : "loss"
-            return "You last traded \(ticker) for a \(outcome). One data point, but recent memory."
+            return "You have some history with \(ticker) — worth reflecting on how those trades felt."
         }
         
         return nil
