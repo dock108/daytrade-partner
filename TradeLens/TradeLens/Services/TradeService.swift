@@ -14,14 +14,18 @@ class TradeService: ObservableObject {
     @Published private(set) var trades: [Trade] = []
     @Published private(set) var isLoading = false
     
-    /// Fetch trades from data source
+    /// Fetch trades from data source.
     func fetchTrades() async throws {
         isLoading = true
         defer { isLoading = false }
-        
-        // Simulate network delay
-        try await Task.sleep(nanoseconds: 1_000_000_000)
-        
+
+        do {
+            // Simulate network delay.
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+        } catch {
+            throw AppError(error)
+        }
+
         // Example trades
         let calendar = Calendar.current
         let now = Date()
@@ -29,7 +33,7 @@ class TradeService: ObservableObject {
         let aaplExit = calendar.date(byAdding: .day, value: -3, to: now)
         let googlEntry = calendar.date(byAdding: .day, value: -6, to: now) ?? now
 
-        trades = [
+        let fetchedTrades = [
             Trade(
                 ticker: "AAPL",
                 entryDate: aaplEntry,
@@ -47,6 +51,12 @@ class TradeService: ObservableObject {
                 category: .speculative
             )
         ]
+
+        guard !fetchedTrades.isEmpty else {
+            throw AppError.emptyData
+        }
+
+        trades = fetchedTrades
     }
     
     /// Add a new trade

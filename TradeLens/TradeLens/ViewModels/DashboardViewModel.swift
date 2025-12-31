@@ -13,20 +13,37 @@ final class DashboardViewModel: ObservableObject {
     @Published var trades: [MockTrade] = []
     @Published var summary: UserSummary?
     @Published var riskMessage = ""
+    @Published var isLoading = false
+    @Published var errorMessage: String?
 
     private let tradeService: MockTradeDataService
 
     init(tradeService: MockTradeDataService = MockTradeDataService()) {
         self.tradeService = tradeService
-        loadDashboard()
+        Task {
+            await loadDashboard()
+        }
     }
 
-    func loadDashboard() {
-        let trades = tradeService.fetchMockTrades()
-        self.trades = trades
-        let summary = buildSummary(from: trades)
-        self.summary = summary
-        riskMessage = message(for: summary.speculativePercent)
+    func loadDashboard() async {
+        isLoading = true
+        errorMessage = nil
+        summary = nil
+        riskMessage = ""
+
+        do {
+            let trades = try await tradeService.fetchMockTrades()
+            self.trades = trades
+            let summary = buildSummary(from: trades)
+            self.summary = summary
+            riskMessage = message(for: summary.speculativePercent)
+        } catch {
+            let appError = AppError(error)
+            errorMessage = appError.userMessage
+            trades = []
+        }
+
+        isLoading = false
     }
 
     private func buildSummary(from trades: [MockTrade]) -> UserSummary {

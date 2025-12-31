@@ -15,6 +15,7 @@
 		TL011 /* TradeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL012 /* TradeService.swift */; };
 		TL013 /* TradeListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL014 /* TradeListViewModel.swift */; };
 		TL015 /* CurrencyFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL016 /* CurrencyFormatter.swift */; };
+		TL200 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL201 /* AppError.swift */; };
 		TL100 /* UserSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL102 /* UserSummary.swift */; };
 		TL101 /* TradeModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL104 /* TradeModelsTests.swift */; };
 /* End PBXBuildFile section */
@@ -39,6 +40,7 @@
 		TL012 /* TradeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeService.swift; sourceTree = "<group>"; };
 		TL014 /* TradeListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeListViewModel.swift; sourceTree = "<group>"; };
 		TL016 /* CurrencyFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyFormatter.swift; sourceTree = "<group>"; };
+		TL201 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		TL018 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		TL102 /* UserSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSummary.swift; sourceTree = "<group>"; };
 		TL103 /* TradeLensTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TradeLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -134,6 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				TL016 /* CurrencyFormatter.swift */,
+				TL201 /* AppError.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -259,6 +262,7 @@
 				TL011 /* TradeService.swift in Sources */,
 				TL013 /* TradeListViewModel.swift in Sources */,
 				TL015 /* CurrencyFormatter.swift in Sources */,
+				TL200 /* AppError.swift in Sources */,
 				TL001 /* TradeLensApp.swift in Sources */,
 				TL100 /* UserSummary.swift in Sources */,
 			);

@@ -52,8 +52,14 @@ struct MockTradeDataService {
         "NTLA": 30
     ]
 
-    /// Generate a realistic set of closed trades for UI display
-    func fetchMockTrades() -> [MockTrade] {
+    /// Generate a realistic set of closed trades for UI display.
+    func fetchMockTrades() async throws -> [MockTrade] {
+        do {
+            try await Task.sleep(nanoseconds: 250_000_000)
+        } catch {
+            throw AppError(error)
+        }
+
         let tradeCount = Int.random(in: 50...120)
         var trades: [MockTrade] = []
         trades.reserveCapacity(tradeCount)
@@ -84,7 +90,11 @@ struct MockTradeDataService {
             trades.append(trade)
         }
 
-        return trades.sorted { $0.exitDate > $1.exitDate }
+        let sortedTrades = trades.sorted { $0.exitDate > $1.exitDate }
+        guard !sortedTrades.isEmpty else {
+            throw AppError.emptyData
+        }
+        return sortedTrades
     }
 
     private func randomCategory() -> MockTradeCategory {

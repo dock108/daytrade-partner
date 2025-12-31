@@ -15,7 +15,18 @@ struct InsightsView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     headerSection
-                    insightCards
+                    if let errorMessage = viewModel.errorMessage {
+                        errorStateView(message: errorMessage) {
+                            Task {
+                                await viewModel.loadInsights()
+                            }
+                        }
+                    } else if viewModel.isLoading {
+                        Text("Loading insights...")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        insightCards
+                    }
                 }
                 .padding()
             }
@@ -36,6 +47,10 @@ struct InsightsView: View {
 
     private var insightCards: some View {
         VStack(alignment: .leading, spacing: 12) {
+            if viewModel.insights.isEmpty {
+                Text("No insights yet.")
+                    .foregroundStyle(.secondary)
+            }
             ForEach(viewModel.insights) { insight in
                 Text(insight.text)
                     .font(.body)
@@ -45,6 +60,19 @@ struct InsightsView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
             }
         }
+    }
+
+    private func errorStateView(message: String, retry: @escaping () -> Void) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(message)
+                .foregroundStyle(.secondary)
+            Button("Retry", action: retry)
+                .buttonStyle(.bordered)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
 

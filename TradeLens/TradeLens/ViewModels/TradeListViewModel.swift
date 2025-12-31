@@ -32,7 +32,8 @@ class TradeListViewModel: ObservableObject {
             try await tradeService.fetchTrades()
             trades = tradeService.trades
         } catch {
-            errorMessage = "Failed to load trades: \(error.localizedDescription)"
+            let appError = AppError(error)
+            errorMessage = appError.userMessage
         }
         
         isLoading = false
