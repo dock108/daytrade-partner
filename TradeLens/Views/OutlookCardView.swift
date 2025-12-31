@@ -11,6 +11,8 @@ import SwiftUI
 struct OutlookCardView: View {
     let outlook: Outlook
     @State private var expandedInfo: InfoType? = nil
+    @State private var isWatchEnabled = false
+    @State private var showWatchConfirmation = false
     
     enum InfoType: String, Identifiable {
         case sentiment = "Sentiment Summary"
@@ -78,6 +80,9 @@ struct OutlookCardView: View {
                 if let personalContext = outlook.personalContext {
                     personalNoteSection(personalContext)
                 }
+                
+                // Watch This For Me - Future Hook
+                watchThisButton
             }
             .padding(20)
         }
@@ -466,6 +471,104 @@ struct OutlookCardView: View {
         )
     }
     
+    // MARK: - Watch This Button (Future Hook)
+    
+    private var watchThisButton: some View {
+        VStack(spacing: 12) {
+            // Divider
+            Rectangle()
+                .fill(Color.white.opacity(0.08))
+                .frame(height: 1)
+                .padding(.vertical, 8)
+            
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                    isWatchEnabled.toggle()
+                    if isWatchEnabled {
+                        showWatchConfirmation = true
+                    }
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    // Icon with animation
+                    ZStack {
+                        Circle()
+                            .fill(
+                                isWatchEnabled
+                                    ? Color(red: 0.4, green: 0.7, blue: 1.0)
+                                    : Color.white.opacity(0.08)
+                            )
+                            .frame(width: 36, height: 36)
+                        
+                        Image(systemName: isWatchEnabled ? "bell.fill" : "bell")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(isWatchEnabled ? .white : Color.white.opacity(0.5))
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(isWatchEnabled ? "Watching \(outlook.ticker)" : "Watch this for me")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(isWatchEnabled ? Color(red: 0.4, green: 0.7, blue: 1.0) : .white)
+                        
+                        Text(isWatchEnabled ? "We'll let you know if something changes" : "Get notified when something important changes")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.white.opacity(0.45))
+                    }
+                    
+                    Spacer()
+                    
+                    // Toggle indicator
+                    if isWatchEnabled {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 20))
+                            .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0))
+                    } else {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(Color.white.opacity(0.3))
+                    }
+                }
+                .padding(14)
+                .background(
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(
+                            isWatchEnabled
+                                ? Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.12)
+                                : Color.white.opacity(0.04)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .strokeBorder(
+                                    isWatchEnabled
+                                        ? Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.3)
+                                        : Color.white.opacity(0.08),
+                                    lineWidth: 1
+                                )
+                        )
+                )
+            }
+            .buttonStyle(WatchButtonStyle())
+            
+            // Explanation text (subtle)
+            if !isWatchEnabled {
+                HStack(spacing: 6) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 10))
+                    
+                    Text("Coming soon: alerts for major moves, earnings, or sentiment shifts")
+                        .font(.system(size: 11))
+                }
+                .foregroundStyle(Color.white.opacity(0.3))
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .alert("Watching \(outlook.ticker)", isPresented: $showWatchConfirmation) {
+            Button("Got it", role: .cancel) { }
+        } message: {
+            Text("This feature is coming soon! When it's ready, you'll get a gentle heads-up if:\n\n• A major price move happens\n• Earnings are approaching\n• Market sentiment shifts\n\nNo spam — just the important stuff.")
+        }
+    }
+    
     // MARK: - Preference Note Card
     
     private func preferenceNoteCard(message: String, icon: String, color: Color) -> some View {
@@ -558,6 +661,17 @@ struct InfoExplanationSheet: View {
         }
         .frame(maxWidth: .infinity)
         .background(Color(red: 0.10, green: 0.12, blue: 0.18))
+    }
+}
+
+// MARK: - Watch Button Style
+
+struct WatchButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .opacity(configuration.isPressed ? 0.9 : 1.0)
+            .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
     }
 }
 
