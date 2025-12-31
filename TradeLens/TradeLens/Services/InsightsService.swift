@@ -46,8 +46,10 @@ struct InsightsService {
     private func volatilityInsight(from trades: [MockTrade]) -> String {
         let highVolTickers = Set(trades.filter { isHighVolatility(trade: $0) }.map { $0.ticker })
         let highVolLosses = trades.filter { highVolTickers.contains($0.ticker) && $0.realizedPnL < 0 }
-        _ = highVolLosses.count
-        return "Losses cluster during high volatility tickers"
+        guard !highVolLosses.isEmpty else {
+            return "High volatility names have been less of a drag recently"
+        }
+        return "High volatility names drove \(highVolLosses.count) losing trades"
     }
 
     private func speculativeImpactInsight(from trades: [MockTrade]) -> String {
