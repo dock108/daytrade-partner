@@ -76,6 +76,11 @@ struct Theme {
             Color.white.opacity(0.12)
         }
         
+        /// Shadow color for cards
+        var shadow: Color {
+            Color.black.opacity(0.25)
+        }
+        
         /// Gradient for premium/featured card backgrounds
         func cardGradient(accent: Color) -> LinearGradient {
             LinearGradient(
