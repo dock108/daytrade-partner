@@ -47,6 +47,8 @@
 		TL418 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL419 /* UserSettings.swift */; };
 		TL420 /* SpeechRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL421 /* SpeechRecognitionService.swift */; };
 		TL422 /* ConversationHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL423 /* ConversationHistory.swift */; };
+		TL424 /* OutlookEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL425 /* OutlookEngine.swift */; };
+		TL426 /* OutlookCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL427 /* OutlookCardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +105,8 @@
 		TL419 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
 		TL421 /* SpeechRecognitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognitionService.swift; sourceTree = "<group>"; };
 		TL423 /* ConversationHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationHistory.swift; sourceTree = "<group>"; };
+		TL425 /* OutlookEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlookEngine.swift; sourceTree = "<group>"; };
+		TL427 /* OutlookCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlookCardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +188,7 @@
 				TL415 /* TickerInfoService.swift */,
 				TL419 /* UserSettings.swift */,
 				TL421 /* SpeechRecognitionService.swift */,
+				TL425 /* OutlookEngine.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -195,6 +200,7 @@
 				TL401 /* HomeView.swift */,
 				TL411 /* TickerChartView.swift */,
 				TL417 /* TickerSnapshotCard.swift */,
+				TL427 /* OutlookCardView.swift */,
 				TL208 /* SettingsView.swift */,
 				TL301 /* DashboardView.swift */,
 				TL303 /* TradeDetailView.swift */,
@@ -389,6 +395,8 @@
 				TL418 /* UserSettings.swift in Sources */,
 				TL420 /* SpeechRecognitionService.swift in Sources */,
 				TL422 /* ConversationHistory.swift in Sources */,
+				TL424 /* OutlookEngine.swift in Sources */,
+				TL426 /* OutlookCardView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

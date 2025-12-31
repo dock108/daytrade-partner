@@ -20,6 +20,7 @@ final class HomeViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var guidedSuggestions: [GuidedSuggestion] = []
     @Published var conversationHistory: [ConversationEntry] = []
+    @Published var outlook: Outlook?
     
     // Voice input state
     @Published var isListening: Bool = false
@@ -29,8 +30,12 @@ final class HomeViewModel: ObservableObject {
     private let tradeService: MockTradeDataService
     private let speechService: SpeechRecognitionService
     private let historyService: ConversationHistoryService
+    private let outlookEngine: OutlookEngine
     private let maxRecentSearches = 5
     private let recentSearchesKey = "TradeLens.RecentSearches"
+    
+    /// Keywords that trigger outlook generation
+    private let outlookKeywords = ["buy", "up", "down", "outlook", "expect", "will", "should", "30 days", "next month", "forecast", "prediction"]
     
     /// A guided suggestion with icon and query
     struct GuidedSuggestion: Identifiable, Equatable {
@@ -51,12 +56,14 @@ final class HomeViewModel: ObservableObject {
         service: AIServiceStub = AIServiceStub(),
         tradeService: MockTradeDataService = MockTradeDataService(),
         speechService: SpeechRecognitionService = SpeechRecognitionService(),
-        historyService: ConversationHistoryService = .shared
+        historyService: ConversationHistoryService = .shared,
+        outlookEngine: OutlookEngine = OutlookEngine()
     ) {
         self.service = service
         self.tradeService = tradeService
         self.speechService = speechService
         self.historyService = historyService
+        self.outlookEngine = outlookEngine
         self.conversationHistory = historyService.recentEntries(limit: 10)
         loadRecentSearches()
         loadGuidedSuggestions()
@@ -122,6 +129,7 @@ final class HomeViewModel: ObservableObject {
             priceHistory = nil
             tickerInfo = nil
             detectedTicker = nil
+            outlook = nil
             return
         }
 
@@ -138,11 +146,26 @@ final class HomeViewModel: ObservableObject {
             tickerInfo = nil
         }
         
+        // Check if this is an outlook-type query
+        let shouldShowOutlook = shouldGenerateOutlook(for: trimmed)
+        
         // Simulate brief loading for AI response
         Task {
             try? await Task.sleep(nanoseconds: 300_000_000)
             let aiResponse = service.structuredResponse(for: trimmed)
             response = aiResponse
+            
+            // Generate outlook if applicable
+            if shouldShowOutlook, let ticker = detectedTicker {
+                outlook = await outlookEngine.generateOutlook(
+                    for: ticker,
+                    timeframeDays: extractTimeframe(from: trimmed),
+                    includePersonalContext: true
+                )
+            } else {
+                outlook = nil
+            }
+            
             isLoading = false
             
             // Save to conversation history
@@ -157,6 +180,39 @@ final class HomeViewModel: ObservableObject {
         addToRecentSearches(trimmed)
     }
     
+    /// Check if query should trigger outlook generation
+    private func shouldGenerateOutlook(for query: String) -> Bool {
+        let lowercased = query.lowercased()
+        
+        // Must have a ticker to show outlook
+        guard MockPriceService.detectTicker(in: query) != nil else {
+            return false
+        }
+        
+        // Check for outlook keywords
+        return outlookKeywords.contains { lowercased.contains($0) }
+    }
+    
+    /// Extract timeframe from query (default 30 days)
+    private func extractTimeframe(from query: String) -> Int {
+        let lowercased = query.lowercased()
+        
+        if lowercased.contains("week") || lowercased.contains("7 day") {
+            return 7
+        } else if lowercased.contains("2 week") || lowercased.contains("14 day") {
+            return 14
+        } else if lowercased.contains("3 month") || lowercased.contains("90 day") || lowercased.contains("quarter") {
+            return 90
+        } else if lowercased.contains("6 month") || lowercased.contains("180 day") {
+            return 180
+        } else if lowercased.contains("year") || lowercased.contains("12 month") || lowercased.contains("365 day") {
+            return 365
+        }
+        
+        // Default to 30 days
+        return 30
+    }
+    
     /// Load a past conversation from history
     func loadConversation(_ entry: ConversationEntry) {
         question = entry.question
@@ -168,9 +224,23 @@ final class HomeViewModel: ObservableObject {
         if let ticker = entry.detectedTicker {
             priceHistory = MockPriceService.priceHistory(for: ticker, range: .oneMonth)
             tickerInfo = TickerInfoService.info(for: ticker)
+            
+            // Regenerate outlook if applicable
+            if shouldGenerateOutlook(for: entry.question) {
+                Task {
+                    outlook = await outlookEngine.generateOutlook(
+                        for: ticker,
+                        timeframeDays: extractTimeframe(from: entry.question),
+                        includePersonalContext: true
+                    )
+                }
+            } else {
+                outlook = nil
+            }
         } else {
             priceHistory = nil
             tickerInfo = nil
+            outlook = nil
         }
     }
     
@@ -206,6 +276,7 @@ final class HomeViewModel: ObservableObject {
         priceHistory = nil
         tickerInfo = nil
         detectedTicker = nil
+        outlook = nil
         lastQuery = ""
         isLoading = false
     }

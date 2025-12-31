@@ -377,6 +377,13 @@ struct HomeView: View {
                     .transition(.opacity.combined(with: .move(edge: .top)))
             }
             
+            // Outlook card if applicable
+            if let outlook = viewModel.outlook {
+                OutlookCardView(outlook: outlook)
+                    .transition(.opacity.combined(with: .scale(scale: 0.98)))
+                    .padding(.top, 8)
+            }
+            
             // Section cards
             ForEach(Array(response.sections.enumerated()), id: \.element.id) { index, section in
                 sectionCard(section: section)
