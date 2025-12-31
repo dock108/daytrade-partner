@@ -28,6 +28,12 @@ struct ContentView: View {
                 .tabItem {
                     Label("Insights", systemImage: "lightbulb")
                 }
+
+            // Settings tab for imports and preferences.
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gearshape")
+                }
         }
     }
 }

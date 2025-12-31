@@ -65,6 +65,11 @@ class TradeService: ObservableObject {
     func addTrade(_ trade: Trade) async {
         trades.append(trade)
     }
+
+    /// Add multiple trades
+    func addTrades(_ newTrades: [Trade]) async {
+        trades.append(contentsOf: newTrades)
+    }
     
     /// Delete a trade
     func deleteTrade(_ trade: Trade) async {
