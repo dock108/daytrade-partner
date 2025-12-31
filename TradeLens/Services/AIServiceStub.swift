@@ -73,6 +73,11 @@ final class AIServiceStub {
             sections.append(personalSection)
         }
         
+        // Add subtle personal note when relevant
+        if let personalNote = buildPersonalNote(for: normalized, simple: isSimpleMode) {
+            sections.append(personalNote)
+        }
+        
         return AIResponse(
             query: question,
             sections: sections,
@@ -443,6 +448,133 @@ final class AIServiceStub {
             type: .yourContext,
             content: intro,
             bulletPoints: points
+        )
+    }
+    
+    // MARK: - Personal Note (Subtle, Contextual)
+    
+    /// Generates a subtle personal observation when relevant to the topic.
+    /// Returns nil if no relevant insight is available — notes are optional.
+    private func buildPersonalNote(for normalized: String, simple: Bool = false) -> AIResponse.Section? {
+        guard let summary else { return nil }
+        
+        // Analyze trading patterns
+        let trades = (try? tradeService.getCachedTrades()) ?? []
+        guard trades.count >= 5 else { return nil } // Need enough data
+        
+        // Determine asset type patterns
+        let etfTickers = Set(["QQQ", "SPY", "IWM", "DIA", "ARKK", "VTI", "VOO", "XLE", "XLF", "GLD", "SLV", "USO"])
+        let etfTrades = trades.filter { etfTickers.contains($0.ticker.uppercased()) }
+        let stockTrades = trades.filter { !etfTickers.contains($0.ticker.uppercased()) }
+        
+        let etfWins = etfTrades.filter { $0.realizedPnL > 0 }.count
+        let stockWins = stockTrades.filter { $0.realizedPnL > 0 }.count
+        
+        let etfWinRate = etfTrades.isEmpty ? 0 : Double(etfWins) / Double(etfTrades.count)
+        let stockWinRate = stockTrades.isEmpty ? 0 : Double(stockWins) / Double(stockTrades.count)
+        
+        // Calculate volatility behavior
+        let volatileTrades = trades.filter { abs($0.returnPct) > 0.10 } // 10%+ swings
+        let volatileWins = volatileTrades.filter { $0.realizedPnL > 0 }.count
+        let volatileWinRate = volatileTrades.isEmpty ? 0 : Double(volatileWins) / Double(volatileTrades.count)
+        
+        // Holding period patterns
+        let quickExits = trades.filter { $0.holdingDays <= 3 }
+        let quickExitWins = quickExits.filter { $0.realizedPnL > 0 }.count
+        let quickExitWinRate = quickExits.isEmpty ? 0 : Double(quickExitWins) / Double(quickExits.count)
+        
+        let longerHolds = trades.filter { $0.holdingDays > 7 }
+        let longerHoldWins = longerHolds.filter { $0.realizedPnL > 0 }.count
+        let longerHoldWinRate = longerHolds.isEmpty ? 0 : Double(longerHoldWins) / Double(longerHolds.count)
+        
+        // Generate contextual note based on topic
+        var note: String? = nil
+        
+        // ETF topics (QQQ, SPY, etc.)
+        if normalized.contains("qqq") || normalized.contains("spy") || normalized.contains("etf") {
+            if etfTrades.count >= 3 && etfWinRate > stockWinRate + 0.15 {
+                note = simple
+                    ? "You've done better with ETFs than single stocks — about \(Int(etfWinRate * 100))% wins vs \(Int(stockWinRate * 100))%."
+                    : "Historically, you've shown stronger results with ETFs (\(Int(etfWinRate * 100))% win rate) than individual stocks (\(Int(stockWinRate * 100))%)."
+            } else if etfTrades.count >= 3 && stockWinRate > etfWinRate + 0.10 {
+                note = simple
+                    ? "You've actually done better picking individual stocks than trading ETFs."
+                    : "Your track record shows stronger performance with individual stocks vs broad ETFs — something to consider."
+            }
+        }
+        
+        // Volatility-related topics (NVDA, oil, etc.)
+        if normalized.contains("nvda") || normalized.contains("nvidia") || normalized.contains("oil") || normalized.contains("volatile") {
+            if volatileTrades.count >= 3 {
+                if volatileWinRate < summary.winRate - 0.15 {
+                    note = simple
+                        ? "Quick observation: volatile swings haven't been your best trades — maybe size down on these."
+                        : "Worth noting: your win rate on high-volatility moves (\(Int(volatileWinRate * 100))%) is below your overall average — something to watch."
+                } else if volatileWinRate > summary.winRate + 0.10 {
+                    note = simple
+                        ? "Interestingly, you've handled volatile moves better than average."
+                        : "You've historically navigated volatility well, with a \(Int(volatileWinRate * 100))% win rate on higher-swing trades."
+                }
+            }
+        }
+        
+        // Holding period patterns
+        if normalized.contains("hold") || normalized.contains("timing") || normalized.contains("exit") || normalized.contains("sell") {
+            if quickExits.count >= 3 && longerHolds.count >= 3 {
+                if longerHoldWinRate > quickExitWinRate + 0.15 {
+                    note = simple
+                        ? "Patience has paid off for you — longer holds tend to work better than quick exits."
+                        : "Your data suggests patience pays: trades held 7+ days have a \(Int(longerHoldWinRate * 100))% win rate vs \(Int(quickExitWinRate * 100))% for quick exits."
+                } else if quickExitWinRate > longerHoldWinRate + 0.10 {
+                    note = simple
+                        ? "Quick trades have actually worked well for you — maybe you read momentum well."
+                        : "Interestingly, your shorter-duration trades have performed better — possibly a sign of good momentum reads."
+                }
+            }
+        }
+        
+        // Tech/growth topics
+        if normalized.contains("tech") || normalized.contains("growth") || normalized.contains("ai") {
+            let techTickers = Set(["NVDA", "AAPL", "MSFT", "GOOGL", "GOOG", "AMZN", "META", "TSLA", "AMD", "INTC", "CRM", "ADBE"])
+            let techTrades = trades.filter { techTickers.contains($0.ticker.uppercased()) }
+            let techWins = techTrades.filter { $0.realizedPnL > 0 }.count
+            let techWinRate = techTrades.isEmpty ? 0 : Double(techWins) / Double(techTrades.count)
+            
+            if techTrades.count >= 3 {
+                let otherTrades = trades.filter { !techTickers.contains($0.ticker.uppercased()) }
+                let otherWins = otherTrades.filter { $0.realizedPnL > 0 }.count
+                let otherWinRate = otherTrades.isEmpty ? 0 : Double(otherWins) / Double(otherTrades.count)
+                
+                if techWinRate > otherWinRate + 0.12 {
+                    note = simple
+                        ? "Good news: tech has been one of your stronger areas."
+                        : "Tech names have been a relative strength in your portfolio — \(Int(techWinRate * 100))% win rate."
+                } else if otherWinRate > techWinRate + 0.12 {
+                    note = simple
+                        ? "Just a thought: non-tech trades have worked better for you historically."
+                        : "Worth considering: your non-tech trades have outperformed tech names historically."
+                }
+            }
+        }
+        
+        // Early exit pattern (general)
+        if note == nil && quickExits.count >= 5 {
+            let avgQuickGain = quickExits.reduce(0.0) { $0 + $1.realizedPnL } / Double(quickExits.count)
+            let avgLongerGain = longerHolds.isEmpty ? 0 : longerHolds.reduce(0.0) { $0 + $1.realizedPnL } / Double(longerHolds.count)
+            
+            if avgLongerGain > avgQuickGain * 1.5 && longerHolds.count >= 3 {
+                note = simple
+                    ? "You tend to exit early during volatile swings — holding longer has worked better for you."
+                    : "Pattern: your quick exits during volatility tend to underperform your longer holds — something to watch."
+            }
+        }
+        
+        // Only return if we have a relevant note
+        guard let personalNote = note else { return nil }
+        
+        return AIResponse.Section(
+            type: .personalNote,
+            content: personalNote
         )
     }
 }

@@ -35,6 +35,7 @@ struct AIResponse: Identifiable {
         case historical = "Historical context"
         case recap = "Quick take"
         case yourContext = "Your trading context"
+        case personalNote = "Personal note"
         
         var icon: String {
             switch self {
@@ -44,6 +45,7 @@ struct AIResponse: Identifiable {
             case .historical: return "clock.arrow.circlepath"
             case .recap: return "text.quote"
             case .yourContext: return "person.crop.circle"
+            case .personalNote: return "heart.text.square"
             }
         }
         
@@ -55,6 +57,7 @@ struct AIResponse: Identifiable {
             case .historical: return Color(red: 0.7, green: 0.5, blue: 0.9)
             case .recap: return Color(red: 0.3, green: 0.8, blue: 0.7)
             case .yourContext: return Color(red: 0.9, green: 0.5, blue: 0.6)
+            case .personalNote: return Color(red: 0.85, green: 0.75, blue: 0.95)
             }
         }
     }

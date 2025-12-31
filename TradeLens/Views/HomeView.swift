@@ -323,6 +323,57 @@ struct HomeView: View {
     }
 
     private func sectionCard(section: AIResponse.Section) -> some View {
+        Group {
+            if section.type == .personalNote {
+                // Personal note has a softer, more subtle appearance
+                personalNoteCard(section: section)
+            } else {
+                // Standard section card
+                standardSectionCard(section: section)
+            }
+        }
+    }
+    
+    private func personalNoteCard(section: AIResponse.Section) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            // Subtle icon
+            Image(systemName: section.type.icon)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(section.type.accentColor.opacity(0.7))
+                .padding(.top, 2)
+            
+            VStack(alignment: .leading, spacing: 6) {
+                Text(section.type.rawValue)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(section.type.accentColor.opacity(0.7))
+                    .textCase(.uppercase)
+                    .tracking(0.3)
+                
+                Text(section.content)
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundStyle(Color.white.opacity(0.7))
+                    .lineSpacing(4)
+                    .italic()
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(section.type.accentColor.opacity(0.06))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(
+                            section.type.accentColor.opacity(0.12),
+                            lineWidth: 1
+                        )
+                )
+        )
+    }
+    
+    private func standardSectionCard(section: AIResponse.Section) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             // Section header
             HStack(spacing: 10) {

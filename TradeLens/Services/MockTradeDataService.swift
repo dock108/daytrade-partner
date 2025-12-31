@@ -24,11 +24,25 @@ struct MockTrade: Identifiable, Codable {
     let exitPrice: Double
     let realizedPnL: Double
     let category: MockTradeCategory
+    
+    /// Computed holding days
+    var holdingDays: Int {
+        Calendar.current.dateComponents([.day], from: entryDate, to: exitDate).day ?? 0
+    }
+    
+    /// Return percentage
+    var returnPct: Double {
+        guard entryPrice > 0 else { return 0 }
+        return (exitPrice - entryPrice) / entryPrice
+    }
 }
 
 /// Service responsible for generating mock trades
-struct MockTradeDataService {
+final class MockTradeDataService {
     private let calendar = Calendar.current
+    
+    /// Cached trades for synchronous access
+    private var cachedTrades: [MockTrade]?
 
     private let coreHoldings = ["QQQ", "SPY", "AAPL", "UNH", "BND"]
     private let speculativePlays = ["TSLA", "COIN", "NVDA", "MRNA", "VRTX", "BIIB", "SRPT", "EXEL", "CRSP", "EDIT", "NTLA"]
@@ -51,6 +65,14 @@ struct MockTradeDataService {
         "EDIT": 7,
         "NTLA": 30
     ]
+    
+    /// Returns cached trades if available (synchronous)
+    func getCachedTrades() throws -> [MockTrade] {
+        guard let trades = cachedTrades, !trades.isEmpty else {
+            throw AppError.emptyData
+        }
+        return trades
+    }
 
     /// Generate a realistic set of closed trades for UI display.
     func fetchMockTrades() async throws -> [MockTrade] {
@@ -96,6 +118,10 @@ struct MockTradeDataService {
         guard !sortedTrades.isEmpty else {
             throw AppError.emptyData
         }
+        
+        // Cache for synchronous access
+        cachedTrades = sortedTrades
+        
         return sortedTrades
     }
 
