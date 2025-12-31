@@ -11,14 +11,9 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         TabView {
-            DashboardView()
+            HomeView()
                 .tabItem {
-                    Label("Dashboard", systemImage: "chart.bar")
-                }
-
-            AskView()
-                .tabItem {
-                    Label("Ask", systemImage: "questionmark.circle")
+                    Label("Home", systemImage: "sparkles")
                 }
 
             InsightsView()
@@ -26,11 +21,17 @@ struct ContentView: View {
                     Label("Insights", systemImage: "lightbulb")
                 }
 
+            DashboardView()
+                .tabItem {
+                    Label("Dashboard", systemImage: "chart.bar")
+                }
+
             SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gearshape")
                 }
         }
+        .tint(Color(red: 0.4, green: 0.7, blue: 1.0))
     }
 }
 

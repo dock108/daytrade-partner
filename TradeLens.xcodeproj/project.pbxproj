@@ -35,6 +35,8 @@
 		TL320 /* InsightsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL321 /* InsightsService.swift */; };
 		TL322 /* MockTradeDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL323 /* MockTradeDataService.swift */; };
 		TL324 /* TradeAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL325 /* TradeAnalyticsService.swift */; };
+		TL400 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL401 /* HomeView.swift */; };
+		TL402 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL403 /* HomeViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +81,8 @@
 		TL321 /* InsightsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsService.swift; sourceTree = "<group>"; };
 		TL323 /* MockTradeDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTradeDataService.swift; sourceTree = "<group>"; };
 		TL325 /* TradeAnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeAnalyticsService.swift; sourceTree = "<group>"; };
+		TL401 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		TL403 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +164,7 @@
 			isa = PBXGroup;
 			children = (
 				TL004 /* ContentView.swift */,
+				TL401 /* HomeView.swift */,
 				TL208 /* SettingsView.swift */,
 				TL301 /* DashboardView.swift */,
 				TL303 /* TradeDetailView.swift */,
@@ -174,6 +179,7 @@
 			isa = PBXGroup;
 			children = (
 				TL014 /* TradeListViewModel.swift */,
+				TL403 /* HomeViewModel.swift */,
 				TL207 /* SettingsViewModel.swift */,
 				TL311 /* DashboardViewModel.swift */,
 				TL313 /* InsightsViewModel.swift */,
@@ -341,6 +347,8 @@
 				TL200 /* AppError.swift in Sources */,
 				TL001 /* TradeLensApp.swift in Sources */,
 				TL100 /* UserSummary.swift in Sources */,
+				TL400 /* HomeView.swift in Sources */,
+				TL402 /* HomeViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
