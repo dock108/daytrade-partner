@@ -1,19 +1,25 @@
-# daytrade-partner
+# TradeLens
+
+A clean, modern iOS trading companion app built with SwiftUI.
 
 ## Overview
 
-This repository contains the TradeLens iOS trading companion app built with SwiftUI.
+TradeLens is designed to be a powerful yet simple trading partner application. It provides a clean foundation for tracking trades, analyzing performance, and making informed trading decisions.
 
 ## Local Setup
 
-1. Open `TradeLens/TradeLens.xcodeproj` in Xcode.
-2. Select a target device or simulator.
+1. Open `TradeLens.xcodeproj` in Xcode.
+2. Select your target device or simulator.
 3. Press `Cmd + R` to build and run.
 
 ## Deployment Basics
 
-Create an Xcode Archive (`Product > Archive`) and distribute it through the Organizer for TestFlight or the App Store.
+Create an Xcode Archive (`Product > Archive`) and distribute the build through the Organizer for TestFlight or the App Store.
 
 ## Documentation
 
-For app-specific details, see [`TradeLens/README.md`](TradeLens/README.md). Architecture notes and development guidelines are in [`TradeLens/docs/PROJECT_GUIDE.md`](TradeLens/docs/PROJECT_GUIDE.md).
+Extended architecture notes, development guidelines, and project structure live in [`docs/PROJECT_GUIDE.md`](docs/PROJECT_GUIDE.md).
+
+---
+
+Built with ♥️ using SwiftUI
