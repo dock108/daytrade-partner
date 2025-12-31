@@ -2,7 +2,7 @@
 //  InsightsView.swift
 //  TradeLens
 //
-//  Patterns & Insights screen.
+//  Patterns & Insights screen — uses ScreenContainerView for consistent styling.
 //
 
 import SwiftUI
@@ -11,97 +11,252 @@ struct InsightsView: View {
     @StateObject private var viewModel = InsightsViewModel()
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    headerSection
-                    if let errorMessage = viewModel.errorMessage {
-                        errorStateView(message: errorMessage) {
-                            Task {
-                                await viewModel.loadInsights()
-                            }
+        ScreenContainerView(
+            title: "Insights",
+            subtitle: "Patterns from your trading activity"
+        ) {
+            VStack(alignment: .leading, spacing: 24) {
+                if let errorMessage = viewModel.errorMessage {
+                    errorStateView(message: errorMessage) {
+                        Task {
+                            await viewModel.loadInsights()
                         }
-                    } else if viewModel.isLoading {
-                        Text("Loading insights...")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        insightCards
-                        tradesSection
                     }
+                } else if viewModel.isLoading {
+                    loadingState
+                } else {
+                    insightCards
+                    tradesSection
                 }
-                .padding()
             }
-            .navigationTitle("Insights")
         }
+    }
+    
+    // MARK: - Loading State
+    
+    private var loadingState: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: Theme.colors.accentBlue))
+                .scaleEffect(1.2)
+            
+            Text("Analyzing patterns...")
+                .font(.subheadline)
+                .foregroundStyle(Theme.colors.textTertiary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 60)
     }
 
-    private var headerSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Patterns & insights")
-                .font(.title2)
-                .fontWeight(.semibold)
-            Text("Personalized observations from your recent activity.")
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
+    // MARK: - Insight Cards
 
     private var insightCards: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
+            ScreenSectionHeader("Key Observations", icon: "lightbulb.fill")
+            
             if viewModel.insights.isEmpty {
-                Text("No insights yet.")
-                    .foregroundStyle(.secondary)
-            }
-            ForEach(viewModel.insights) { insight in
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(insight.title)
-                        .font(.headline)
-                    Text(insight.subtitle)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(insight.detail)
-                        .font(.body)
+                emptyInsightsCard
+            } else {
+                ForEach(viewModel.insights) { insight in
+                    insightCard(insight)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(Color(.secondarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
             }
         }
     }
+    
+    private var emptyInsightsCard: some View {
+        ScreenCard {
+            HStack(spacing: 14) {
+                ZStack {
+                    Circle()
+                        .fill(Theme.colors.textQuaternary.opacity(0.2))
+                        .frame(width: 44, height: 44)
+                    
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 18))
+                        .foregroundStyle(Theme.colors.textQuaternary)
+                }
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("No insights yet")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(Theme.colors.textSecondary)
+                    
+                    Text("Add more trades to see personalized patterns")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Theme.colors.textTertiary)
+                }
+            }
+        }
+    }
+    
+    private func insightCard(_ insight: InsightsViewModel.Insight) -> some View {
+        ScreenCard(accent: accentColor(for: insight.title)) {
+            VStack(alignment: .leading, spacing: 10) {
+                // Header
+                HStack(spacing: 10) {
+                    ZStack {
+                        Circle()
+                            .fill(accentColor(for: insight.title).opacity(0.15))
+                            .frame(width: 36, height: 36)
+                        
+                        Image(systemName: icon(for: insight.title))
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(accentColor(for: insight.title))
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(insight.title)
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Theme.colors.textPrimary)
+                        
+                        Text(insight.subtitle)
+                            .font(.system(size: 11))
+                            .foregroundStyle(Theme.colors.textTertiary)
+                    }
+                }
+                
+                // Detail
+                Text(insight.detail)
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.colors.textSecondary)
+                    .lineSpacing(4)
+            }
+        }
+    }
+    
+    private func accentColor(for title: String) -> Color {
+        switch title.lowercased() {
+        case let t where t.contains("win"):
+            return Theme.colors.accentGreen
+        case let t where t.contains("hold") || t.contains("time"):
+            return Theme.colors.accentBlue
+        case let t where t.contains("risk") || t.contains("loss"):
+            return Theme.colors.accentOrange
+        case let t where t.contains("best") || t.contains("strong"):
+            return Theme.colors.accentGreen
+        default:
+            return Theme.colors.accentPurple
+        }
+    }
+    
+    private func icon(for title: String) -> String {
+        switch title.lowercased() {
+        case let t where t.contains("win"):
+            return "trophy.fill"
+        case let t where t.contains("hold") || t.contains("time"):
+            return "clock.fill"
+        case let t where t.contains("risk"):
+            return "exclamationmark.triangle.fill"
+        case let t where t.contains("best"):
+            return "star.fill"
+        default:
+            return "lightbulb.fill"
+        }
+    }
+
+    // MARK: - Trades Section
 
     private var tradesSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Trade details")
-                .font(.headline)
-
+        VStack(alignment: .leading, spacing: 16) {
+            ScreenSectionHeader("Recent Trades", icon: "clock.arrow.circlepath")
+            
             if viewModel.trades.isEmpty {
-                Text("No trades available.")
-                    .foregroundStyle(.secondary)
+                ScreenCard {
+                    Text("No trades yet")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Theme.colors.textTertiary)
+                }
             } else {
-                ForEach(viewModel.trades.prefix(5)) { trade in
-                    NavigationLink {
-                        TradeDetailView(trade: trade)
-                    } label: {
-                        TradeRowView(trade: trade)
+                ScreenCard {
+                    VStack(spacing: 0) {
+                        ForEach(Array(viewModel.trades.prefix(5).enumerated()), id: \.element.id) { index, trade in
+                            NavigationLink {
+                                TradeDetailView(trade: trade)
+                            } label: {
+                                tradeRow(trade)
+                            }
+                            .buttonStyle(.plain)
+                            
+                            if index < min(4, viewModel.trades.count - 1) {
+                                Divider()
+                                    .background(Theme.colors.divider)
+                                    .padding(.leading, 54)
+                            }
+                        }
                     }
-                    .buttonStyle(.plain)
                 }
             }
         }
     }
+    
+    private func tradeRow(_ trade: MockTrade) -> some View {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(trade.realizedPnL >= 0 ? Theme.colors.accentGreen.opacity(0.15) : Theme.colors.accentRed.opacity(0.15))
+                    .frame(width: 40, height: 40)
+                
+                Image(systemName: trade.realizedPnL >= 0 ? "arrow.up.right" : "arrow.down.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(trade.realizedPnL >= 0 ? Theme.colors.accentGreen : Theme.colors.accentRed)
+            }
+            
+            VStack(alignment: .leading, spacing: 3) {
+                Text(trade.ticker)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Theme.colors.textPrimary)
+                
+                Text("\(trade.holdingDays) days")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.colors.textTertiary)
+            }
+            
+            Spacer()
+            
+            Text(CurrencyFormatter.formatUSD(trade.realizedPnL))
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(trade.realizedPnL >= 0 ? Theme.colors.accentGreen : Theme.colors.accentRed)
+            
+            Image(systemName: "chevron.right")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Theme.colors.textQuaternary)
+        }
+        .padding(.vertical, 12)
+    }
+
+    // MARK: - Error State
 
     private func errorStateView(message: String, retry: @escaping () -> Void) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(message)
-                .foregroundStyle(.secondary)
-            Button("Retry", action: retry)
-                .buttonStyle(.bordered)
+        ScreenCard(accent: Theme.colors.accentOrange) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 10) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 18))
+                        .foregroundStyle(Theme.colors.accentOrange)
+                    
+                    Text("Something went wrong")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Theme.colors.textPrimary)
+                }
+                
+                Text(message)
+                    .font(.system(size: 13))
+                    .foregroundStyle(Theme.colors.textTertiary)
+                
+                Button(action: retry) {
+                    Text("Try Again")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Theme.colors.accentBlue)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            Capsule()
+                                .fill(Theme.colors.accentBlue.opacity(0.15))
+                        )
+                }
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
 
