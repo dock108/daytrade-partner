@@ -10,7 +10,7 @@ import SwiftUI
 /// Main view of the application
 struct ContentView: View {
     var body: some View {
-        DashboardView()
+        AskView()
     }
 }
 
