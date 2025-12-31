@@ -11,25 +11,21 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         TabView {
-            // Dashboard summary tab.
             DashboardView()
                 .tabItem {
                     Label("Dashboard", systemImage: "chart.bar")
                 }
 
-            // Ask tab for quick questions.
             AskView()
                 .tabItem {
                     Label("Ask", systemImage: "questionmark.circle")
                 }
 
-            // Insights tab for pattern summaries.
             InsightsView()
                 .tabItem {
                     Label("Insights", systemImage: "lightbulb")
                 }
 
-            // Settings tab for imports and preferences.
             SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gearshape")
@@ -38,7 +34,6 @@ struct ContentView: View {
     }
 }
 
-/// Preview provider for ContentView
 #Preview {
     ContentView()
 }

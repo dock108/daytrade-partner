@@ -20,7 +20,6 @@ class TradeService: ObservableObject {
         defer { isLoading = false }
 
         do {
-            // Simulate network delay.
             try await Task.sleep(nanoseconds: 1_000_000_000)
         } catch is CancellationError {
             throw CancellationError()
@@ -28,7 +27,6 @@ class TradeService: ObservableObject {
             throw AppError(error)
         }
 
-        // Example trades
         let calendar = Calendar.current
         let now = Date()
         let aaplEntry = calendar.date(byAdding: .day, value: -12, to: now) ?? now
