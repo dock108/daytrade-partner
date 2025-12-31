@@ -17,6 +17,7 @@ final class InsightsViewModel: ObservableObject {
     }
 
     @Published var insights: [Insight] = []
+    @Published var trades: [MockTrade] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
 
@@ -36,18 +37,21 @@ final class InsightsViewModel: ObservableObject {
 
     func loadInsights() async {
         isLoading = true
+        defer { isLoading = false }
         errorMessage = nil
         insights = []
+        trades = []
 
         do {
             let trades = try await tradeService.fetchMockTrades()
+            self.trades = trades
             let items = insightsService.generateInsights(from: trades)
             insights = items.map { Insight(title: $0.title, subtitle: $0.subtitle, detail: $0.detail) }
+        } catch is CancellationError {
+            return
         } catch {
             let appError = AppError(error)
             errorMessage = appError.userMessage
         }
-
-        isLoading = false
     }
 }

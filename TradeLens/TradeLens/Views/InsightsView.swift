@@ -26,6 +26,7 @@ struct InsightsView: View {
                             .foregroundStyle(.secondary)
                     } else {
                         insightCards
+                        tradesSection
                     }
                 }
                 .padding()
@@ -65,6 +66,27 @@ struct InsightsView: View {
                 .padding()
                 .background(Color(.secondarySystemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+        }
+    }
+
+    private var tradesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Trade details")
+                .font(.headline)
+
+            if viewModel.trades.isEmpty {
+                Text("No trades available.")
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(viewModel.trades.prefix(5)) { trade in
+                    NavigationLink {
+                        TradeDetailView(trade: trade)
+                    } label: {
+                        TradeRowView(trade: trade)
+                    }
+                    .buttonStyle(.plain)
+                }
             }
         }
     }

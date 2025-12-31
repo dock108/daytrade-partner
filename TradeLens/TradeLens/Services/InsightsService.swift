@@ -8,6 +8,12 @@
 import Foundation
 
 struct InsightsService {
+    private let analyticsService: TradeAnalyticsService
+
+    init(analyticsService: TradeAnalyticsService = TradeAnalyticsService()) {
+        self.analyticsService = analyticsService
+    }
+
     struct InsightItem {
         let title: String
         let subtitle: String
@@ -44,7 +50,7 @@ struct InsightsService {
         ]
 
         let grouped = Dictionary(grouping: trades) { trade in
-            let days = holdingDays(for: trade)
+            let days = analyticsService.holdingDays(for: trade)
             return ranges.first { $0.range.contains(days) }?.label ?? "46+"
         }
 
@@ -117,8 +123,8 @@ struct InsightsService {
             )
         }
 
-        let winningAverage = averageHoldingDays(for: winningTrades)
-        let losingAverage = averageHoldingDays(for: losingTrades)
+        let winningAverage = analyticsService.averageHoldingDays(for: winningTrades)
+        let losingAverage = analyticsService.averageHoldingDays(for: losingTrades)
         let detail: String
         if winningAverage < losingAverage {
             detail = "You tend to cut winners faster than losers — this increases drawdowns."
@@ -203,16 +209,6 @@ struct InsightsService {
             subtitle: "Speculative vs core PnL contribution",
             detail: detail
         )
-    }
-
-    private func averageHoldingDays(for trades: [MockTrade]) -> Double {
-        let totalDays = trades.reduce(0) { $0 + holdingDays(for: $1) }
-        return trades.isEmpty ? 0 : Double(totalDays) / Double(trades.count)
-    }
-
-    private func holdingDays(for trade: MockTrade) -> Int {
-        let components = Calendar.current.dateComponents([.day], from: trade.entryDate, to: trade.exitDate)
-        return max(1, components.day ?? 1)
     }
 
     private func isHighVolatility(trade: MockTrade) -> Bool {

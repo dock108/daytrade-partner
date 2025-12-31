@@ -17,9 +17,14 @@ final class DashboardViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private let tradeService: MockTradeDataService
+    private let analyticsService: TradeAnalyticsService
 
-    init(tradeService: MockTradeDataService = MockTradeDataService()) {
+    init(
+        tradeService: MockTradeDataService = MockTradeDataService(),
+        analyticsService: TradeAnalyticsService = TradeAnalyticsService()
+    ) {
         self.tradeService = tradeService
+        self.analyticsService = analyticsService
         Task {
             await loadDashboard()
         }
@@ -27,6 +32,7 @@ final class DashboardViewModel: ObservableObject {
 
     func loadDashboard() async {
         isLoading = true
+        defer { isLoading = false }
         errorMessage = nil
         summary = nil
         riskMessage = ""
@@ -37,13 +43,13 @@ final class DashboardViewModel: ObservableObject {
             let summary = buildSummary(from: trades)
             self.summary = summary
             riskMessage = message(for: summary.speculativePercent)
+        } catch is CancellationError {
+            return
         } catch {
             let appError = AppError(error)
             errorMessage = appError.userMessage
             trades = []
         }
-
-        isLoading = false
     }
 
     private func buildSummary(from trades: [MockTrade]) -> UserSummary {
@@ -51,9 +57,9 @@ final class DashboardViewModel: ObservableObject {
         let wins = trades.filter { $0.realizedPnL > 0 }.count
         let winRate = totalTrades > 0 ? Double(wins) / Double(totalTrades) : 0
         let realizedPnLTotal = trades.reduce(0) { $0 + $1.realizedPnL }
-        let avgHoldDays = averageHoldDays(for: trades)
-        let speculativePercent = speculativeShare(for: trades)
-        let (bestTicker, worstTicker) = tickerExtremes(for: trades)
+        let avgHoldDays = analyticsService.averageHoldingDays(for: trades)
+        let speculativePercent = analyticsService.speculativeShare(for: trades)
+        let (bestTicker, worstTicker) = analyticsService.tickerExtremes(for: trades)
 
         return UserSummary(
             totalTrades: totalTrades,
@@ -64,30 +70,6 @@ final class DashboardViewModel: ObservableObject {
             speculativePercent: speculativePercent,
             realizedPnLTotal: realizedPnLTotal
         )
-    }
-
-    private func averageHoldDays(for trades: [MockTrade]) -> Double {
-        guard !trades.isEmpty else { return 0 }
-        let totalDays = trades.reduce(0) { partial, trade in
-            let days = Calendar.current.dateComponents([.day], from: trade.entryDate, to: trade.exitDate).day ?? 0
-            return partial + days
-        }
-        return Double(totalDays) / Double(trades.count)
-    }
-
-    private func speculativeShare(for trades: [MockTrade]) -> Double {
-        guard !trades.isEmpty else { return 0 }
-        let speculativeCount = trades.filter { $0.category == .speculative }.count
-        return Double(speculativeCount) / Double(trades.count)
-    }
-
-    private func tickerExtremes(for trades: [MockTrade]) -> (String?, String?) {
-        guard !trades.isEmpty else { return (nil, nil) }
-        let totals = trades.reduce(into: [String: Double]()) { result, trade in
-            result[trade.ticker, default: 0] += trade.realizedPnL
-        }
-        let sortedTotals = totals.sorted { $0.value < $1.value }
-        return (sortedTotals.last?.key, sortedTotals.first?.key)
     }
 
     private func message(for speculativePercent: Double) -> String {

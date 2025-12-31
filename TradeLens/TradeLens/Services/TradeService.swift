@@ -22,6 +22,8 @@ class TradeService: ObservableObject {
         do {
             // Simulate network delay.
             try await Task.sleep(nanoseconds: 1_000_000_000)
+        } catch is CancellationError {
+            throw CancellationError()
         } catch {
             throw AppError(error)
         }

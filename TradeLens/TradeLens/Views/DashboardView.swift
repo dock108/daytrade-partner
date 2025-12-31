@@ -29,6 +29,7 @@ struct DashboardView: View {
                         statsSection(summary: summary)
                         insightSection(summary: summary)
                         tickerSection(summary: summary)
+                        tradesSection
                     } else {
                         Text("No summary available.")
                             .foregroundStyle(.secondary)
@@ -90,6 +91,27 @@ struct DashboardView: View {
         .padding()
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var tradesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Recent trades")
+                .font(.headline)
+
+            if viewModel.trades.isEmpty {
+                Text("No trades yet.")
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(viewModel.trades.prefix(5)) { trade in
+                    NavigationLink {
+                        TradeDetailView(trade: trade)
+                    } label: {
+                        TradeRowView(trade: trade)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
     }
 
     private func statRow(title: String, value: String) -> some View {
