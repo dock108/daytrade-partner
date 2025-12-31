@@ -19,6 +19,7 @@ final class HomeViewModel: ObservableObject {
     @Published var recentSearches: [String] = []
     @Published var isLoading: Bool = false
     @Published var guidedSuggestions: [GuidedSuggestion] = []
+    @Published var conversationHistory: [ConversationEntry] = []
     
     // Voice input state
     @Published var isListening: Bool = false
@@ -27,6 +28,7 @@ final class HomeViewModel: ObservableObject {
     private let service: AIServiceStub
     private let tradeService: MockTradeDataService
     private let speechService: SpeechRecognitionService
+    private let historyService: ConversationHistoryService
     private let maxRecentSearches = 5
     private let recentSearchesKey = "TradeLens.RecentSearches"
     
@@ -48,11 +50,14 @@ final class HomeViewModel: ObservableObject {
     init(
         service: AIServiceStub = AIServiceStub(),
         tradeService: MockTradeDataService = MockTradeDataService(),
-        speechService: SpeechRecognitionService = SpeechRecognitionService()
+        speechService: SpeechRecognitionService = SpeechRecognitionService(),
+        historyService: ConversationHistoryService = .shared
     ) {
         self.service = service
         self.tradeService = tradeService
         self.speechService = speechService
+        self.historyService = historyService
+        self.conversationHistory = historyService.recentEntries(limit: 10)
         loadRecentSearches()
         loadGuidedSuggestions()
     }
@@ -136,11 +141,48 @@ final class HomeViewModel: ObservableObject {
         // Simulate brief loading for AI response
         Task {
             try? await Task.sleep(nanoseconds: 300_000_000)
-            response = service.structuredResponse(for: trimmed)
+            let aiResponse = service.structuredResponse(for: trimmed)
+            response = aiResponse
             isLoading = false
+            
+            // Save to conversation history
+            historyService.save(
+                question: trimmed,
+                response: aiResponse,
+                detectedTicker: detectedTicker
+            )
+            refreshConversationHistory()
         }
         
         addToRecentSearches(trimmed)
+    }
+    
+    /// Load a past conversation from history
+    func loadConversation(_ entry: ConversationEntry) {
+        question = entry.question
+        lastQuery = entry.question
+        response = entry.toAIResponse()
+        detectedTicker = entry.detectedTicker
+        
+        // Reload price data and ticker info if applicable
+        if let ticker = entry.detectedTicker {
+            priceHistory = MockPriceService.priceHistory(for: ticker, range: .oneMonth)
+            tickerInfo = TickerInfoService.info(for: ticker)
+        } else {
+            priceHistory = nil
+            tickerInfo = nil
+        }
+    }
+    
+    /// Refresh the conversation history list
+    func refreshConversationHistory() {
+        conversationHistory = historyService.recentEntries(limit: 10)
+    }
+    
+    /// Delete a conversation entry
+    func deleteConversation(_ entry: ConversationEntry) {
+        historyService.delete(entry)
+        refreshConversationHistory()
     }
 
     func selectSuggestion(_ suggestion: GuidedSuggestion) {

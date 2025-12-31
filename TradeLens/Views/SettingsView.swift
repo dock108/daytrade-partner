@@ -10,6 +10,8 @@ import SwiftUI
 struct SettingsView: View {
     @StateObject private var viewModel = SettingsViewModel()
     @ObservedObject private var userSettings = UserSettings.shared
+    @ObservedObject private var historyService = ConversationHistoryService.shared
+    @State private var showClearHistoryAlert = false
 
     var body: some View {
         NavigationStack {
@@ -30,6 +32,34 @@ struct SettingsView: View {
                     Text("AI Responses")
                 } footer: {
                     Text("When enabled, TradeLens explains things in plain English that anyone can understand.")
+                }
+                
+                // Conversation History Section
+                Section {
+                    Button(role: .destructive) {
+                        showClearHistoryAlert = true
+                    } label: {
+                        HStack {
+                            Text("Clear Conversation History")
+                            Spacer()
+                            Text("\(historyService.count) saved")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .disabled(historyService.count == 0)
+                } header: {
+                    Text("History")
+                } footer: {
+                    Text("Your questions and answers are stored locally on this device. No account needed.")
+                }
+                .alert("Clear Conversation History?", isPresented: $showClearHistoryAlert) {
+                    Button("Cancel", role: .cancel) { }
+                    Button("Clear All", role: .destructive) {
+                        historyService.clearHistory()
+                    }
+                } message: {
+                    Text("This will remove all \(historyService.count) saved questions and answers. This cannot be undone.")
                 }
                 
                 // Import Section

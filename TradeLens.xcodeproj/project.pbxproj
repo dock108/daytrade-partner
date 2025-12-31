@@ -46,6 +46,7 @@
 		TL416 /* TickerSnapshotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL417 /* TickerSnapshotCard.swift */; };
 		TL418 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL419 /* UserSettings.swift */; };
 		TL420 /* SpeechRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL421 /* SpeechRecognitionService.swift */; };
+		TL422 /* ConversationHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL423 /* ConversationHistory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +102,7 @@
 		TL417 /* TickerSnapshotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerSnapshotCard.swift; sourceTree = "<group>"; };
 		TL419 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
 		TL421 /* SpeechRecognitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognitionService.swift; sourceTree = "<group>"; };
+		TL423 /* ConversationHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationHistory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,6 +166,7 @@
 				TL405 /* AIResponse.swift */,
 				TL407 /* PriceData.swift */,
 				TL413 /* TickerInfo.swift */,
+				TL423 /* ConversationHistory.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -385,6 +388,7 @@
 				TL416 /* TickerSnapshotCard.swift in Sources */,
 				TL418 /* UserSettings.swift in Sources */,
 				TL420 /* SpeechRecognitionService.swift in Sources */,
+				TL422 /* ConversationHistory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

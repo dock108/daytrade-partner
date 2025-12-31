@@ -49,7 +49,12 @@ struct HomeView: View {
                             suggestedChips
                                 .padding(.top, 28)
 
-                            if !viewModel.recentSearches.isEmpty {
+                            if !viewModel.conversationHistory.isEmpty {
+                                conversationHistorySection
+                                    .padding(.top, 32)
+                            }
+                            
+                            if !viewModel.recentSearches.isEmpty && viewModel.conversationHistory.isEmpty {
                                 recentSearchesSection
                                     .padding(.top, 40)
                             }
@@ -641,6 +646,124 @@ struct HomeView: View {
         }
     }
 
+    // MARK: - Conversation History
+    
+    private var conversationHistorySection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                HStack(spacing: 6) {
+                    Image(systemName: "bubble.left.and.bubble.right.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.7))
+                    
+                    Text("Recent Questions")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundStyle(Color.white.opacity(0.5))
+                        .textCase(.uppercase)
+                        .tracking(0.5)
+                }
+                
+                Spacer()
+            }
+            
+            VStack(spacing: 10) {
+                ForEach(viewModel.conversationHistory.prefix(5)) { entry in
+                    conversationEntryCard(entry)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    private func conversationEntryCard(_ entry: ConversationEntry) -> some View {
+        Button {
+            viewModel.loadConversation(entry)
+        } label: {
+            VStack(alignment: .leading, spacing: 8) {
+                // Question
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: "text.bubble.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.6))
+                        .padding(.top, 2)
+                    
+                    Text(entry.question)
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(Color.white.opacity(0.85))
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                    
+                    Spacer()
+                }
+                
+                // Metadata row
+                HStack(spacing: 12) {
+                    // Ticker badge if detected
+                    if let ticker = entry.detectedTicker {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chart.line.uptrend.xyaxis")
+                                .font(.system(size: 9))
+                            Text(ticker)
+                                .font(.system(size: 11, weight: .semibold))
+                        }
+                        .foregroundStyle(Color(red: 0.5, green: 0.85, blue: 0.6))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(Color(red: 0.5, green: 0.85, blue: 0.6).opacity(0.12))
+                        )
+                    }
+                    
+                    Spacer()
+                    
+                    // Timestamp
+                    Text(relativeTimeString(entry.timestamp))
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color.white.opacity(0.35))
+                    
+                    // Arrow
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(Color.white.opacity(0.25))
+                }
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color.white.opacity(0.05))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                    )
+            )
+        }
+        .buttonStyle(ConversationCardButtonStyle())
+    }
+    
+    private func relativeTimeString(_ date: Date) -> String {
+        let now = Date()
+        let interval = now.timeIntervalSince(date)
+        
+        if interval < 60 {
+            return "Just now"
+        } else if interval < 3600 {
+            let minutes = Int(interval / 60)
+            return "\(minutes)m ago"
+        } else if interval < 86400 {
+            let hours = Int(interval / 3600)
+            return "\(hours)h ago"
+        } else if interval < 604800 {
+            let days = Int(interval / 86400)
+            return "\(days)d ago"
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MMM d"
+            return formatter.string(from: date)
+        }
+    }
+
     // MARK: - Recent Searches
 
     private var recentSearchesSection: some View {
@@ -784,6 +907,15 @@ struct MicButtonStyle: ButtonStyle {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
             .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
+    }
+}
+
+struct ConversationCardButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .opacity(configuration.isPressed ? 0.85 : 1.0)
+            .animation(.easeInOut(duration: 0.12), value: configuration.isPressed)
     }
 }
 
