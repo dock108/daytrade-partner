@@ -16,22 +16,8 @@ struct HomeView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Gradient background
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.06, green: 0.09, blue: 0.16),
-                        Color(red: 0.08, green: 0.12, blue: 0.22),
-                        Color(red: 0.05, green: 0.08, blue: 0.14)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-
-                // Subtle grid pattern overlay
-                gridPattern
-                    .opacity(0.03)
-                    .ignoresSafeArea()
+                // Themed background with grid
+                AppGridBackgroundView()
 
                 ScrollView {
                     VStack(spacing: 0) {
@@ -96,15 +82,15 @@ struct HomeView: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                Color(red: 0.4, green: 0.7, blue: 1.0),
-                                Color(red: 0.3, green: 0.5, blue: 0.9)
+                                Theme.colors.accentBlue,
+                                Theme.colors.accentBlueDark
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
                     .frame(width: 64, height: 64)
-                    .shadow(color: Color(red: 0.3, green: 0.5, blue: 0.9).opacity(0.4), radius: 20, y: 8)
+                    .shadow(color: Theme.colors.accentBlueDark.opacity(0.4), radius: 20, y: 8)
 
                 Image(systemName: "chart.line.uptrend.xyaxis")
                     .font(.system(size: 28, weight: .medium))
@@ -138,7 +124,7 @@ struct HomeView: View {
                     .foregroundStyle(Color.white.opacity(0.35)))
                     .font(.system(size: 17))
                     .foregroundStyle(.white)
-                    .tint(Color(red: 0.4, green: 0.7, blue: 1.0))
+                    .tint(Theme.colors.accentBlue)
                     .focused($isSearchFocused)
                     .submitLabel(.search)
                     .onSubmit {
@@ -173,7 +159,7 @@ struct HomeView: View {
                                 viewModel.isListening
                                     ? Color(red: 1.0, green: 0.4, blue: 0.4).opacity(0.5)
                                     : (isSearchFocused
-                                        ? Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.5)
+                                        ? Theme.colors.accentBlue.opacity(0.5)
                                         : Color.white.opacity(0.1)),
                                 lineWidth: 1
                             )
@@ -314,7 +300,7 @@ struct HomeView: View {
                 .foregroundStyle(Color.white.opacity(0.35)))
                 .font(.system(size: 16))
                 .foregroundStyle(.white)
-                .tint(Color(red: 0.4, green: 0.7, blue: 1.0))
+                .tint(Theme.colors.accentBlue)
                 .submitLabel(.search)
                 .onSubmit {
                     viewModel.submit()
@@ -347,7 +333,7 @@ struct HomeView: View {
     private var loadingState: some View {
         VStack(spacing: 16) {
             ProgressView()
-                .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 0.4, green: 0.7, blue: 1.0)))
+                .progressViewStyle(CircularProgressViewStyle(tint: Theme.colors.accentBlue))
                 .scaleEffect(1.2)
             
             Text("Analyzing...")
@@ -432,8 +418,8 @@ struct HomeView: View {
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    Color(red: 0.95, green: 0.85, blue: 0.55),
-                                    Color(red: 0.85, green: 0.65, blue: 0.35)
+                                    Theme.colors.accentGold,
+                                    Color(red: 0.85, green: 0.65, blue: 0.35) // Theme gold variant
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -449,13 +435,13 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("The Story")
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Color(red: 0.95, green: 0.85, blue: 0.55).opacity(0.7))
+                        .foregroundStyle(Theme.colors.accentGold.opacity(0.7))
                         .textCase(.uppercase)
                         .tracking(0.5)
                     
                     Text("Here's what's really going on")
                         .font(.system(size: 15, weight: .bold))
-                        .foregroundStyle(Color(red: 0.95, green: 0.85, blue: 0.55))
+                        .foregroundStyle(Theme.colors.accentGold)
                 }
                 
                 Spacer()
@@ -475,8 +461,8 @@ struct HomeView: View {
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color(red: 0.95, green: 0.85, blue: 0.55).opacity(0.08),
-                            Color(red: 0.85, green: 0.65, blue: 0.35).opacity(0.04)
+                            Theme.colors.accentGold.opacity(0.08),
+                            Color(red: 0.85, green: 0.65, blue: 0.35) // Theme gold variant.opacity(0.04)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -487,8 +473,8 @@ struct HomeView: View {
                         .strokeBorder(
                             LinearGradient(
                                 colors: [
-                                    Color(red: 0.95, green: 0.85, blue: 0.55).opacity(0.25),
-                                    Color(red: 0.85, green: 0.65, blue: 0.35).opacity(0.08)
+                                    Theme.colors.accentGold.opacity(0.25),
+                                    Color(red: 0.85, green: 0.65, blue: 0.35) // Theme gold variant.opacity(0.08)
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -646,8 +632,8 @@ struct HomeView: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                Color(red: 0.4, green: 0.7, blue: 1.0),
-                                Color(red: 0.3, green: 0.5, blue: 0.9)
+                                Theme.colors.accentBlue,
+                                Theme.colors.accentBlueDark
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -688,12 +674,12 @@ struct HomeView: View {
             Text("Simple")
                 .font(.system(size: 10, weight: .bold))
         }
-        .foregroundStyle(Color(red: 0.5, green: 0.85, blue: 0.6))
+        .foregroundStyle(Theme.colors.accentGreenMuted)
         .padding(.horizontal, 6)
         .padding(.vertical, 3)
         .background(
             Capsule()
-                .fill(Color(red: 0.5, green: 0.85, blue: 0.6).opacity(0.15))
+                .fill(Theme.colors.accentGreenMuted.opacity(0.15))
         )
     }
 
@@ -880,11 +866,11 @@ struct HomeView: View {
     private func iconColor(for category: HomeViewModel.GuidedSuggestion.Category) -> Color {
         switch category {
         case .ticker:
-            return Color(red: 0.4, green: 0.7, blue: 1.0)
+            return Theme.colors.accentBlue
         case .market:
-            return Color(red: 0.9, green: 0.7, blue: 0.3)
+            return Theme.colors.accentOrange
         case .learning:
-            return Color(red: 0.5, green: 0.85, blue: 0.6)
+            return Theme.colors.accentGreenMuted
         }
     }
 
@@ -896,7 +882,7 @@ struct HomeView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "bubble.left.and.bubble.right.fill")
                         .font(.system(size: 12))
-                        .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.7))
+                        .foregroundStyle(Theme.colors.accentBlue.opacity(0.7))
                     
                     Text("Recent Questions")
                         .font(.caption)
@@ -927,7 +913,7 @@ struct HomeView: View {
                 HStack(alignment: .top, spacing: 10) {
                     Image(systemName: "text.bubble.fill")
                         .font(.system(size: 12))
-                        .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.6))
+                        .foregroundStyle(Theme.colors.accentBlue.opacity(0.6))
                         .padding(.top, 2)
                     
                     Text(entry.question)
@@ -949,12 +935,12 @@ struct HomeView: View {
                             Text(ticker)
                                 .font(.system(size: 11, weight: .semibold))
                         }
-                        .foregroundStyle(Color(red: 0.5, green: 0.85, blue: 0.6))
+                        .foregroundStyle(Theme.colors.accentGreenMuted)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(
                             Capsule()
-                                .fill(Color(red: 0.5, green: 0.85, blue: 0.6).opacity(0.12))
+                                .fill(Theme.colors.accentGreenMuted.opacity(0.12))
                         )
                     }
                     
@@ -1069,24 +1055,6 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Grid Pattern
-
-    private var gridPattern: some View {
-        Canvas { context, size in
-            let gridSize: CGFloat = 40
-            let path = Path { path in
-                for x in stride(from: 0, through: size.width, by: gridSize) {
-                    path.move(to: CGPoint(x: x, y: 0))
-                    path.addLine(to: CGPoint(x: x, y: size.height))
-                }
-                for y in stride(from: 0, through: size.height, by: gridSize) {
-                    path.move(to: CGPoint(x: 0, y: y))
-                    path.addLine(to: CGPoint(x: size.width, y: y))
-                }
-            }
-            context.stroke(path, with: .color(.white), lineWidth: 0.5)
-        }
-    }
 }
 
 // MARK: - Flow Layout for Chips

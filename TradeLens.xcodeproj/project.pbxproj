@@ -52,6 +52,7 @@
 		TL428 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL429 /* UserPreferences.swift */; };
 		TL430 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL431 /* OnboardingView.swift */; };
 		TL432 /* HistoricalRangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL433 /* HistoricalRangeView.swift */; };
+		TL434 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL435 /* Theme.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -113,6 +114,7 @@
 		TL429 /* UserPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPreferences.swift; sourceTree = "<group>"; };
 		TL431 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		TL433 /* HistoricalRangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoricalRangeView.swift; sourceTree = "<group>"; };
+		TL435 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -239,6 +241,7 @@
 			children = (
 				TL016 /* CurrencyFormatter.swift */,
 				TL201 /* AppError.swift */,
+				TL435 /* Theme.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -409,6 +412,7 @@
 				TL428 /* UserPreferences.swift in Sources */,
 				TL430 /* OnboardingView.swift in Sources */,
 				TL432 /* HistoricalRangeView.swift in Sources */,
+				TL434 /* Theme.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
