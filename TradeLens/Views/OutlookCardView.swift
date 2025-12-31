@@ -67,6 +67,14 @@ struct OutlookCardView: View {
                 
                 historicalSection
                 
+                // Visual distribution chart - "Typical 30-day range based on past moves"
+                HistoricalRangeView(
+                    ticker: outlook.ticker,
+                    timeframeDays: outlook.timeframeDays,
+                    volatilityBand: outlook.volatilityBand,
+                    historicalHitRate: outlook.historicalHitRate
+                )
+                
                 if let personalContext = outlook.personalContext {
                     personalNoteSection(personalContext)
                 }

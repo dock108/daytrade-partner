@@ -51,6 +51,7 @@
 		TL426 /* OutlookCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL427 /* OutlookCardView.swift */; };
 		TL428 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL429 /* UserPreferences.swift */; };
 		TL430 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL431 /* OnboardingView.swift */; };
+		TL432 /* HistoricalRangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL433 /* HistoricalRangeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,6 +112,7 @@
 		TL427 /* OutlookCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlookCardView.swift; sourceTree = "<group>"; };
 		TL429 /* UserPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPreferences.swift; sourceTree = "<group>"; };
 		TL431 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		TL433 /* HistoricalRangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoricalRangeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -207,6 +209,7 @@
 				TL417 /* TickerSnapshotCard.swift */,
 				TL427 /* OutlookCardView.swift */,
 				TL431 /* OnboardingView.swift */,
+				TL433 /* HistoricalRangeView.swift */,
 				TL208 /* SettingsView.swift */,
 				TL301 /* DashboardView.swift */,
 				TL303 /* TradeDetailView.swift */,
@@ -405,6 +408,7 @@
 				TL426 /* OutlookCardView.swift in Sources */,
 				TL428 /* UserPreferences.swift in Sources */,
 				TL430 /* OnboardingView.swift in Sources */,
+				TL432 /* HistoricalRangeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
