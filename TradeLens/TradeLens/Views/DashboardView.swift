@@ -16,12 +16,21 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     headerSection
 
-                    if let summary = viewModel.summary {
+                    if let errorMessage = viewModel.errorMessage {
+                        errorStateView(message: errorMessage) {
+                            Task {
+                                await viewModel.loadDashboard()
+                            }
+                        }
+                    } else if viewModel.isLoading {
+                        Text("Loading summary...")
+                            .foregroundStyle(.secondary)
+                    } else if let summary = viewModel.summary {
                         statsSection(summary: summary)
                         insightSection(summary: summary)
                         tickerSection(summary: summary)
                     } else {
-                        Text("Loading summary...")
+                        Text("No summary available.")
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -90,6 +99,19 @@ struct DashboardView: View {
             Text(value)
                 .fontWeight(.semibold)
         }
+    }
+
+    private func errorStateView(message: String, retry: @escaping () -> Void) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(message)
+                .foregroundStyle(.secondary)
+            Button("Retry", action: retry)
+                .buttonStyle(.bordered)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
 
