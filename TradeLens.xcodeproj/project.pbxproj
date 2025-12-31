@@ -22,6 +22,19 @@
 		TL203 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL207 /* SettingsViewModel.swift */; };
 		TL204 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL208 /* SettingsView.swift */; };
 		TL205 /* MockTrades.csv in Resources */ = {isa = PBXBuildFile; fileRef = TL209 /* MockTrades.csv */; };
+		TL300 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL301 /* DashboardView.swift */; };
+		TL302 /* TradeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL303 /* TradeDetailView.swift */; };
+		TL304 /* TradeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL305 /* TradeRowView.swift */; };
+		TL306 /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL307 /* InsightsView.swift */; };
+		TL308 /* AskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL309 /* AskView.swift */; };
+		TL310 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL311 /* DashboardViewModel.swift */; };
+		TL312 /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL313 /* InsightsViewModel.swift */; };
+		TL314 /* TradeDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL315 /* TradeDetailViewModel.swift */; };
+		TL316 /* AskViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL317 /* AskViewModel.swift */; };
+		TL318 /* AIServiceStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL319 /* AIServiceStub.swift */; };
+		TL320 /* InsightsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL321 /* InsightsService.swift */; };
+		TL322 /* MockTradeDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL323 /* MockTradeDataService.swift */; };
+		TL324 /* TradeAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL325 /* TradeAnalyticsService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +66,19 @@
 		TL207 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		TL208 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		TL209 /* MockTrades.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = MockTrades.csv; sourceTree = "<group>"; };
+		TL301 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		TL303 /* TradeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeDetailView.swift; sourceTree = "<group>"; };
+		TL305 /* TradeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeRowView.swift; sourceTree = "<group>"; };
+		TL307 /* InsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsView.swift; sourceTree = "<group>"; };
+		TL309 /* AskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskView.swift; sourceTree = "<group>"; };
+		TL311 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
+		TL313 /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
+		TL315 /* TradeDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeDetailViewModel.swift; sourceTree = "<group>"; };
+		TL317 /* AskViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskViewModel.swift; sourceTree = "<group>"; };
+		TL319 /* AIServiceStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIServiceStub.swift; sourceTree = "<group>"; };
+		TL321 /* InsightsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsService.swift; sourceTree = "<group>"; };
+		TL323 /* MockTradeDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTradeDataService.swift; sourceTree = "<group>"; };
+		TL325 /* TradeAnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeAnalyticsService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +148,10 @@
 			children = (
 				TL012 /* TradeService.swift */,
 				TL206 /* ImportService.swift */,
+				TL319 /* AIServiceStub.swift */,
+				TL321 /* InsightsService.swift */,
+				TL323 /* MockTradeDataService.swift */,
+				TL325 /* TradeAnalyticsService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -131,6 +161,11 @@
 			children = (
 				TL004 /* ContentView.swift */,
 				TL208 /* SettingsView.swift */,
+				TL301 /* DashboardView.swift */,
+				TL303 /* TradeDetailView.swift */,
+				TL305 /* TradeRowView.swift */,
+				TL307 /* InsightsView.swift */,
+				TL309 /* AskView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -140,6 +175,10 @@
 			children = (
 				TL014 /* TradeListViewModel.swift */,
 				TL207 /* SettingsViewModel.swift */,
+				TL311 /* DashboardViewModel.swift */,
+				TL313 /* InsightsViewModel.swift */,
+				TL315 /* TradeDetailViewModel.swift */,
+				TL317 /* AskViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -280,11 +319,24 @@
 			files = (
 				TL003 /* ContentView.swift in Sources */,
 				TL204 /* SettingsView.swift in Sources */,
+				TL300 /* DashboardView.swift in Sources */,
+				TL302 /* TradeDetailView.swift in Sources */,
+				TL304 /* TradeRowView.swift in Sources */,
+				TL306 /* InsightsView.swift in Sources */,
+				TL308 /* AskView.swift in Sources */,
 				TL009 /* Trade.swift in Sources */,
 				TL011 /* TradeService.swift in Sources */,
 				TL202 /* ImportService.swift in Sources */,
+				TL318 /* AIServiceStub.swift in Sources */,
+				TL320 /* InsightsService.swift in Sources */,
+				TL322 /* MockTradeDataService.swift in Sources */,
+				TL324 /* TradeAnalyticsService.swift in Sources */,
 				TL013 /* TradeListViewModel.swift in Sources */,
 				TL203 /* SettingsViewModel.swift in Sources */,
+				TL310 /* DashboardViewModel.swift in Sources */,
+				TL312 /* InsightsViewModel.swift in Sources */,
+				TL314 /* TradeDetailViewModel.swift in Sources */,
+				TL316 /* AskViewModel.swift in Sources */,
 				TL015 /* CurrencyFormatter.swift in Sources */,
 				TL200 /* AppError.swift in Sources */,
 				TL001 /* TradeLensApp.swift in Sources */,
@@ -363,7 +415,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -421,7 +473,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
