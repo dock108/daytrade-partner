@@ -13,6 +13,7 @@ final class HomeViewModel: ObservableObject {
     @Published var question: String = ""
     @Published var response: AIResponse?
     @Published var priceHistory: PriceHistory?
+    @Published var tickerInfo: TickerInfo?
     @Published var detectedTicker: String?
     @Published var lastQuery: String = ""
     @Published var recentSearches: [String] = []
@@ -47,12 +48,14 @@ final class HomeViewModel: ObservableObject {
         isLoading = true
         lastQuery = trimmed
         
-        // Detect ticker and load price data immediately (non-blocking)
+        // Detect ticker and load price data + info immediately (non-blocking)
         detectedTicker = MockPriceService.detectTicker(in: trimmed)
         if let ticker = detectedTicker {
             priceHistory = MockPriceService.priceHistory(for: ticker, range: .oneMonth)
+            tickerInfo = TickerInfoService.info(for: ticker)
         } else {
             priceHistory = nil
+            tickerInfo = nil
         }
         
         // Simulate brief loading for AI response
@@ -79,6 +82,7 @@ final class HomeViewModel: ObservableObject {
         question = ""
         response = nil
         priceHistory = nil
+        tickerInfo = nil
         detectedTicker = nil
         lastQuery = ""
         isLoading = false

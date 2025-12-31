@@ -41,6 +41,9 @@
 		TL406 /* PriceData.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL407 /* PriceData.swift */; };
 		TL408 /* MockPriceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL409 /* MockPriceService.swift */; };
 		TL410 /* TickerChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL411 /* TickerChartView.swift */; };
+		TL412 /* TickerInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL413 /* TickerInfo.swift */; };
+		TL414 /* TickerInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL415 /* TickerInfoService.swift */; };
+		TL416 /* TickerSnapshotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL417 /* TickerSnapshotCard.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +94,9 @@
 		TL407 /* PriceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceData.swift; sourceTree = "<group>"; };
 		TL409 /* MockPriceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockPriceService.swift; sourceTree = "<group>"; };
 		TL411 /* TickerChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerChartView.swift; sourceTree = "<group>"; };
+		TL413 /* TickerInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerInfo.swift; sourceTree = "<group>"; };
+		TL415 /* TickerInfoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerInfoService.swift; sourceTree = "<group>"; };
+		TL417 /* TickerSnapshotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerSnapshotCard.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +159,7 @@
 				TL102 /* UserSummary.swift */,
 				TL405 /* AIResponse.swift */,
 				TL407 /* PriceData.swift */,
+				TL413 /* TickerInfo.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -167,6 +174,7 @@
 				TL323 /* MockTradeDataService.swift */,
 				TL325 /* TradeAnalyticsService.swift */,
 				TL409 /* MockPriceService.swift */,
+				TL415 /* TickerInfoService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -177,6 +185,7 @@
 				TL004 /* ContentView.swift */,
 				TL401 /* HomeView.swift */,
 				TL411 /* TickerChartView.swift */,
+				TL417 /* TickerSnapshotCard.swift */,
 				TL208 /* SettingsView.swift */,
 				TL301 /* DashboardView.swift */,
 				TL303 /* TradeDetailView.swift */,
@@ -365,6 +374,9 @@
 				TL406 /* PriceData.swift in Sources */,
 				TL408 /* MockPriceService.swift in Sources */,
 				TL410 /* TickerChartView.swift in Sources */,
+				TL412 /* TickerInfo.swift in Sources */,
+				TL414 /* TickerInfoService.swift in Sources */,
+				TL416 /* TickerSnapshotCard.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

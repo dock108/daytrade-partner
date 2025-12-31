@@ -237,6 +237,12 @@ struct HomeView: View {
                     .transition(.opacity.combined(with: .scale(scale: 0.95)))
             }
             
+            // Ticker snapshot card if info available
+            if let tickerInfo = viewModel.tickerInfo {
+                TickerSnapshotCard(info: tickerInfo)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+            
             // Section cards
             ForEach(Array(response.sections.enumerated()), id: \.element.id) { index, section in
                 sectionCard(section: section)
