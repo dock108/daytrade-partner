@@ -2,7 +2,7 @@
 
 ## Project Structure
 
-The project follows a clean architecture pattern with clear separation of concerns:
+The project follows a clean MVVM architecture with clear separation of concerns:
 
 ```
 TradeLens/
@@ -10,125 +10,168 @@ TradeLens/
 └── TradeLens/                  # Main application directory
     ├── TradeLensApp.swift      # Application entry point
     ├── Info.plist              # App configuration
+    │
     ├── Models/                 # Data models and business entities
-    │   └── Trade.swift         # Example: Trade entity
+    │   ├── Trade.swift         # Trade entity & MockTrade
+    │   ├── AIResponse.swift    # Structured AI response model
+    │   ├── ConversationHistory.swift # Chat history persistence
+    │   ├── PriceData.swift     # Price chart data structures
+    │   ├── TickerInfo.swift    # Ticker knowledge panel data
+    │   ├── UserSummary.swift   # Trading summary analytics
+    │   └── UserPreferences.swift # User settings model
+    │
     ├── Services/               # Business logic and data management
-    │   └── TradeService.swift  # Example: Trade data service
+    │   ├── AIServiceStub.swift # AI response generation (mock)
+    │   ├── AIContentProvider.swift # Topic content for AI responses
+    │   ├── OutlookEngine.swift # Market outlook synthesis
+    │   ├── MockTradeDataService.swift # Mock trade generation
+    │   ├── TradeAnalyticsService.swift # Trade analytics calculations
+    │   ├── InsightsService.swift # Behavioral insights
+    │   ├── MockPriceService.swift # Mock price data
+    │   ├── TickerInfoService.swift # Ticker metadata
+    │   ├── SpeechRecognitionService.swift # Voice input
+    │   ├── UserSettings.swift  # Settings persistence
+    │   ├── TradeService.swift  # Trade data operations
+    │   └── ImportService.swift # Data import handling
+    │
     ├── Views/                  # SwiftUI view components
-    │   └── ContentView.swift   # Main content view
+    │   ├── ContentView.swift   # Tab navigation container
+    │   ├── HomeView.swift      # AI-first home screen
+    │   ├── DashboardView.swift # Trading summary dashboard
+    │   ├── InsightsView.swift  # Patterns & insights
+    │   ├── SettingsView.swift  # App settings
+    │   ├── OutlookCardView.swift # Market outlook card
+    │   ├── TickerChartView.swift # Price chart component
+    │   ├── TickerSnapshotCard.swift # Ticker info panel
+    │   ├── HistoricalRangeView.swift # Bell curve visualization
+    │   ├── InfoCardView.swift  # Reusable card components
+    │   ├── ScreenContainerView.swift # Screen layout wrapper
+    │   ├── TradeDetailView.swift # Individual trade view
+    │   ├── TradeRowView.swift  # Trade list row
+    │   └── OnboardingView.swift # First-run experience
+    │
     ├── ViewModels/             # View state and presentation logic
-    │   └── TradeListViewModel.swift # Example: Trade list view model
+    │   ├── HomeViewModel.swift # Home screen state
+    │   ├── DashboardViewModel.swift # Dashboard state
+    │   ├── InsightsViewModel.swift # Insights state
+    │   ├── SettingsViewModel.swift # Settings state
+    │   ├── TradeDetailViewModel.swift # Trade detail state
+    │   └── TradeListViewModel.swift # Trade list state
+    │   (Note: AskView/AskViewModel removed — replaced by HomeView/HomeViewModel)
+    │
     ├── Utilities/              # Helper functions and extensions
-    │   └── CurrencyFormatter.swift # Example: Currency formatting utilities
+    │   ├── Theme.swift         # Colors, typography, spacing, button styles
+    │   ├── CurrencyFormatter.swift # Currency/percentage formatting
+    │   └── AppError.swift      # Error handling
+    │
     ├── Assets.xcassets/        # Image and color assets
-    └── Preview Content/        # Resources for SwiftUI previews
+    ├── Resources/              # Static data files
+    │   └── MockTrades.csv      # Sample trade data
+    └── Preview Content/        # SwiftUI preview resources
 ```
 
 ## Architecture Overview
 
 ### Models
-Contains data structures and business entities. Models should be:
+Data structures and business entities. Models should be:
 - **Codable** for JSON serialization
 - **Identifiable** when used in SwiftUI lists
 - **Immutable** when possible (use `let` instead of `var`)
-- Well-documented with clear property purposes
 
 ### Services
-Houses business logic, API clients, and data management. Services should:
+Business logic, API clients, and data management. Services should:
 - Use `@MainActor` for UI-related state
 - Leverage Swift Concurrency (`async/await`)
-- Be protocol-based for testability
-- Handle all data persistence and networking
+- Be singleton or dependency-injected
 
 ### Views
-SwiftUI view components representing the UI. Views should be:
-- Small and focused on a single responsibility
-- Stateless when possible
-- Leverage `@State`, `@Binding`, and `@ObservedObject` appropriately
-- Include `#Preview` for rapid development
+SwiftUI view components. Views should be:
+- Small and focused (target ≤300 LOC, max ~500 LOC)
+- Use `ScreenContainerView` for consistent layout
+- Use `InfoCardView` components for cards
+- Include `#Preview` for development
 
 ### ViewModels
-Presentation logic and view state management. ViewModels should:
-- Use `@MainActor` for main thread operations
+Presentation logic and view state. ViewModels should:
+- Use `@MainActor` annotation
 - Conform to `ObservableObject`
-- Expose `@Published` properties for reactive UI updates
-- Keep views thin by handling business logic
+- Expose `@Published` properties
 
 ### Utilities
-Reusable helper functions, extensions, and formatters. Utilities should be:
-- Stateless and pure when possible
-- Well-tested
-- Generic and reusable across the app
+- **Theme.swift**: Centralized design system (colors, typography, spacing, button styles)
+- **CurrencyFormatter.swift**: Number formatting utilities
 
 ## Key Features
 
-### Swift Concurrency
-The project is configured with strict concurrency checking:
-- **Async/await** for asynchronous operations
-- **Actors** for thread-safe state management
-- **@MainActor** for UI updates
-- Eliminates data races at compile time
+### AI-First Experience
+The app centers around an AI home screen (`HomeView`) that:
+- Provides a "Google for stocks" search experience
+- Returns structured article-style responses
+- Shows price charts and ticker knowledge cards
+- Supports voice input via `SpeechRecognitionService`
+- Maintains conversation history locally
 
-Build settings include:
-```
-SWIFT_STRICT_CONCURRENCY = complete
-```
+### Outlook Engine
+`OutlookEngine.swift` synthesizes market outlooks:
+- Generates structured `Outlook` objects
+- Combines ticker data, volatility, sector trends
+- Adds personalized context from trade history
+- No financial advice — descriptive metrics only
 
-### Modern SwiftUI
-- Uses latest SwiftUI components and patterns
-- NavigationStack for modern navigation
-- Preview providers for rapid iteration
-- iOS 17.0+ deployment target
+### Theming System
+`Theme.swift` provides:
+- **Colors**: Semantic color palette with dark mode support
+- **Typography**: Consistent text styles across the app
+- **Spacing**: Standard spacing values
+- **Button Styles**: Interactive feedback styles
 
 ## Development Guidelines
 
 ### Code Style
-- Use clear, descriptive names for types and properties
-- Keep files small and focused (under 300 lines when possible)
-- Add documentation comments for public APIs
-- Follow Swift naming conventions
+- Use clear, descriptive names
+- Keep files under 500 LOC when possible
+- Use `Theme.typography` for fonts, `Theme.colors` for colors
+- Follow existing patterns before introducing new ones
+
+### File Organization
+When a file exceeds ~500 LOC:
+1. Extract reusable subviews into separate files
+2. Move button styles to `Theme.swift`
+3. Split content data into separate modules
 
 ### Best Practices
-1. **Separation of Concerns**: Keep business logic out of views
-2. **Dependency Injection**: Pass dependencies through initializers
-3. **Error Handling**: Use proper error handling with Result types or throws
-4. **Testing**: Write unit tests for ViewModels and Services
-5. **Previews**: Always include SwiftUI previews for views
-
-### Git Workflow
-- Keep commits atomic and well-described
-- Use feature branches for new functionality
-- Review code before merging
+1. **Separation of Concerns**: Keep logic in ViewModels, UI in Views
+2. **Consistent Styling**: Use `InfoCardView`, `ScreenContainerView`
+3. **Interactive States**: Use button styles from Theme for press feedback
+4. **Comments**: Explain *why*, not *what*
 
 ## Requirements
 
-- **iOS**: 17.0+
-- **Xcode**: 15.0+
-- **Swift**: 5.9+
+- **iOS**: 26.0+
+- **Xcode**: 16.0+ (Beta)
+- **Swift**: 6.0+
 
 ## Building the Project
 
-The project uses standard Xcode build settings:
-- **Debug**: Full optimization off, debugging symbols included
-- **Release**: Whole module optimization, no debug symbols
+```bash
+# Build for simulator
+xcodebuild -project TradeLens.xcodeproj \
+  -scheme TradeLens \
+  -sdk iphonesimulator \
+  -configuration Debug \
+  -derivedDataPath build \
+  build
 
-## Future Enhancements
-
-This is a foundational structure ready for expansion:
-- Real-time market data integration
-- Trade history and analytics
-- Portfolio tracking
-- Risk management tools
-- Social trading features
-
-## License
-
-This project is part of the daytrade-partner repository.
+# Install and launch
+xcrun simctl install booted build/Build/Products/Debug-iphonesimulator/TradeLens.app
+xcrun simctl launch booted com.tradelens.TradeLens
+```
 
 ## Contributing
 
 When adding new features:
-1. Place files in the appropriate folder based on their responsibility
-2. Keep the structure clean and maintainable
-3. Update documentation if adding new major components or patterns
-4. Add comments explaining non-obvious code
+1. Place files in the appropriate folder based on responsibility
+2. Follow existing naming patterns
+3. Use Theme system for styling
+4. Keep files focused and under 500 LOC
+5. Add `#Preview` for new views
