@@ -359,6 +359,7 @@ struct InfoCardRow: View {
                 }
             }
             .padding(.vertical, 10)
+            .contentShape(Rectangle())
         }
         .buttonStyle(InfoCardRowButtonStyle())
         .disabled(action == nil)
@@ -368,10 +369,13 @@ struct InfoCardRow: View {
 struct InfoCardRowButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .contentShape(Rectangle())
             .background(
                 RoundedRectangle(cornerRadius: 12)
                     .fill(configuration.isPressed ? Theme.colors.cardBackgroundElevated : Color.clear)
             )
+            .opacity(configuration.isPressed ? 0.85 : 1.0)
+            .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
     }
 }
 

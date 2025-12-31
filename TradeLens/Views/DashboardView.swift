@@ -272,8 +272,9 @@ struct DashboardView: View {
                                 TradeDetailView(trade: trade)
                             } label: {
                                 tradeRow(trade)
+                                    .contentShape(Rectangle())
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(RowButtonStyle())
                             
                             if index < min(4, viewModel.trades.count - 1) {
                                 Divider()

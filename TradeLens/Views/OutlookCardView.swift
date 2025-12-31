@@ -159,7 +159,9 @@ struct OutlookCardView: View {
                 Image(systemName: "info.circle")
                     .font(.system(size: 18))
                     .foregroundStyle(Color.white.opacity(0.35))
+                    .contentShape(Circle())
             }
+            .buttonStyle(IconButtonStyle())
         }
         .padding(20)
     }
@@ -217,7 +219,9 @@ struct OutlookCardView: View {
                     Image(systemName: "info.circle")
                         .font(.system(size: 14))
                         .foregroundStyle(Color.white.opacity(0.3))
+                        .contentShape(Circle())
                 }
+                .buttonStyle(IconButtonStyle())
             }
             
             // Volatility visualization
@@ -321,7 +325,9 @@ struct OutlookCardView: View {
                     Image(systemName: "info.circle")
                         .font(.system(size: 14))
                         .foregroundStyle(Color.white.opacity(0.3))
+                        .contentShape(Circle())
                 }
+                .buttonStyle(IconButtonStyle())
             }
             
             HStack(spacing: 20) {
@@ -669,9 +675,11 @@ struct InfoExplanationSheet: View {
 struct WatchButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
-            .opacity(configuration.isPressed ? 0.9 : 1.0)
-            .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
+            .contentShape(RoundedRectangle(cornerRadius: 14))
+            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+            .opacity(configuration.isPressed ? 0.85 : 1.0)
+            .brightness(configuration.isPressed ? 0.05 : 0)
+            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
     }
 }
 

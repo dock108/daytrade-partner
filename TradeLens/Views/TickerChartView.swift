@@ -140,8 +140,9 @@ struct TickerChartView: View {
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(selectedRange == range ? chartColor.opacity(0.25) : Color.clear)
                         )
+                        .contentShape(RoundedRectangle(cornerRadius: 8))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(SegmentButtonStyle(isSelected: selectedRange == range))
             }
         }
         .padding(4)

@@ -446,6 +446,101 @@ extension View {
     func themedCard(elevated: Bool = false, accent: Color? = nil, cornerRadius: CGFloat = Theme.cornerRadius.lg) -> some View {
         modifier(ThemedCardModifier(elevated: elevated, accentColor: accent, cornerRadius: cornerRadius))
     }
+    
+    /// Apply interactive press effect to any view
+    func pressable(isPressed: Bool) -> some View {
+        self
+            .opacity(isPressed ? 0.85 : 1.0)
+            .scaleEffect(isPressed ? 0.98 : 1.0)
+            .animation(.easeOut(duration: 0.15), value: isPressed)
+    }
+    
+    /// Apply subtle highlight effect
+    func highlightable(isHighlighted: Bool) -> some View {
+        self
+            .brightness(isHighlighted ? 0.05 : 0)
+            .animation(.easeOut(duration: 0.1), value: isHighlighted)
+    }
+}
+
+// MARK: - Interactive Button Styles
+
+/// Premium button style with subtle press animation
+struct PressableButtonStyle: ButtonStyle {
+    var scale: CGFloat = 0.98
+    var opacity: CGFloat = 0.85
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? opacity : 1.0)
+            .scaleEffect(configuration.isPressed ? scale : 1.0)
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+/// Card button style with background highlight
+struct CardButtonStyle: ButtonStyle {
+    var cornerRadius: CGFloat = 20
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .fill(configuration.isPressed ? Color.white.opacity(0.03) : Color.clear)
+            )
+            .opacity(configuration.isPressed ? 0.9 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.985 : 1.0)
+            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+    }
+}
+
+/// Row button style with subtle highlight
+struct RowButtonStyle: ButtonStyle {
+    var cornerRadius: CGFloat = 12
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .fill(configuration.isPressed ? Theme.colors.cardBackgroundElevated : Color.clear)
+            )
+            .opacity(configuration.isPressed ? 0.9 : 1.0)
+            .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
+    }
+}
+
+/// Chip/pill button style
+struct ChipButtonStyle: ButtonStyle {
+    var activeColor: Color = Theme.colors.accentBlue
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.7 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
+    }
+}
+
+/// Icon button style (for mic, clear, etc)
+struct IconButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.6 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+            .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
+    }
+}
+
+/// Tab/segment style
+struct SegmentButtonStyle: ButtonStyle {
+    var isSelected: Bool = false
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.7 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
+            .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
+    }
 }
 
 // MARK: - Preview

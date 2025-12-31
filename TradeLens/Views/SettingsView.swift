@@ -113,7 +113,7 @@ struct SettingsView: View {
                         }
                     }
                 }
-                .buttonStyle(InfoCardRowButtonStyle())
+                .buttonStyle(RowButtonStyle())
                 .disabled(historyService.count == 0)
                 .opacity(historyService.count == 0 ? 0.5 : 1.0)
             }
@@ -181,7 +181,7 @@ struct SettingsView: View {
                                 .foregroundStyle(Theme.colors.textQuaternary)
                         }
                     }
-                    .buttonStyle(InfoCardRowButtonStyle())
+                    .buttonStyle(RowButtonStyle())
                     .disabled(viewModel.isImporting)
                     
                     // Import status
