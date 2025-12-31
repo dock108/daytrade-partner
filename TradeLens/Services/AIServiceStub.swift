@@ -33,10 +33,13 @@ final class AIServiceStub {
 
     func structuredResponse(for question: String) -> AIResponse {
         let normalized = question.lowercased()
+        let isSimpleMode = UserSettings.shared.isSimpleModeEnabled
         var sections: [AIResponse.Section] = []
         
-        // Get topic-specific content
-        let topicContent = getTopicContent(for: normalized)
+        // Get topic-specific content (simple or standard)
+        let topicContent = isSimpleMode 
+            ? getSimpleTopicContent(for: normalized)
+            : getTopicContent(for: normalized)
         
         // Build sections
         sections.append(AIResponse.Section(
@@ -66,7 +69,7 @@ final class AIServiceStub {
         ))
         
         // Add personalized context if available
-        if let personalSection = buildPersonalizedSection(for: normalized) {
+        if let personalSection = buildPersonalizedSection(for: normalized, simple: isSimpleMode) {
             sections.append(personalSection)
         }
         
@@ -265,9 +268,140 @@ final class AIServiceStub {
         )
     }
     
+    // MARK: - Simple Mode Content
+    
+    private func getSimpleTopicContent(for normalized: String) -> TopicContent {
+        if normalized.contains("nvda") || normalized.contains("nvidia") {
+            return TopicContent(
+                current: "NVIDIA makes the computer chips that power AI. Think of them as selling the pickaxes during a gold rush — everyone building AI needs their products. The stock price has been going up a lot because of this.",
+                driversIntro: "Here's what affects the stock price:",
+                drivers: [
+                    "Big tech companies buying their AI chips",
+                    "New, faster chips coming out",
+                    "Other companies trying to compete",
+                    "Rules about selling to China"
+                ],
+                riskOpportunity: "The good news: AI is growing fast and NVIDIA is the leader. The risk: The stock is already expensive. If growth slows down, the price could drop. It's like buying a house at the top of the market.",
+                historical: "NVIDIA has had big price swings before. During the crypto craze, it shot up and then fell. This AI boom feels bigger, but nothing goes up forever.",
+                recap: "NVIDIA is the main company powering AI. Great business, but the price already reflects a lot of good news."
+            )
+        }
+        
+        if normalized.contains("oil") {
+            return TopicContent(
+                current: "Oil prices go up and down based on supply (how much is being pumped) and demand (how much people are using). Right now, it's a tug of war between countries limiting production and worries about the economy.",
+                driversIntro: "What moves oil prices:",
+                drivers: [
+                    "OPEC countries deciding to pump more or less",
+                    "How much oil the U.S. is producing",
+                    "Whether China's economy is growing",
+                    "World events and conflicts"
+                ],
+                riskOpportunity: "Prices could go up if there's a supply problem or if China starts using more oil. Prices could fall if people worry about a recession. Think of it like any product — price depends on supply and demand.",
+                historical: "Oil has bounced between $40 and $120 per barrel over the past 10 years. It moves around a lot based on world events.",
+                recap: "Oil prices are hard to predict. They depend on global events, not just company performance."
+            )
+        }
+        
+        if normalized.contains("gold") {
+            return TopicContent(
+                current: "Gold is often called a 'safe haven' — people buy it when they're nervous about the economy. It's like keeping cash under the mattress, but shinier. Right now, some countries are buying gold as a backup.",
+                driversIntro: "What affects gold prices:",
+                drivers: [
+                    "Interest rates — when rates are high, gold is less attractive",
+                    "The value of the U.S. dollar",
+                    "Countries buying gold as a reserve",
+                    "General nervousness in markets"
+                ],
+                riskOpportunity: "Gold could go up if inflation stays high or if there's a crisis. It might stay flat or drop if interest rates stay high, since bonds then pay better returns. Gold doesn't pay dividends — you only make money if the price goes up.",
+                historical: "Gold tends to do well when people are scared and poorly when everything seems fine. It's insurance for your portfolio, not a way to get rich.",
+                recap: "Think of gold as financial insurance. It protects against bad times but won't grow like stocks in good times."
+            )
+        }
+        
+        if normalized.contains("qqq") {
+            return TopicContent(
+                current: "QQQ is like buying a basket of the 100 biggest tech companies at once. Apple, Microsoft, NVIDIA, and others are all in there. When tech does well, QQQ does well. When tech struggles, so does QQQ.",
+                driversIntro: "What moves QQQ:",
+                drivers: [
+                    "How the big tech companies are doing",
+                    "Interest rates (higher rates hurt tech stocks more)",
+                    "Excitement about AI",
+                    "Whether people are spending on tech products"
+                ],
+                riskOpportunity: "QQQ can grow faster than the overall market when tech is hot. But it can also fall harder. It's like betting on the star players — great when they're winning, rough when they're not.",
+                historical: "In 2022, QQQ dropped about 30% when interest rates went up. Then it bounced back strongly. It's more of a rollercoaster than the broader market.",
+                recap: "QQQ is a way to invest in big tech companies all at once. Higher potential reward, but also more ups and downs."
+            )
+        }
+        
+        if normalized.contains("spy") {
+            return TopicContent(
+                current: "SPY is like buying a tiny piece of 500 of America's biggest companies at once. It's one of the most popular ways to invest in the stock market. When you hear 'the market is up,' they usually mean something like SPY.",
+                driversIntro: "What moves SPY:",
+                drivers: [
+                    "How well companies are doing overall",
+                    "What the Federal Reserve does with interest rates",
+                    "Jobs and economic news",
+                    "General mood of investors"
+                ],
+                riskOpportunity: "SPY tends to go up over time — historically about 10% per year on average. But it can drop 20% or more during bad times. It's like the tide — it goes in and out, but the long-term trend is up.",
+                historical: "SPY has recovered from every downturn in history, though sometimes it takes a few years. The 2022 drop was about 20%, and it's since recovered.",
+                recap: "SPY is a simple way to invest in the overall U.S. stock market. Steady and reliable over the long term."
+            )
+        }
+        
+        if normalized.contains("inflation") {
+            return TopicContent(
+                current: "Inflation means prices are going up — your groceries, rent, gas cost more. It went crazy in 2022-2023 but has been calming down. The Fed is trying to get it back to 'normal' (about 2% per year).",
+                driversIntro: "What causes inflation:",
+                drivers: [
+                    "Rent and housing costs (a big chunk)",
+                    "Wages going up",
+                    "Gas and energy prices",
+                    "Supply chain issues getting better or worse"
+                ],
+                riskOpportunity: "If inflation drops, the Fed might lower interest rates, which is usually good for stocks. If inflation stays stubborn, rates stay high, which can slow the economy. It's like a thermostat — too hot or too cold causes problems.",
+                historical: "This is the worst inflation since the 1980s. Back then, it took a painful recession to fix it. This time, we're hoping for a 'soft landing' where inflation falls without a big recession.",
+                recap: "Inflation is cooling down but not gone yet. Keep an eye on rent and service prices — they're the sticky parts."
+            )
+        }
+        
+        if normalized.contains("earnings") || normalized.contains("tech earnings") {
+            return TopicContent(
+                current: "Earnings season is when companies report their grades — how much money they made. It happens every 3 months. What companies say about the future often matters more than the numbers themselves.",
+                driversIntro: "What to listen for:",
+                drivers: [
+                    "Did they make more money than expected?",
+                    "Are profit margins (how much they keep) growing?",
+                    "What do they say about next quarter?",
+                    "Are they hiring or cutting costs?"
+                ],
+                riskOpportunity: "Good earnings + positive outlook = stock usually goes up. Good earnings + worried outlook = stock might still fall. It's like report cards — straight A's matter less if the teacher says you're struggling.",
+                historical: "Stock prices often move more on the outlook than the actual numbers. Companies that 'beat and raise' (good results + better forecast) usually do best.",
+                recap: "Focus on what companies say about the future, not just their past results."
+            )
+        }
+        
+        // Default/generic simple response
+        return TopicContent(
+            current: "The stock market moves based on how companies are doing, the economy, and what people think will happen next. Right now, there's some uncertainty about where things are headed.",
+            driversIntro: "Things that move the market:",
+            drivers: [
+                "What the Federal Reserve does with interest rates",
+                "How well companies are doing",
+                "Jobs and economic numbers",
+                "Big world events"
+            ],
+            riskOpportunity: "Markets go up and down. Over the long term, they've always gone up, but there can be rough patches. Staying invested usually beats trying to time the market. It's like weather — storms come and go.",
+            historical: "The stock market has recovered from every crash in history. Sometimes it takes months, sometimes years, but patience has been rewarded.",
+            recap: "Try asking about specific things like NVDA, oil, gold, QQQ, SPY, or inflation for more helpful answers."
+        )
+    }
+    
     // MARK: - Personalized Section
     
-    private func buildPersonalizedSection(for normalized: String) -> AIResponse.Section? {
+    private func buildPersonalizedSection(for normalized: String, simple: Bool = false) -> AIResponse.Section? {
         guard let summary else { return nil }
         
         var points: [String] = []
@@ -276,16 +410,23 @@ final class AIServiceStub {
         let avgHoldDays = Int(summary.avgHoldDays.rounded())
         let pnl = CurrencyFormatter.formatUSD(summary.realizedPnLTotal)
         
-        points.append("You have \(summary.totalTrades) closed trades with a \(winRate) win rate")
-        points.append("Average hold period: \(avgHoldDays) days")
-        points.append("Total realized P/L: \(pnl)")
+        if simple {
+            points.append("You've made \(summary.totalTrades) trades total")
+            points.append("You make money on about \(winRate) of your trades")
+            points.append("You typically hold for \(avgHoldDays) days")
+            points.append("Your total profit/loss: \(pnl)")
+        } else {
+            points.append("You have \(summary.totalTrades) closed trades with a \(winRate) win rate")
+            points.append("Average hold period: \(avgHoldDays) days")
+            points.append("Total realized P/L: \(pnl)")
+        }
         
         if let bestTicker = summary.bestTicker {
-            points.append("Strongest performer: \(bestTicker)")
+            points.append(simple ? "Your best stock: \(bestTicker)" : "Strongest performer: \(bestTicker)")
         }
         
         if let worstTicker = summary.worstTicker {
-            points.append("Weakest performer: \(worstTicker)")
+            points.append(simple ? "Your toughest stock: \(worstTicker)" : "Weakest performer: \(worstTicker)")
         }
         
         // Add relevant insight
@@ -294,9 +435,13 @@ final class AIServiceStub {
             points.append(holdingInsight.detail)
         }
         
+        let intro = simple 
+            ? "Here's a quick look at your trading:"
+            : "Based on your trading history, here's how this topic relates to your activity:"
+        
         return AIResponse.Section(
             type: .yourContext,
-            content: "Based on your trading history, here's how this topic relates to your activity:",
+            content: intro,
             bulletPoints: points
         )
     }

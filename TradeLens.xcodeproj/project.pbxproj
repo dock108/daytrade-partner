@@ -44,6 +44,7 @@
 		TL412 /* TickerInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL413 /* TickerInfo.swift */; };
 		TL414 /* TickerInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL415 /* TickerInfoService.swift */; };
 		TL416 /* TickerSnapshotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL417 /* TickerSnapshotCard.swift */; };
+		TL418 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL419 /* UserSettings.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,6 +98,7 @@
 		TL413 /* TickerInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerInfo.swift; sourceTree = "<group>"; };
 		TL415 /* TickerInfoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerInfoService.swift; sourceTree = "<group>"; };
 		TL417 /* TickerSnapshotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerSnapshotCard.swift; sourceTree = "<group>"; };
+		TL419 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -175,6 +177,7 @@
 				TL325 /* TradeAnalyticsService.swift */,
 				TL409 /* MockPriceService.swift */,
 				TL415 /* TickerInfoService.swift */,
+				TL419 /* UserSettings.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -377,6 +380,7 @@
 				TL412 /* TickerInfo.swift in Sources */,
 				TL414 /* TickerInfoService.swift in Sources */,
 				TL416 /* TickerSnapshotCard.swift in Sources */,
+				TL418 /* UserSettings.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

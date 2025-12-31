@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
+    @ObservedObject private var userSettings = UserSettings.shared
     @FocusState private var isSearchFocused: Bool
     @Namespace private var animation
 
@@ -285,9 +286,15 @@ struct HomeView: View {
             }
             
             VStack(alignment: .leading, spacing: 2) {
-                Text("TradeLens")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Color.white.opacity(0.6))
+                HStack(spacing: 6) {
+                    Text("TradeLens")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color.white.opacity(0.6))
+                    
+                    if userSettings.isSimpleModeEnabled {
+                        simpleModeIndicator
+                    }
+                }
                 
                 Text(query)
                     .font(.system(size: 17, weight: .semibold))
@@ -297,6 +304,22 @@ struct HomeView: View {
             Spacer()
         }
         .padding(.bottom, 8)
+    }
+    
+    private var simpleModeIndicator: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "leaf.fill")
+                .font(.system(size: 9, weight: .bold))
+            Text("Simple")
+                .font(.system(size: 10, weight: .bold))
+        }
+        .foregroundStyle(Color(red: 0.5, green: 0.85, blue: 0.6))
+        .padding(.horizontal, 6)
+        .padding(.vertical, 3)
+        .background(
+            Capsule()
+                .fill(Color(red: 0.5, green: 0.85, blue: 0.6).opacity(0.15))
+        )
     }
 
     private func sectionCard(section: AIResponse.Section) -> some View {

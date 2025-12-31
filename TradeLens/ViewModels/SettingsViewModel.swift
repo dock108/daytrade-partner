@@ -12,6 +12,8 @@ class SettingsViewModel: ObservableObject {
     @Published var importStatusMessage: String?
     @Published var importDetails: [String] = []
     @Published var isImporting = false
+    
+    let userSettings = UserSettings.shared
 
     private let importService: ImportService
 
