@@ -31,6 +31,10 @@
     <true/>
     <key>UILaunchScreen</key>
     <dict/>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>TradeLens uses your microphone to let you ask questions by voice. Just tap the mic button and speak your question.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>TradeLens converts your voice to text so you can search stocks and ask questions hands-free.</string>
     <key>UIRequiredDeviceCapabilities</key>
     <array>
         <string>armv7</string>

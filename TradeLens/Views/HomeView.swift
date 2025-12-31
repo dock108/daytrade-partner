@@ -123,50 +123,178 @@ struct HomeView: View {
     // MARK: - Search Section
 
     private var searchSection: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 18, weight: .medium))
-                .foregroundStyle(Color.white.opacity(0.4))
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(Color.white.opacity(0.4))
 
-            TextField("", text: $viewModel.question, prompt: Text("Search stocks, themes, or ask a question...")
-                .foregroundStyle(Color.white.opacity(0.35)))
-                .font(.system(size: 17))
-                .foregroundStyle(.white)
-                .tint(Color(red: 0.4, green: 0.7, blue: 1.0))
-                .focused($isSearchFocused)
-                .submitLabel(.search)
-                .onSubmit {
-                    viewModel.submit()
-                }
+                TextField("", text: $viewModel.question, prompt: Text("Search stocks, themes, or ask a question...")
+                    .foregroundStyle(Color.white.opacity(0.35)))
+                    .font(.system(size: 17))
+                    .foregroundStyle(.white)
+                    .tint(Color(red: 0.4, green: 0.7, blue: 1.0))
+                    .focused($isSearchFocused)
+                    .submitLabel(.search)
+                    .onSubmit {
+                        viewModel.submit()
+                    }
+                    .disabled(viewModel.isListening)
 
-            if !viewModel.question.isEmpty {
-                Button {
-                    viewModel.question = ""
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Color.white.opacity(0.3))
+                if !viewModel.question.isEmpty && !viewModel.isListening {
+                    Button {
+                        viewModel.question = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 18))
+                            .foregroundStyle(Color.white.opacity(0.3))
+                    }
+                    .transition(.scale.combined(with: .opacity))
                 }
-                .transition(.scale.combined(with: .opacity))
+                
+                // Microphone button
+                microphoneButton
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(viewModel.isListening 
+                          ? Color(red: 1.0, green: 0.3, blue: 0.3).opacity(0.12) 
+                          : Color.white.opacity(0.08))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .strokeBorder(
+                                viewModel.isListening
+                                    ? Color(red: 1.0, green: 0.4, blue: 0.4).opacity(0.5)
+                                    : (isSearchFocused
+                                        ? Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.5)
+                                        : Color.white.opacity(0.1)),
+                                lineWidth: 1
+                            )
+                    )
+            )
+            .animation(.easeInOut(duration: 0.2), value: isSearchFocused)
+            .animation(.easeInOut(duration: 0.2), value: viewModel.isListening)
+            .animation(.easeInOut(duration: 0.15), value: viewModel.question.isEmpty)
+            
+            // Listening indicator
+            if viewModel.isListening {
+                listeningIndicator
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+            
+            // Speech error message
+            if let error = viewModel.speechError {
+                speechErrorBanner(error)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 16)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: viewModel.isListening)
+    }
+    
+    // MARK: - Microphone Button
+    
+    private var microphoneButton: some View {
+        Button {
+            viewModel.toggleVoiceInput()
+        } label: {
+            ZStack {
+                if viewModel.isListening {
+                    // Animated recording indicator
+                    Circle()
+                        .fill(Color(red: 1.0, green: 0.3, blue: 0.3).opacity(0.3))
+                        .frame(width: 44, height: 44)
+                        .scaleEffect(pulseAnimation ? 1.2 : 1.0)
+                        .opacity(pulseAnimation ? 0.5 : 1.0)
+                }
+                
+                Circle()
+                    .fill(viewModel.isListening 
+                          ? Color(red: 1.0, green: 0.35, blue: 0.35)
+                          : Color.white.opacity(0.1))
+                    .frame(width: 36, height: 36)
+                
+                Image(systemName: viewModel.isListening ? "stop.fill" : "mic.fill")
+                    .font(.system(size: viewModel.isListening ? 12 : 16, weight: .medium))
+                    .foregroundStyle(viewModel.isListening ? .white : Color.white.opacity(0.5))
+            }
+        }
+        .buttonStyle(MicButtonStyle())
+        .onAppear {
+            withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
+                pulseAnimation = true
+            }
+        }
+    }
+    
+    @State private var pulseAnimation = false
+    
+    // MARK: - Listening Indicator
+    
+    private var listeningIndicator: some View {
+        HStack(spacing: 8) {
+            // Animated waveform
+            ForEach(0..<3, id: \.self) { index in
+                Capsule()
+                    .fill(Color(red: 1.0, green: 0.4, blue: 0.4))
+                    .frame(width: 3, height: waveHeight(for: index))
+                    .animation(
+                        .easeInOut(duration: 0.4)
+                        .repeatForever(autoreverses: true)
+                        .delay(Double(index) * 0.15),
+                        value: pulseAnimation
+                    )
+            }
+            
+            Text("Listening...")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(Color(red: 1.0, green: 0.5, blue: 0.5))
+            
+            Spacer()
+            
+            Text("Tap stop when done")
+                .font(.system(size: 12))
+                .foregroundStyle(Color.white.opacity(0.4))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.08))
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color(red: 1.0, green: 0.3, blue: 0.3).opacity(0.08))
+        )
+    }
+    
+    private func waveHeight(for index: Int) -> CGFloat {
+        let base: CGFloat = 12
+        let variation: CGFloat = pulseAnimation ? 8 : 0
+        return base + (index == 1 ? variation : variation * 0.6)
+    }
+    
+    // MARK: - Speech Error Banner
+    
+    private func speechErrorBanner(_ message: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 14))
+                .foregroundStyle(Color.orange)
+            
+            Text(message)
+                .font(.system(size: 13))
+                .foregroundStyle(Color.white.opacity(0.7))
+            
+            Spacer()
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.orange.opacity(0.1))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .strokeBorder(
-                            isSearchFocused
-                                ? Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.5)
-                                : Color.white.opacity(0.1),
-                            lineWidth: 1
-                        )
+                    RoundedRectangle(cornerRadius: 10)
+                        .strokeBorder(Color.orange.opacity(0.2), lineWidth: 1)
                 )
         )
-        .animation(.easeInOut(duration: 0.2), value: isSearchFocused)
-        .animation(.easeInOut(duration: 0.15), value: viewModel.question.isEmpty)
     }
 
     // MARK: - Compact Search Header (for response state)
@@ -648,6 +776,14 @@ struct SuggestionButtonStyle: ButtonStyle {
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
             .opacity(configuration.isPressed ? 0.8 : 1.0)
             .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+struct MicButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
     }
 }
 

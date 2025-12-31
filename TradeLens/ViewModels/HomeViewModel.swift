@@ -19,9 +19,14 @@ final class HomeViewModel: ObservableObject {
     @Published var recentSearches: [String] = []
     @Published var isLoading: Bool = false
     @Published var guidedSuggestions: [GuidedSuggestion] = []
+    
+    // Voice input state
+    @Published var isListening: Bool = false
+    @Published var speechError: String?
 
     private let service: AIServiceStub
     private let tradeService: MockTradeDataService
+    private let speechService: SpeechRecognitionService
     private let maxRecentSearches = 5
     private let recentSearchesKey = "TradeLens.RecentSearches"
     
@@ -40,11 +45,69 @@ final class HomeViewModel: ObservableObject {
         }
     }
 
-    init(service: AIServiceStub = AIServiceStub(), tradeService: MockTradeDataService = MockTradeDataService()) {
+    init(
+        service: AIServiceStub = AIServiceStub(),
+        tradeService: MockTradeDataService = MockTradeDataService(),
+        speechService: SpeechRecognitionService = SpeechRecognitionService()
+    ) {
         self.service = service
         self.tradeService = tradeService
+        self.speechService = speechService
         loadRecentSearches()
         loadGuidedSuggestions()
+    }
+    
+    // MARK: - Voice Input
+    
+    func toggleVoiceInput() {
+        if isListening {
+            stopVoiceInput()
+        } else {
+            startVoiceInput()
+        }
+    }
+    
+    func startVoiceInput() {
+        speechError = nil
+        isListening = true
+        
+        speechService.startListening(
+            onResult: { [weak self] partialText in
+                Task { @MainActor in
+                    self?.question = partialText
+                }
+            },
+            onComplete: { [weak self] finalText in
+                Task { @MainActor in
+                    guard let self = self else { return }
+                    self.isListening = false
+                    
+                    if let text = finalText, !text.isEmpty {
+                        self.question = text
+                        // Auto-submit after successful voice input
+                        self.submit()
+                    } else if self.speechService.error != nil {
+                        self.speechError = self.speechService.error?.localizedDescription
+                        // Clear error after 3 seconds
+                        Task {
+                            try? await Task.sleep(nanoseconds: 3_000_000_000)
+                            await MainActor.run {
+                                self.speechError = nil
+                            }
+                        }
+                    }
+                }
+            }
+        )
+    }
+    
+    func stopVoiceInput() {
+        speechService.stopListening()
+        isListening = false
+    }
+    
+    var canUseMicrophone: Bool {
+        speechService.canRequestMicrophone
     }
 
     func submit() {
