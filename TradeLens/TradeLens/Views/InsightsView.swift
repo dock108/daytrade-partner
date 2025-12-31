@@ -52,12 +52,19 @@ struct InsightsView: View {
                     .foregroundStyle(.secondary)
             }
             ForEach(viewModel.insights) { insight in
-                Text(insight.text)
-                    .font(.body)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-                    .background(Color(.secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(insight.title)
+                        .font(.headline)
+                    Text(insight.subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(insight.detail)
+                        .font(.body)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
             }
         }
     }

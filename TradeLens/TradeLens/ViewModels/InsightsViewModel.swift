@@ -11,7 +11,9 @@ import Foundation
 final class InsightsViewModel: ObservableObject {
     struct Insight: Identifiable {
         let id = UUID()
-        let text: String
+        let title: String
+        let subtitle: String
+        let detail: String
     }
 
     @Published var insights: [Insight] = []
@@ -39,8 +41,8 @@ final class InsightsViewModel: ObservableObject {
 
         do {
             let trades = try await tradeService.fetchMockTrades()
-            let strings = insightsService.generateInsights(from: trades)
-            insights = strings.map { Insight(text: $0) }
+            let items = insightsService.generateInsights(from: trades)
+            insights = items.map { Insight(title: $0.title, subtitle: $0.subtitle, detail: $0.detail) }
         } catch {
             let appError = AppError(error)
             errorMessage = appError.userMessage
