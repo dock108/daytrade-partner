@@ -56,6 +56,8 @@ struct MockTradeDataService {
     func fetchMockTrades() async throws -> [MockTrade] {
         do {
             try await Task.sleep(nanoseconds: 250_000_000)
+        } catch is CancellationError {
+            throw CancellationError()
         } catch {
             throw AppError(error)
         }
