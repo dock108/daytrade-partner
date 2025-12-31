@@ -68,6 +68,13 @@ final class AIServiceStub {
             content: topicContent.recap
         ))
         
+        // Add "Here's the story in simple terms" digest section
+        let digestContent = buildDigestSection(for: normalized, simple: isSimpleMode)
+        sections.append(AIResponse.Section(
+            type: .digest,
+            content: digestContent
+        ))
+        
         // Add personalized context if available
         if let personalSection = buildPersonalizedSection(for: normalized, simple: isSimpleMode) {
             sections.append(personalSection)
@@ -78,9 +85,13 @@ final class AIServiceStub {
             sections.append(personalNote)
         }
         
+        // Generate sources for this topic
+        let sources = buildSources(for: normalized)
+        
         return AIResponse(
             query: question,
             sections: sections,
+            sources: sources,
             timestamp: Date()
         )
     }
@@ -576,5 +587,231 @@ final class AIServiceStub {
             type: .personalNote,
             content: personalNote
         )
+    }
+    
+    // MARK: - Digest Section (Human-Readable Summary)
+    
+    private func buildDigestSection(for normalized: String, simple: Bool) -> String {
+        // Create a cohesive narrative that reads like a human explanation
+        // This synthesizes the news + drivers without just listing headlines
+        
+        if normalized.contains("nvda") || normalized.contains("nvidia") {
+            if simple {
+                return "Here's what's going on: NVIDIA is the company making the brains behind AI. Every time you hear about ChatGPT or AI assistants getting smarter, NVIDIA's chips are usually powering it. Big tech companies are spending billions to buy their products. The stock has gone way up because of this — but that also means a lot of good news is already baked into the price. It's like buying a house in a hot neighborhood: great location, but you're paying top dollar."
+            } else {
+                return "The AI infrastructure buildout has positioned NVIDIA as the de facto supplier of compute power for the industry's largest players. Microsoft, Google, Amazon, and Meta are all racing to scale their AI capabilities, and NVIDIA's H100/H200 chips are the currency of that race. Recent earnings have consistently beaten expectations, driven by data center revenue that now dwarfs gaming. However, the market has priced in substantial future growth — current multiples assume sustained hypergrowth that leaves little room for disappointment. Competition from AMD and custom silicon (Google's TPUs, Amazon's Trainium) represents a longer-term variable."
+            }
+        }
+        
+        if normalized.contains("oil") {
+            if simple {
+                return "Oil prices are like a tug of war right now. On one side, countries that produce oil (OPEC) are trying to limit supply to keep prices up. On the other side, people are worried about the economy slowing down, which would mean less demand for oil. China's economy is a big question mark — if they use more oil, prices go up; if their economy stays sluggish, prices stay flat or drop. It's not really about any one company, it's about global supply and demand."
+            } else {
+                return "Crude oil markets are navigating a complex supply-demand dynamic. OPEC+ continues to manage production cuts aimed at supporting prices, while U.S. shale production has proven more resilient than expected. The demand side hinges heavily on China's economic trajectory — a meaningful recovery would tighten balances, while continued weakness keeps a lid on prices. Geopolitical risk premiums can spike suddenly (Middle East tensions, Russian supply disruptions), but have tended to fade unless actual supply is affected. The macro backdrop — recession risks vs. soft landing — will likely determine direction more than any single catalyst."
+            }
+        }
+        
+        if normalized.contains("gold") {
+            if simple {
+                return "Gold is behaving like it usually does — it's the thing people buy when they're nervous. Central banks around the world, especially in Asia, have been stockpiling gold as a hedge against uncertainty. But here's the catch: when interest rates are high, bonds and savings accounts pay you a return, while gold just sits there. So gold has been range-bound — up when fears spike, flat when rates dominate the conversation."
+            } else {
+                return "The gold market is responding to competing forces: safe-haven demand from central banks (particularly China and emerging markets diversifying away from dollar reserves) versus the headwind of elevated real yields. Gold pays no interest, so when Treasury yields are attractive, the opportunity cost of holding gold rises. Recent price action suggests the market is weighing inflation uncertainty against a higher-for-longer rate environment. Gold tends to shine brightest during periods of negative real yields or acute crisis — neither of which is dominant right now, keeping prices in a consolidation range."
+            }
+        }
+        
+        if normalized.contains("qqq") {
+            if simple {
+                return "QQQ is basically a way to own the 100 biggest tech companies at once. When you hear about the 'Magnificent Seven' (Apple, Microsoft, NVIDIA, Amazon, Google, Meta, Tesla) — they're all in there and they dominate the returns. When AI excitement picks up, QQQ rallies. When interest rates go up or growth stocks fall out of favor, QQQ drops. It's more concentrated than most people realize — a few stocks are doing most of the work."
+            } else {
+                return "QQQ's performance reflects the bifurcated nature of the current market. Mega-cap tech — particularly AI beneficiaries — has driven the lion's share of returns, while the average Nasdaq stock has lagged. This concentration is a double-edged sword: leadership by the strongest companies is bullish, but it also means QQQ is less diversified than it appears. Duration sensitivity remains a factor — as a growth-heavy index, QQQ is more impacted by changes in rate expectations than the broader market. The AI narrative has provided cover for valuations, but earnings delivery will need to validate multiples."
+            }
+        }
+        
+        if normalized.contains("spy") {
+            if simple {
+                return "SPY tracks the S&P 500 — that's 500 of America's biggest companies across all industries. When people talk about 'the market,' this is usually what they mean. Right now, the mood is cautiously optimistic. Inflation is cooling, the economy hasn't crashed, and companies are still making money. But there's worry about whether rates will stay high for longer and what that might mean for the economy. It's not wildly expensive, but it's not cheap either."
+            } else {
+                return "The S&P 500 is navigating a 'soft landing' narrative — where inflation moderates without triggering recession. So far, the economic data has cooperated: employment remains robust, consumer spending is resilient, and corporate earnings have exceeded lowered expectations. However, market breadth tells a more nuanced story — much of the index-level strength has been concentrated in a handful of mega-caps. The bull case rests on earnings growth broadening out as the Fed eventually eases. The bear case worries about 'higher for longer' rates eventually breaking something in the economy. Valuations are above historical averages but not extreme."
+            }
+        }
+        
+        if normalized.contains("inflation") {
+            if simple {
+                return "Inflation is cooling down, but it's not gone yet. The easy part — bringing down goods prices like TVs and furniture — has happened. The hard part is services and rent, which are still elevated. The Fed wants to see inflation at 2%, and we're not there yet. That's why they're keeping interest rates high. Think of it like a fever that's come down from 103° to 99° — better, but you're not fully healthy yet."
+            } else {
+                return "Headline inflation has decelerated meaningfully from 2022 peaks, but the 'last mile' to the Fed's 2% target is proving elusive. Core services inflation — particularly shelter/rent — remains sticky, though leading indicators suggest it should moderate with a lag. The goods disinflation phase is largely complete as supply chains normalized. The Fed's challenge is calibrating policy: easing too early risks reigniting inflation, while staying too tight risks unnecessary economic damage. Market expectations for rate cuts have repeatedly been pushed back as inflation data has come in hotter than hoped."
+            }
+        }
+        
+        // Default digest
+        if simple {
+            return "Markets are in a wait-and-see mode. People are trying to figure out whether inflation will keep falling, whether the economy will stay strong, and what the Fed will do with interest rates. There's optimism that we'll get a 'soft landing' — where things cool down without crashing — but nothing is certain. The best approach is to stay informed and not make big bets on predictions."
+        } else {
+            return "Market conditions reflect an ongoing recalibration of expectations. The prevailing narrative favors a soft landing, but conviction is low given the cross-currents: sticky services inflation, resilient employment, and elevated but normalizing rates. Earnings have been the bright spot, providing fundamental support for prices even as valuation multiples have expanded. The key variables to monitor are the pace of disinflation, the health of the consumer, and any signs of credit stress. For specific insights, try asking about individual topics like NVDA, oil, gold, SPY, QQQ, or inflation."
+        }
+    }
+    
+    // MARK: - Sources (Placeholder Content)
+    
+    private func buildSources(for normalized: String) -> [AIResponse.SourceReference] {
+        var sources: [AIResponse.SourceReference] = []
+        
+        if normalized.contains("nvda") || normalized.contains("nvidia") {
+            sources = [
+                AIResponse.SourceReference(
+                    title: "Data Center Revenue Drives Record Quarter",
+                    source: "Earnings Release, Nov 2024",
+                    type: .filings,
+                    summary: "Q3 revenue beat estimates by 12%, with data center up 279% YoY"
+                ),
+                AIResponse.SourceReference(
+                    title: "AI Capex Spending Outlook",
+                    source: "Industry Analysis",
+                    type: .research,
+                    summary: "Hyperscaler capex expected to grow 25-30% in 2025"
+                ),
+                AIResponse.SourceReference(
+                    title: "New Chip Architecture Ahead of Schedule",
+                    source: "Tech News",
+                    type: .news,
+                    summary: "Blackwell GPU production ramping faster than expected"
+                ),
+                AIResponse.SourceReference(
+                    title: "Competition Landscape: AMD and Custom Silicon",
+                    source: "Market Analysis",
+                    type: .analysis,
+                    summary: "Alternatives emerging but NVIDIA maintains 80%+ market share"
+                )
+            ]
+        } else if normalized.contains("oil") {
+            sources = [
+                AIResponse.SourceReference(
+                    title: "OPEC+ Extends Production Cuts",
+                    source: "Energy News",
+                    type: .news,
+                    summary: "Supply cuts extended through Q2 2025 to support prices"
+                ),
+                AIResponse.SourceReference(
+                    title: "Weekly Inventory Report",
+                    source: "EIA Data",
+                    type: .filings,
+                    summary: "U.S. crude inventories drew down more than expected"
+                ),
+                AIResponse.SourceReference(
+                    title: "China Demand Signals Mixed",
+                    source: "Asia Economics",
+                    type: .research,
+                    summary: "Refinery runs up but end-user demand remains subdued"
+                )
+            ]
+        } else if normalized.contains("gold") {
+            sources = [
+                AIResponse.SourceReference(
+                    title: "Central Bank Buying Hits Record",
+                    source: "World Gold Council",
+                    type: .research,
+                    summary: "EM central banks added 800+ tonnes in 2024"
+                ),
+                AIResponse.SourceReference(
+                    title: "Real Yields and Gold Correlation",
+                    source: "Macro Analysis",
+                    type: .analysis,
+                    summary: "Historical relationship suggests upside if Fed pivots"
+                ),
+                AIResponse.SourceReference(
+                    title: "ETF Flows Turn Positive",
+                    source: "Fund Flows Data",
+                    type: .filings,
+                    summary: "First net inflows to gold ETFs in 18 months"
+                )
+            ]
+        } else if normalized.contains("qqq") {
+            sources = [
+                AIResponse.SourceReference(
+                    title: "Mega-Cap Tech Dominates Returns",
+                    source: "Index Analysis",
+                    type: .analysis,
+                    summary: "Top 7 holdings account for 45% of QQQ weight"
+                ),
+                AIResponse.SourceReference(
+                    title: "AI Revenue Monetization Tracking",
+                    source: "Tech Research",
+                    type: .research,
+                    summary: "Cloud AI services growing 40%+ at major providers"
+                ),
+                AIResponse.SourceReference(
+                    title: "Rate Sensitivity Analysis",
+                    source: "Quant Research",
+                    type: .analysis,
+                    summary: "QQQ duration ~3x higher than value indices"
+                )
+            ]
+        } else if normalized.contains("spy") {
+            sources = [
+                AIResponse.SourceReference(
+                    title: "Earnings Season Recap",
+                    source: "Market Summary",
+                    type: .analysis,
+                    summary: "78% of S&P 500 beat estimates, but guidance mixed"
+                ),
+                AIResponse.SourceReference(
+                    title: "Breadth Indicators Improve",
+                    source: "Technical Analysis",
+                    type: .research,
+                    summary: "Advance-decline line turning up after narrow rally"
+                ),
+                AIResponse.SourceReference(
+                    title: "Buyback Activity Elevated",
+                    source: "Corporate Actions",
+                    type: .filings,
+                    summary: "Q4 buybacks on pace for $250B+ record"
+                )
+            ]
+        } else if normalized.contains("inflation") {
+            sources = [
+                AIResponse.SourceReference(
+                    title: "Core PCE Comes in Hot",
+                    source: "Economic Data",
+                    type: .filings,
+                    summary: "November reading at 0.3% MoM, above 0.2% consensus"
+                ),
+                AIResponse.SourceReference(
+                    title: "Shelter Inflation Decomposition",
+                    source: "Economic Research",
+                    type: .research,
+                    summary: "Rent and OER expected to moderate with 6-12 month lag"
+                ),
+                AIResponse.SourceReference(
+                    title: "Fed Minutes: Higher for Longer",
+                    source: "Policy Documents",
+                    type: .filings,
+                    summary: "Committee sees no rush to cut while inflation persists"
+                )
+            ]
+        } else {
+            // Generic sources
+            sources = [
+                AIResponse.SourceReference(
+                    title: "Market Overview: December 2024",
+                    source: "Weekly Summary",
+                    type: .analysis,
+                    summary: "S&P 500 consolidating near highs ahead of Fed"
+                ),
+                AIResponse.SourceReference(
+                    title: "Economic Calendar Highlights",
+                    source: "Data Preview",
+                    type: .research,
+                    summary: "Jobs report and CPI on deck for next week"
+                ),
+                AIResponse.SourceReference(
+                    title: "Fund Flow Trends",
+                    source: "Flow Data",
+                    type: .filings,
+                    summary: "Equity funds seeing consistent inflows, bonds mixed"
+                )
+            ]
+        }
+        
+        return sources
     }
 }

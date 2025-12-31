@@ -384,13 +384,27 @@ struct HomeView: View {
                     .padding(.top, 8)
             }
             
-            // Section cards
+            // Section cards (with special handling for digest)
             ForEach(Array(response.sections.enumerated()), id: \.element.id) { index, section in
-                sectionCard(section: section)
-                    .transition(.asymmetric(
-                        insertion: .opacity.combined(with: .move(edge: .bottom)),
-                        removal: .opacity
-                    ))
+                if section.type == .digest {
+                    digestCard(section: section)
+                        .transition(.asymmetric(
+                            insertion: .opacity.combined(with: .move(edge: .bottom)),
+                            removal: .opacity
+                        ))
+                } else {
+                    sectionCard(section: section)
+                        .transition(.asymmetric(
+                            insertion: .opacity.combined(with: .move(edge: .bottom)),
+                            removal: .opacity
+                        ))
+                }
+            }
+            
+            // Sources section (expandable)
+            if !response.sources.isEmpty {
+                sourcesSection(sources: response.sources)
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
             
             // Timestamp
@@ -405,6 +419,203 @@ struct HomeView: View {
             // Disclaimer footer
             disclaimerFooter
         }
+    }
+    
+    // MARK: - Digest Card (Special Styling)
+    
+    private func digestCard(section: AIResponse.Section) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            // Header with special emphasis
+            HStack(spacing: 10) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.95, green: 0.85, blue: 0.55),
+                                    Color(red: 0.85, green: 0.65, blue: 0.35)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 36, height: 36)
+                    
+                    Image(systemName: "doc.text.fill")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("The Story")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(Color(red: 0.95, green: 0.85, blue: 0.55).opacity(0.7))
+                        .textCase(.uppercase)
+                        .tracking(0.5)
+                    
+                    Text("Here's what's really going on")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(Color(red: 0.95, green: 0.85, blue: 0.55))
+                }
+                
+                Spacer()
+            }
+            
+            // Content with larger, more readable text
+            Text(section.content)
+                .font(.system(size: 16, weight: .regular))
+                .foregroundStyle(Color.white.opacity(0.9))
+                .lineSpacing(7)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.95, green: 0.85, blue: 0.55).opacity(0.08),
+                            Color(red: 0.85, green: 0.65, blue: 0.35).opacity(0.04)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.95, green: 0.85, blue: 0.55).opacity(0.25),
+                                    Color(red: 0.85, green: 0.65, blue: 0.35).opacity(0.08)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                )
+        )
+    }
+    
+    // MARK: - Sources Section (Expandable)
+    
+    @State private var isSourcesExpanded = false
+    
+    private func sourcesSection(sources: [AIResponse.SourceReference]) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Expandable header
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                    isSourcesExpanded.toggle()
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "books.vertical.fill")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(Color.white.opacity(0.5))
+                        
+                        Text("Sources & deeper reading")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Color.white.opacity(0.7))
+                    }
+                    
+                    Spacer()
+                    
+                    HStack(spacing: 6) {
+                        Text("\(sources.count) sources")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.white.opacity(0.4))
+                        
+                        Image(systemName: isSourcesExpanded ? "chevron.up" : "chevron.down")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(Color.white.opacity(0.4))
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+            }
+            .buttonStyle(.plain)
+            
+            // Expanded content
+            if isSourcesExpanded {
+                Divider()
+                    .background(Color.white.opacity(0.08))
+                
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(sources) { source in
+                        sourceRow(source)
+                        
+                        if source.id != sources.last?.id {
+                            Divider()
+                                .background(Color.white.opacity(0.05))
+                                .padding(.leading, 44)
+                        }
+                    }
+                }
+            }
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color.white.opacity(0.04))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                )
+        )
+    }
+    
+    private func sourceRow(_ source: AIResponse.SourceReference) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            // Type icon
+            ZStack {
+                Circle()
+                    .fill(source.type.color.opacity(0.15))
+                    .frame(width: 32, height: 32)
+                
+                Image(systemName: source.type.icon)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(source.type.color)
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                // Title
+                Text(source.title)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(Color.white.opacity(0.85))
+                    .lineLimit(2)
+                
+                // Source + type badge
+                HStack(spacing: 8) {
+                    Text(source.source)
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color.white.opacity(0.4))
+                    
+                    Text(source.type.rawValue)
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(source.type.color)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(
+                            Capsule()
+                                .fill(source.type.color.opacity(0.12))
+                        )
+                }
+                
+                // Summary
+                Text(source.summary)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color.white.opacity(0.55))
+                    .lineSpacing(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
     }
     
     // MARK: - Disclaimer Footer
