@@ -62,7 +62,7 @@ struct MockTradeDataService {
             let category = randomCategory()
             let ticker = randomTicker(for: category)
             let entryDate = randomEntryDate()
-            let holdingDays = Int.random(in: 1...180)
+            let holdingDays = randomHoldingDays(since: entryDate)
             let exitDate = calendar.date(byAdding: .day, value: holdingDays, to: entryDate) ?? entryDate
             let entryPrice = randomEntryPrice(for: ticker, category: category)
             let returnPct = randomReturnPct(for: category)
@@ -103,6 +103,12 @@ struct MockTradeDataService {
     private func randomEntryDate() -> Date {
         let daysBack = Int.random(in: 5...330)
         return calendar.date(byAdding: .day, value: -daysBack, to: Date()) ?? Date()
+    }
+
+    private func randomHoldingDays(since entryDate: Date) -> Int {
+        let daysSinceEntry = calendar.dateComponents([.day], from: entryDate, to: Date()).day ?? 0
+        let cappedMax = min(180, max(1, daysSinceEntry))
+        return Int.random(in: 1...cappedMax)
     }
 
     private func randomEntryPrice(for ticker: String, category: MockTradeCategory) -> Double {

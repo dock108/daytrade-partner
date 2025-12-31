@@ -19,8 +19,7 @@ struct InsightsService {
     private func holdingPeriodInsight(from trades: [MockTrade]) -> String {
         let preferredRangeLabel = "5–15"
         let bestRangeLabel = bestHoldingRangeLabel(from: trades) ?? preferredRangeLabel
-        let normalizedLabel = bestRangeLabel == preferredRangeLabel ? preferredRangeLabel : preferredRangeLabel
-        return "You perform best holding \(normalizedLabel) days"
+        return "You perform best holding \(bestRangeLabel) days"
     }
 
     private func bestHoldingRangeLabel(from trades: [MockTrade]) -> String? {
