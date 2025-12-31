@@ -369,10 +369,10 @@ struct HomeView: View {
         )
     }
 
-    // MARK: - Suggested Chips
+    // MARK: - Guided Suggestions
 
     private var suggestedChips: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Try asking")
                 .font(.caption)
                 .fontWeight(.medium)
@@ -380,30 +380,63 @@ struct HomeView: View {
                 .textCase(.uppercase)
                 .tracking(0.5)
 
-            FlowLayout(spacing: 10) {
-                ForEach(viewModel.suggestedQuestions, id: \.self) { suggestion in
+            VStack(spacing: 10) {
+                ForEach(viewModel.guidedSuggestions) { suggestion in
                     Button {
                         viewModel.selectSuggestion(suggestion)
                     } label: {
-                        Text(suggestion)
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(Color.white.opacity(0.85))
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 10)
-                            .background(
-                                Capsule()
-                                    .fill(Color.white.opacity(0.08))
-                                    .overlay(
-                                        Capsule()
-                                            .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
-                                    )
-                            )
+                        HStack(spacing: 12) {
+                            // Icon
+                            ZStack {
+                                Circle()
+                                    .fill(iconColor(for: suggestion.category).opacity(0.15))
+                                    .frame(width: 36, height: 36)
+                                
+                                Image(systemName: suggestion.icon)
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundStyle(iconColor(for: suggestion.category))
+                            }
+                            
+                            // Text
+                            Text(suggestion.text)
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundStyle(Color.white.opacity(0.85))
+                                .lineLimit(1)
+                            
+                            Spacer()
+                            
+                            // Arrow
+                            Image(systemName: "arrow.right")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(Color.white.opacity(0.25))
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(Color.white.opacity(0.05))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                                )
+                        )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(SuggestionButtonStyle())
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    private func iconColor(for category: HomeViewModel.GuidedSuggestion.Category) -> Color {
+        switch category {
+        case .ticker:
+            return Color(red: 0.4, green: 0.7, blue: 1.0)
+        case .market:
+            return Color(red: 0.9, green: 0.7, blue: 0.3)
+        case .learning:
+            return Color(red: 0.5, green: 0.85, blue: 0.6)
+        }
     }
 
     // MARK: - Recent Searches
@@ -530,6 +563,17 @@ struct FlowLayout: Layout {
             lineHeight = max(lineHeight, size.height)
             currentX += size.width + spacing
         }
+    }
+}
+
+// MARK: - Button Styles
+
+struct SuggestionButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .opacity(configuration.isPressed ? 0.8 : 1.0)
+            .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
     }
 }
 

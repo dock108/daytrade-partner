@@ -18,22 +18,33 @@ final class HomeViewModel: ObservableObject {
     @Published var lastQuery: String = ""
     @Published var recentSearches: [String] = []
     @Published var isLoading: Bool = false
-
-    let suggestedQuestions: [String] = [
-        "What's moving NVDA?",
-        "Oil outlook",
-        "SPY vs QQQ",
-        "Inflation impact",
-        "Tech earnings"
-    ]
+    @Published var guidedSuggestions: [GuidedSuggestion] = []
 
     private let service: AIServiceStub
+    private let tradeService: MockTradeDataService
     private let maxRecentSearches = 5
     private let recentSearchesKey = "TradeLens.RecentSearches"
+    
+    /// A guided suggestion with icon and query
+    struct GuidedSuggestion: Identifiable, Equatable {
+        let id = UUID()
+        let icon: String
+        let text: String
+        let query: String
+        let category: Category
+        
+        enum Category {
+            case ticker
+            case market
+            case learning
+        }
+    }
 
-    init(service: AIServiceStub = AIServiceStub()) {
+    init(service: AIServiceStub = AIServiceStub(), tradeService: MockTradeDataService = MockTradeDataService()) {
         self.service = service
+        self.tradeService = tradeService
         loadRecentSearches()
+        loadGuidedSuggestions()
     }
 
     func submit() {
@@ -41,6 +52,7 @@ final class HomeViewModel: ObservableObject {
         guard !trimmed.isEmpty else {
             response = nil
             priceHistory = nil
+            tickerInfo = nil
             detectedTicker = nil
             return
         }
@@ -68,8 +80,13 @@ final class HomeViewModel: ObservableObject {
         addToRecentSearches(trimmed)
     }
 
-    func selectSuggestion(_ suggestion: String) {
-        question = suggestion
+    func selectSuggestion(_ suggestion: GuidedSuggestion) {
+        question = suggestion.query
+        submit()
+    }
+    
+    func selectSuggestionText(_ text: String) {
+        question = text
         submit()
     }
 
@@ -97,7 +114,108 @@ final class HomeViewModel: ObservableObject {
         recentSearches = []
         saveRecentSearches()
     }
+    
+    func refreshSuggestions() {
+        loadGuidedSuggestions()
+    }
 
+    // MARK: - Guided Suggestions
+    
+    private func loadGuidedSuggestions() {
+        Task {
+            let userTickers = await fetchUserTickers()
+            await MainActor.run {
+                guidedSuggestions = buildGuidedSuggestions(userTickers: userTickers)
+            }
+        }
+    }
+    
+    private func fetchUserTickers() async -> [String] {
+        do {
+            let trades = try await tradeService.fetchMockTrades()
+            // Get unique tickers sorted by frequency
+            let tickerCounts = trades.reduce(into: [String: Int]()) { counts, trade in
+                counts[trade.ticker, default: 0] += 1
+            }
+            return tickerCounts.sorted { $0.value > $1.value }.prefix(5).map { $0.key }
+        } catch {
+            return ["AAPL", "SPY", "QQQ"] // Fallback defaults
+        }
+    }
+    
+    private func buildGuidedSuggestions(userTickers: [String]) -> [GuidedSuggestion] {
+        var suggestions: [GuidedSuggestion] = []
+        
+        // Ticker-specific suggestions using user's tickers
+        if let topTicker = userTickers.first {
+            suggestions.append(GuidedSuggestion(
+                icon: "chart.line.uptrend.xyaxis",
+                text: "What's the outlook on \(topTicker)?",
+                query: "What's the outlook on \(topTicker)?",
+                category: .ticker
+            ))
+        }
+        
+        if userTickers.count >= 2 {
+            let ticker = userTickers[1]
+            suggestions.append(GuidedSuggestion(
+                icon: "arrow.up.arrow.down",
+                text: "Why is \(ticker) moving?",
+                query: "Why is \(ticker) moving?",
+                category: .ticker
+            ))
+        }
+        
+        // Comparison suggestion
+        if userTickers.count >= 2 {
+            let t1 = userTickers[0]
+            let t2 = userTickers[1]
+            suggestions.append(GuidedSuggestion(
+                icon: "arrow.left.arrow.right",
+                text: "Compare \(t1) vs \(t2)",
+                query: "Compare \(t1) vs \(t2)",
+                category: .ticker
+            ))
+        } else {
+            suggestions.append(GuidedSuggestion(
+                icon: "arrow.left.arrow.right",
+                text: "Compare SPY vs QQQ",
+                query: "Compare SPY vs QQQ",
+                category: .ticker
+            ))
+        }
+        
+        // Market-wide suggestions
+        suggestions.append(GuidedSuggestion(
+            icon: "waveform.path.ecg",
+            text: "Is the market nervous or calm?",
+            query: "Is the market nervous or calm right now?",
+            category: .market
+        ))
+        
+        suggestions.append(GuidedSuggestion(
+            icon: "sun.max",
+            text: "Explain today simply",
+            query: "Explain what's happening in the market today in simple terms",
+            category: .learning
+        ))
+        
+        // Add one more ticker-specific if we have enough tickers
+        if userTickers.count >= 3 {
+            let ticker = userTickers[2]
+            suggestions.append(GuidedSuggestion(
+                icon: "questionmark.circle",
+                text: "Should I watch \(ticker)?",
+                query: "What should I know about \(ticker) right now?",
+                category: .ticker
+            ))
+        }
+        
+        return suggestions
+    }
+
+    // MARK: - Recent Searches
+    
     private func addToRecentSearches(_ query: String) {
         // Remove if already exists to avoid duplicates
         recentSearches.removeAll { $0.lowercased() == query.lowercased() }
