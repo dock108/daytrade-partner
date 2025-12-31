@@ -22,22 +22,33 @@ struct DashboardView: View {
                                 await viewModel.loadDashboard()
                             }
                         }
+                        .transition(.opacity)
                     } else if viewModel.isLoading {
                         Text("Loading summary...")
                             .foregroundStyle(.secondary)
+                            .transition(.opacity)
                     } else if let summary = viewModel.summary {
                         statsSection(summary: summary)
+                            .transition(.opacity.combined(with: .move(edge: .top)))
                         insightSection(summary: summary)
+                            .transition(.opacity)
                         tickerSection(summary: summary)
+                            .transition(.opacity)
                         tradesSection
+                            .transition(.opacity.combined(with: .move(edge: .bottom)))
                     } else {
                         Text("No summary available.")
                             .foregroundStyle(.secondary)
+                            .transition(.opacity)
                     }
                 }
                 .padding()
             }
             .navigationTitle("Dashboard")
+            .animation(.easeInOut(duration: 0.2), value: viewModel.isLoading)
+            .animation(.easeInOut(duration: 0.2), value: viewModel.errorMessage)
+            .animation(.easeInOut(duration: 0.2), value: viewModel.summary != nil)
+            .animation(.easeInOut(duration: 0.2), value: viewModel.trades.count)
         }
     }
 
@@ -46,6 +57,7 @@ struct DashboardView: View {
             Text("Your trading story")
                 .font(.title2)
                 .fontWeight(.semibold)
+                .foregroundStyle(.primary)
             Text("A quick look at how you trade.")
                 .foregroundStyle(.secondary)
         }
@@ -56,6 +68,7 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Key stats")
                 .font(.headline)
+                .foregroundStyle(.primary)
 
             statRow(title: "Total trades", value: "\(summary.totalTrades)")
             statRow(title: "Win rate", value: summary.winRate.formatted(.percent.precision(.fractionLength(0))))
@@ -115,12 +128,28 @@ struct DashboardView: View {
     }
 
     private func statRow(title: String, value: String) -> some View {
-        HStack {
-            Text(title)
-            Spacer()
-            Text(value)
-                .fontWeight(.semibold)
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(title)
+                    .foregroundStyle(.secondary)
+                Spacer(minLength: 12)
+                Text(value)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .foregroundStyle(.secondary)
+                Text(value)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
+            }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(title))
+        .accessibilityValue(Text(value))
+        .padding(.vertical, 4)
     }
 
     private func errorStateView(message: String, retry: @escaping () -> Void) -> some View {
