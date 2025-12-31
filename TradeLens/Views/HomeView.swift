@@ -394,7 +394,31 @@ struct HomeView: View {
                     .foregroundStyle(Color.white.opacity(0.3))
             }
             .padding(.top, 8)
+            
+            // Disclaimer footer
+            disclaimerFooter
         }
+    }
+    
+    // MARK: - Disclaimer Footer
+    
+    private var disclaimerFooter: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "info.circle")
+                .font(.system(size: 10))
+            
+            Text("This app explains markets — it does not recommend trades.")
+                .font(.system(size: 11))
+        }
+        .foregroundStyle(Color.white.opacity(0.25))
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 16)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.white.opacity(0.02))
+        )
+        .padding(.top, 16)
     }
 
     private func queryHeader(_ query: String) -> some View {
