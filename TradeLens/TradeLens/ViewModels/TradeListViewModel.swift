@@ -39,8 +39,14 @@ class TradeListViewModel: ObservableObject {
     }
     
     /// Add a new trade
-    func addTrade(symbol: String, quantity: Double, price: Double, type: Trade.TradeType) async {
-        let trade = Trade(symbol: symbol, quantity: quantity, price: price, type: type)
+    func addTrade(ticker: String, qty: Double, entryPrice: Double, category: Trade.Category) async {
+        let trade = Trade(
+            ticker: ticker,
+            entryDate: Date(),
+            qty: qty,
+            entryPrice: entryPrice,
+            category: category
+        )
         await tradeService.addTrade(trade)
         trades = tradeService.trades
     }

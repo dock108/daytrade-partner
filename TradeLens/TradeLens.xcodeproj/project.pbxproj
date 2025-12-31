@@ -15,7 +15,19 @@
 		TL011 /* TradeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL012 /* TradeService.swift */; };
 		TL013 /* TradeListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL014 /* TradeListViewModel.swift */; };
 		TL015 /* CurrencyFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL016 /* CurrencyFormatter.swift */; };
+		TL100 /* UserSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL102 /* UserSummary.swift */; };
+		TL101 /* TradeModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL104 /* TradeModelsTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		TL110 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = TL033 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = TL029 /* TradeLens */;
+			remoteInfo = TradeLens;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		TL017 /* TradeLens.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TradeLens.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -28,10 +40,20 @@
 		TL014 /* TradeListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeListViewModel.swift; sourceTree = "<group>"; };
 		TL016 /* CurrencyFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyFormatter.swift; sourceTree = "<group>"; };
 		TL018 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		TL102 /* UserSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSummary.swift; sourceTree = "<group>"; };
+		TL103 /* TradeLensTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TradeLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		TL104 /* TradeModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeModelsTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		TL019 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		TL105 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -46,6 +68,7 @@
 			children = (
 				TL021 /* TradeLens */,
 				TL022 /* Products */,
+				TL106 /* TradeLensTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -53,6 +76,7 @@
 			isa = PBXGroup;
 			children = (
 				TL017 /* TradeLens.app */,
+				TL103 /* TradeLensTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -77,6 +101,7 @@
 			isa = PBXGroup;
 			children = (
 				TL010 /* Trade.swift */,
+				TL102 /* UserSummary.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -121,6 +146,14 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		TL106 /* TradeLensTests */ = {
+			isa = PBXGroup;
+			children = (
+				TL104 /* TradeModelsTests.swift */,
+			);
+			path = TradeLensTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -141,6 +174,24 @@
 			productReference = TL017 /* TradeLens.app */;
 			productType = "com.apple.product-type.application";
 		};
+		TL107 /* TradeLensTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = TL112 /* Build configuration list for PBXNativeTarget "TradeLensTests" */;
+			buildPhases = (
+				TL108 /* Sources */,
+				TL105 /* Frameworks */,
+				TL109 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				TL111 /* PBXTargetDependency */,
+			);
+			name = TradeLensTests;
+			productName = TradeLensTests;
+			productReference = TL103 /* TradeLensTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -153,6 +204,10 @@
 				TargetAttributes = {
 					TL029 = {
 						CreatedOnToolsVersion = 15.0;
+					};
+					TL107 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = TL029;
 					};
 				};
 			};
@@ -170,6 +225,7 @@
 			projectRoot = "";
 			targets = (
 				TL029 /* TradeLens */,
+				TL107 /* TradeLensTests */,
 			);
 		};
 /* End PBXProject section */
@@ -181,6 +237,13 @@
 			files = (
 				TL007 /* Preview Assets.xcassets in Resources */,
 				TL005 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		TL109 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,10 +260,27 @@
 				TL013 /* TradeListViewModel.swift in Sources */,
 				TL015 /* CurrencyFormatter.swift in Sources */,
 				TL001 /* TradeLensApp.swift in Sources */,
+				TL100 /* UserSummary.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		TL108 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				TL101 /* TradeModelsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		TL111 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = TL029 /* TradeLens */;
+			targetProxy = TL110 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		TL035 /* Debug */ = {
@@ -384,6 +464,53 @@
 			};
 			name = Release;
 		};
+		TL113 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TradeLensTests;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tradelens.TradeLensTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TradeLens.app/TradeLens";
+			};
+			name = Debug;
+		};
+		TL114 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TradeLensTests;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tradelens.TradeLensTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TradeLens.app/TradeLens";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -401,6 +528,15 @@
 			buildConfigurations = (
 				TL037 /* Debug */,
 				TL038 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		TL112 /* Build configuration list for PBXNativeTarget "TradeLensTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				TL113 /* Debug */,
+				TL114 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
