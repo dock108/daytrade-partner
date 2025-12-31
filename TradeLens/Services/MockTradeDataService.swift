@@ -137,7 +137,7 @@ struct MockTradeDataService {
                 return Double.random(in: 0.10...0.25)
             }
             if roll < 0.2 {
-                return Double.random(in: -0.15...-0.05)
+                return Double.random(in: -0.15 ... -0.05)
             }
             return Double.random(in: -0.06...0.08)
         case .speculative:
@@ -146,7 +146,7 @@ struct MockTradeDataService {
                 return Double.random(in: 0.30...0.90)
             }
             if roll < 0.3 {
-                return Double.random(in: -0.60...-0.25)
+                return Double.random(in: -0.60 ... -0.25)
             }
             return Double.random(in: -0.15...0.20)
         }
