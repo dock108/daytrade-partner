@@ -12,6 +12,8 @@ import SwiftUI
 final class HomeViewModel: ObservableObject {
     @Published var question: String = ""
     @Published var response: AIResponse?
+    @Published var priceHistory: PriceHistory?
+    @Published var detectedTicker: String?
     @Published var lastQuery: String = ""
     @Published var recentSearches: [String] = []
     @Published var isLoading: Bool = false
@@ -37,13 +39,23 @@ final class HomeViewModel: ObservableObject {
         let trimmed = question.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             response = nil
+            priceHistory = nil
+            detectedTicker = nil
             return
         }
 
         isLoading = true
         lastQuery = trimmed
         
-        // Simulate brief loading for feel
+        // Detect ticker and load price data immediately (non-blocking)
+        detectedTicker = MockPriceService.detectTicker(in: trimmed)
+        if let ticker = detectedTicker {
+            priceHistory = MockPriceService.priceHistory(for: ticker, range: .oneMonth)
+        } else {
+            priceHistory = nil
+        }
+        
+        // Simulate brief loading for AI response
         Task {
             try? await Task.sleep(nanoseconds: 300_000_000)
             response = service.structuredResponse(for: trimmed)
@@ -66,8 +78,15 @@ final class HomeViewModel: ObservableObject {
     func clearAndReset() {
         question = ""
         response = nil
+        priceHistory = nil
+        detectedTicker = nil
         lastQuery = ""
         isLoading = false
+    }
+    
+    func updateChartRange(_ range: ChartTimeRange) {
+        guard let ticker = detectedTicker else { return }
+        priceHistory = MockPriceService.priceHistory(for: ticker, range: range)
     }
 
     func clearRecentSearches() {

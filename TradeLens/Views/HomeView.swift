@@ -231,6 +231,12 @@ struct HomeView: View {
             // Query header
             queryHeader(response.query)
             
+            // Price chart if ticker detected
+            if let priceHistory = viewModel.priceHistory {
+                TickerChartView(priceHistory: priceHistory)
+                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
+            }
+            
             // Section cards
             ForEach(Array(response.sections.enumerated()), id: \.element.id) { index, section in
                 sectionCard(section: section)
