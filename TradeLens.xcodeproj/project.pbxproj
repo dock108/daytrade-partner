@@ -49,6 +49,8 @@
 		TL422 /* ConversationHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL423 /* ConversationHistory.swift */; };
 		TL424 /* OutlookEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL425 /* OutlookEngine.swift */; };
 		TL426 /* OutlookCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL427 /* OutlookCardView.swift */; };
+		TL428 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL429 /* UserPreferences.swift */; };
+		TL430 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL431 /* OnboardingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,6 +109,8 @@
 		TL423 /* ConversationHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationHistory.swift; sourceTree = "<group>"; };
 		TL425 /* OutlookEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlookEngine.swift; sourceTree = "<group>"; };
 		TL427 /* OutlookCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlookCardView.swift; sourceTree = "<group>"; };
+		TL429 /* UserPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPreferences.swift; sourceTree = "<group>"; };
+		TL431 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -171,6 +175,7 @@
 				TL407 /* PriceData.swift */,
 				TL413 /* TickerInfo.swift */,
 				TL423 /* ConversationHistory.swift */,
+				TL429 /* UserPreferences.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -201,6 +206,7 @@
 				TL411 /* TickerChartView.swift */,
 				TL417 /* TickerSnapshotCard.swift */,
 				TL427 /* OutlookCardView.swift */,
+				TL431 /* OnboardingView.swift */,
 				TL208 /* SettingsView.swift */,
 				TL301 /* DashboardView.swift */,
 				TL303 /* TradeDetailView.swift */,
@@ -397,6 +403,8 @@
 				TL422 /* ConversationHistory.swift in Sources */,
 				TL424 /* OutlookEngine.swift in Sources */,
 				TL426 /* OutlookCardView.swift in Sources */,
+				TL428 /* UserPreferences.swift in Sources */,
+				TL430 /* OnboardingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

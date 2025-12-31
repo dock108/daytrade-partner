@@ -20,6 +20,8 @@ struct Outlook: Identifiable {
     let volatilityBand: Double          // Expected swing as percentage (e.g., 0.08 = 8%)
     let historicalHitRate: Double       // % times ticker was up over similar windows
     let personalContext: String?        // Tailored note from user history
+    let volatilityWarning: String?      // Warning if above user's tolerance
+    let timeframeNote: String?          // Note if timeframe differs from user's style
     let generatedAt: Date
     
     /// Sentiment categories — descriptive, not predictive
@@ -36,6 +38,18 @@ struct Outlook: Identifiable {
                 return "Signals are mixed — some positive indicators balanced by areas of uncertainty."
             case .cautious:
                 return "Conditions suggest elevated uncertainty or headwinds in the near term."
+            }
+        }
+        
+        /// Simplified description for users preferring simple mode
+        var simpleDescription: String {
+            switch self {
+            case .positive:
+                return "Things look pretty good right now based on recent trends."
+            case .mixed:
+                return "It's a bit of a mixed bag — some good signs, some uncertainty."
+            case .cautious:
+                return "There's more uncertainty than usual at the moment."
             }
         }
         
@@ -58,6 +72,7 @@ final class OutlookEngine {
     // MARK: - Dependencies
     
     private let tradeService: MockTradeDataService
+    private let preferencesManager: UserPreferencesManager
     
     // MARK: - Mock Data Sources
     
@@ -166,8 +181,12 @@ final class OutlookEngine {
     
     // MARK: - Initialization
     
-    init(tradeService: MockTradeDataService = MockTradeDataService()) {
+    init(
+        tradeService: MockTradeDataService = MockTradeDataService(),
+        preferencesManager: UserPreferencesManager = .shared
+    ) {
         self.tradeService = tradeService
+        self.preferencesManager = preferencesManager
     }
     
     // MARK: - Public API
@@ -224,6 +243,10 @@ final class OutlookEngine {
             )
         }
         
+        // Generate preference-aware notes
+        let volatilityWarning = generateVolatilityWarning(volatilityBand: volatilityBand)
+        let timeframeNote = generateTimeframeNote(timeframeDays: timeframeDays)
+        
         return Outlook(
             ticker: normalizedTicker,
             timeframeDays: timeframeDays,
@@ -232,6 +255,8 @@ final class OutlookEngine {
             volatilityBand: volatilityBand,
             historicalHitRate: adjustedHitRate,
             personalContext: personalContext,
+            volatilityWarning: volatilityWarning,
+            timeframeNote: timeframeNote,
             generatedAt: Date()
         )
     }
@@ -262,6 +287,9 @@ final class OutlookEngine {
             sectorStrength: sectorTrend.strength
         )
         
+        let volatilityWarning = generateVolatilityWarning(volatilityBand: volatilityBand)
+        let timeframeNote = generateTimeframeNote(timeframeDays: timeframeDays)
+        
         return Outlook(
             ticker: normalizedTicker,
             timeframeDays: timeframeDays,
@@ -270,8 +298,20 @@ final class OutlookEngine {
             volatilityBand: volatilityBand,
             historicalHitRate: adjustedHitRate,
             personalContext: nil,
+            volatilityWarning: volatilityWarning,
+            timeframeNote: timeframeNote,
             generatedAt: Date()
         )
+    }
+    
+    /// Get user's preferred default timeframe
+    func preferredTimeframe() -> Int {
+        preferencesManager.preferences.tradingStyle.defaultTimeframeDays
+    }
+    
+    /// Check if ticker is in user's watch list
+    func isWatchedTicker(_ ticker: String) -> Bool {
+        preferencesManager.preferences.watchedTickers.contains(ticker.uppercased())
     }
     
     // MARK: - Private Calculations
@@ -404,6 +444,57 @@ final class OutlookEngine {
             let recentTrade = tickerTrades.first!
             let outcome = recentTrade.realizedPnL > 0 ? "profit" : "loss"
             return "You last traded \(ticker) for a \(outcome). One data point, but recent memory."
+        }
+        
+        return nil
+    }
+    
+    // MARK: - Preference-Aware Notes
+    
+    private func generateVolatilityWarning(volatilityBand: Double) -> String? {
+        let userTolerance = preferencesManager.preferences.riskTolerance
+        let threshold = userTolerance.volatilityWarningThreshold
+        
+        guard volatilityBand > threshold else { return nil }
+        
+        let percentAbove = Int((volatilityBand - threshold) / threshold * 100)
+        
+        switch userTolerance {
+        case .low:
+            return "This ticker typically swings more than you've indicated you're comfortable with. The expected range is about \(percentAbove)% above your preference."
+        case .moderate:
+            return "Heads up: this shows higher-than-usual volatility for your comfort level."
+        case .high:
+            // High tolerance users rarely see warnings
+            return "Even for someone comfortable with swings, this one's on the volatile side."
+        }
+    }
+    
+    private func generateTimeframeNote(timeframeDays: Int) -> String? {
+        let userStyle = preferencesManager.preferences.tradingStyle
+        let preferredDays = userStyle.defaultTimeframeDays
+        
+        // Only note if significantly different
+        let ratio = Double(timeframeDays) / Double(preferredDays)
+        
+        if ratio > 3.0 {
+            switch userStyle {
+            case .shortTerm:
+                return "This is a longer timeframe than you typically trade. Consider how that changes your approach."
+            case .mixed:
+                return nil
+            case .longTerm:
+                return nil
+            }
+        } else if ratio < 0.3 {
+            switch userStyle {
+            case .longTerm:
+                return "This is a shorter window than your usual holding period. Short-term noise may be higher."
+            case .mixed:
+                return nil
+            case .shortTerm:
+                return nil
+            }
         }
         
         return nil

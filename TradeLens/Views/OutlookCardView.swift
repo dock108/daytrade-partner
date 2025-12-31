@@ -43,9 +43,27 @@ struct OutlookCardView: View {
             VStack(alignment: .leading, spacing: 20) {
                 bigPictureSection
                 
+                // Timeframe note if applicable
+                if let timeframeNote = outlook.timeframeNote {
+                    preferenceNoteCard(
+                        message: timeframeNote,
+                        icon: "clock.badge.exclamationmark",
+                        color: Color(red: 0.4, green: 0.7, blue: 1.0)
+                    )
+                }
+                
                 keyDriversSection
                 
                 expectedSwingsSection
+                
+                // Volatility warning if applicable
+                if let volatilityWarning = outlook.volatilityWarning {
+                    preferenceNoteCard(
+                        message: volatilityWarning,
+                        icon: "exclamationmark.triangle",
+                        color: .orange
+                    )
+                }
                 
                 historicalSection
                 
@@ -363,6 +381,33 @@ struct OutlookCardView: View {
         )
     }
     
+    // MARK: - Preference Note Card
+    
+    private func preferenceNoteCard(message: String, icon: String, color: Color) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(color)
+                .padding(.top, 2)
+            
+            Text(message)
+                .font(.system(size: 13))
+                .foregroundStyle(Color.white.opacity(0.75))
+                .lineSpacing(3)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(color.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .strokeBorder(color.opacity(0.15), lineWidth: 1)
+                )
+        )
+    }
+    
     // MARK: - Helpers
     
     private func sectionHeader(title: String, icon: String, color: Color) -> some View {
@@ -448,6 +493,8 @@ struct InfoExplanationSheet: View {
             volatilityBand: 0.12,
             historicalHitRate: 0.68,
             personalContext: "You've traded NVDA 5 times with a 80% win rate — historically one of your stronger names.",
+            volatilityWarning: "This ticker typically swings more than you've indicated you're comfortable with.",
+            timeframeNote: nil,
             generatedAt: Date()
         ))
         .padding(20)
