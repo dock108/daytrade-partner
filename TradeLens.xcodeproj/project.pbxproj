@@ -54,6 +54,7 @@
 		TL432 /* HistoricalRangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL433 /* HistoricalRangeView.swift */; };
 		TL434 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL435 /* Theme.swift */; };
 		TL436 /* ScreenContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL437 /* ScreenContainerView.swift */; };
+		TL438 /* InfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL439 /* InfoCardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -117,6 +118,7 @@
 		TL433 /* HistoricalRangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoricalRangeView.swift; sourceTree = "<group>"; };
 		TL435 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		TL437 /* ScreenContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenContainerView.swift; sourceTree = "<group>"; };
+		TL439 /* InfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoCardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -215,6 +217,7 @@
 				TL431 /* OnboardingView.swift */,
 				TL433 /* HistoricalRangeView.swift */,
 				TL437 /* ScreenContainerView.swift */,
+				TL439 /* InfoCardView.swift */,
 				TL208 /* SettingsView.swift */,
 				TL301 /* DashboardView.swift */,
 				TL303 /* TradeDetailView.swift */,
@@ -417,6 +420,7 @@
 				TL432 /* HistoricalRangeView.swift in Sources */,
 				TL434 /* Theme.swift in Sources */,
 				TL436 /* ScreenContainerView.swift in Sources */,
+				TL438 /* InfoCardView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -2,7 +2,7 @@
 //  InsightsView.swift
 //  TradeLens
 //
-//  Patterns & Insights screen — uses ScreenContainerView for consistent styling.
+//  Patterns & Insights screen — uses InfoCardView for consistent styling.
 //
 
 import SwiftUI
@@ -55,72 +55,21 @@ struct InsightsView: View {
             ScreenSectionHeader("Key Observations", icon: "lightbulb.fill")
             
             if viewModel.insights.isEmpty {
-                emptyInsightsCard
+                EmptyStateCard(
+                    icon: "sparkles",
+                    title: "No insights yet",
+                    message: "Add more trades to see personalized patterns"
+                )
             } else {
                 ForEach(viewModel.insights) { insight in
-                    insightCard(insight)
+                    InsightInfoCard(
+                        title: insight.title,
+                        subtitle: insight.subtitle,
+                        detail: insight.detail,
+                        icon: icon(for: insight.title),
+                        color: accentColor(for: insight.title)
+                    )
                 }
-            }
-        }
-    }
-    
-    private var emptyInsightsCard: some View {
-        ScreenCard {
-            HStack(spacing: 14) {
-                ZStack {
-                    Circle()
-                        .fill(Theme.colors.textQuaternary.opacity(0.2))
-                        .frame(width: 44, height: 44)
-                    
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Theme.colors.textQuaternary)
-                }
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("No insights yet")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Theme.colors.textSecondary)
-                    
-                    Text("Add more trades to see personalized patterns")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Theme.colors.textTertiary)
-                }
-            }
-        }
-    }
-    
-    private func insightCard(_ insight: InsightsViewModel.Insight) -> some View {
-        ScreenCard(accent: accentColor(for: insight.title)) {
-            VStack(alignment: .leading, spacing: 10) {
-                // Header
-                HStack(spacing: 10) {
-                    ZStack {
-                        Circle()
-                            .fill(accentColor(for: insight.title).opacity(0.15))
-                            .frame(width: 36, height: 36)
-                        
-                        Image(systemName: icon(for: insight.title))
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(accentColor(for: insight.title))
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(insight.title)
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(Theme.colors.textPrimary)
-                        
-                        Text(insight.subtitle)
-                            .font(.system(size: 11))
-                            .foregroundStyle(Theme.colors.textTertiary)
-                    }
-                }
-                
-                // Detail
-                Text(insight.detail)
-                    .font(.system(size: 14))
-                    .foregroundStyle(Theme.colors.textSecondary)
-                    .lineSpacing(4)
             }
         }
     }
@@ -162,13 +111,14 @@ struct InsightsView: View {
             ScreenSectionHeader("Recent Trades", icon: "clock.arrow.circlepath")
             
             if viewModel.trades.isEmpty {
-                ScreenCard {
+                InfoCardView {
                     Text("No trades yet")
                         .font(.system(size: 14))
                         .foregroundStyle(Theme.colors.textTertiary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
             } else {
-                ScreenCard {
+                ListInfoCard {
                     VStack(spacing: 0) {
                         ForEach(Array(viewModel.trades.prefix(5).enumerated()), id: \.element.id) { index, trade in
                             NavigationLink {
@@ -222,13 +172,13 @@ struct InsightsView: View {
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Theme.colors.textQuaternary)
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, 10)
     }
 
     // MARK: - Error State
 
     private func errorStateView(message: String, retry: @escaping () -> Void) -> some View {
-        ScreenCard(accent: Theme.colors.accentOrange) {
+        InfoCardView(accent: Theme.colors.accentOrange) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 10) {
                     Image(systemName: "exclamationmark.triangle.fill")

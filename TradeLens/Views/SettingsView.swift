@@ -2,7 +2,7 @@
 //  SettingsView.swift
 //  TradeLens
 //
-//  Settings and data import view — uses ScreenContainerView for consistent styling.
+//  Settings and data import view — uses InfoCardView for consistent styling.
 //
 
 import SwiftUI
@@ -34,37 +34,33 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 16) {
             ScreenSectionHeader("AI Responses", icon: "brain")
             
-            ScreenCard {
-                VStack(spacing: 0) {
-                    // Simple mode toggle
-                    HStack(spacing: 14) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Theme.colors.accentGreenMuted.opacity(0.15))
-                                .frame(width: 40, height: 40)
-                            
-                            Image(systemName: "leaf.fill")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundStyle(Theme.colors.accentGreenMuted)
-                        }
+            InfoCardView {
+                HStack(spacing: 14) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Theme.colors.accentGreenMuted.opacity(0.15))
+                            .frame(width: 40, height: 40)
                         
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text("Simple Explanations")
-                                .font(.system(size: 15, weight: .medium))
-                                .foregroundStyle(Theme.colors.textPrimary)
-                            
-                            Text("Plain English, no jargon, helpful analogies")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Theme.colors.textTertiary)
-                        }
-                        
-                        Spacer()
-                        
-                        Toggle("", isOn: $userSettings.isSimpleModeEnabled)
-                            .tint(Theme.colors.accentGreenMuted)
-                            .labelsHidden()
+                        Image(systemName: "leaf.fill")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(Theme.colors.accentGreenMuted)
                     }
-                    .padding(.vertical, 4)
+                    
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Simple Explanations")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(Theme.colors.textPrimary)
+                        
+                        Text("Plain English, no jargon, helpful analogies")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Theme.colors.textTertiary)
+                    }
+                    
+                    Spacer()
+                    
+                    Toggle("", isOn: $userSettings.isSimpleModeEnabled)
+                        .tint(Theme.colors.accentGreenMuted)
+                        .labelsHidden()
                 }
             }
             
@@ -82,7 +78,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 16) {
             ScreenSectionHeader("Conversation History", icon: "bubble.left.and.bubble.right.fill")
             
-            ScreenCard {
+            InfoCardView {
                 Button {
                     showClearHistoryAlert = true
                 } label: {
@@ -115,9 +111,8 @@ struct SettingsView: View {
                                 .foregroundStyle(Theme.colors.textQuaternary)
                         }
                     }
-                    .padding(.vertical, 4)
                 }
-                .buttonStyle(SettingsRowButtonStyle())
+                .buttonStyle(InfoCardRowButtonStyle())
                 .disabled(historyService.count == 0)
                 .opacity(historyService.count == 0 ? 0.5 : 1.0)
             }
@@ -143,7 +138,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 16) {
             ScreenSectionHeader("Data Import", icon: "square.and.arrow.down.fill")
             
-            ScreenCard {
+            InfoCardView {
                 VStack(spacing: 0) {
                     Button {
                         Task {
@@ -183,9 +178,8 @@ struct SettingsView: View {
                                 .font(.system(size: 12, weight: .semibold))
                                 .foregroundStyle(Theme.colors.textQuaternary)
                         }
-                        .padding(.vertical, 4)
                     }
-                    .buttonStyle(SettingsRowButtonStyle())
+                    .buttonStyle(InfoCardRowButtonStyle())
                     .disabled(viewModel.isImporting)
                     
                     // Import status
@@ -230,7 +224,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 16) {
             ScreenSectionHeader("Coming Soon", icon: "sparkles")
             
-            ScreenCard(accent: Theme.colors.accentPurple) {
+            InfoCardView(accent: Theme.colors.accentPurple) {
                 HStack(spacing: 14) {
                     ZStack {
                         Circle()
@@ -264,7 +258,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 16) {
             ScreenSectionHeader("About", icon: "info.circle.fill")
             
-            ScreenCard {
+            InfoCardView {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Text("TradeLens")
@@ -285,18 +279,6 @@ struct SettingsView: View {
                 }
             }
         }
-    }
-}
-
-// MARK: - Settings Row Button Style
-
-struct SettingsRowButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .background(
-                RoundedRectangle(cornerRadius: Theme.cornerRadius.md)
-                    .fill(configuration.isPressed ? Theme.colors.cardBackgroundElevated : Color.clear)
-            )
     }
 }
 

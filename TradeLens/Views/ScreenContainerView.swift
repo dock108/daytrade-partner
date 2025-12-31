@@ -139,216 +139,18 @@ struct ScreenSectionHeader: View {
     }
 }
 
-// MARK: - Screen Card
-
-/// Reusable card wrapper for consistent card styling
-struct ScreenCard<Content: View>: View {
-    let accent: Color?
-    let elevated: Bool
-    let content: Content
-    
-    init(
-        accent: Color? = nil,
-        elevated: Bool = false,
-        @ViewBuilder content: () -> Content
-    ) {
-        self.accent = accent
-        self.elevated = elevated
-        self.content = content()
-    }
-    
-    var body: some View {
-        content
-            .padding(Theme.spacing.md)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .themedCard(elevated: elevated, accent: accent)
-    }
-}
-
-// MARK: - Screen Row
-
-/// Reusable row for list-style content
-struct ScreenRow: View {
-    let icon: String
-    let iconColor: Color
-    let title: String
-    let subtitle: String?
-    let value: String?
-    let valueColor: Color?
-    let action: (() -> Void)?
-    
-    init(
-        icon: String,
-        iconColor: Color = Theme.colors.accentBlue,
-        title: String,
-        subtitle: String? = nil,
-        value: String? = nil,
-        valueColor: Color? = nil,
-        action: (() -> Void)? = nil
-    ) {
-        self.icon = icon
-        self.iconColor = iconColor
-        self.title = title
-        self.subtitle = subtitle
-        self.value = value
-        self.valueColor = valueColor
-        self.action = action
-    }
-    
-    var body: some View {
-        Button {
-            action?()
-        } label: {
-            HStack(spacing: 14) {
-                // Icon
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(iconColor.opacity(0.15))
-                        .frame(width: 40, height: 40)
-                    
-                    Image(systemName: icon)
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(iconColor)
-                }
-                
-                // Text
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(title)
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Theme.colors.textPrimary)
-                    
-                    if let subtitle = subtitle {
-                        Text(subtitle)
-                            .font(.system(size: 12))
-                            .foregroundStyle(Theme.colors.textTertiary)
-                    }
-                }
-                
-                Spacer()
-                
-                // Value or chevron
-                if let value = value {
-                    Text(value)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(valueColor ?? Theme.colors.textSecondary)
-                } else if action != nil {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(Theme.colors.textQuaternary)
-                }
-            }
-            .padding(.vertical, 12)
-            .padding(.horizontal, 14)
-        }
-        .buttonStyle(ScreenRowButtonStyle())
-        .disabled(action == nil)
-    }
-}
-
-struct ScreenRowButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .background(
-                RoundedRectangle(cornerRadius: Theme.cornerRadius.md)
-                    .fill(configuration.isPressed ? Theme.colors.cardBackgroundElevated : Color.clear)
-            )
-    }
-}
-
-// MARK: - Stat Card
-
-/// Compact stat display card
-struct StatCard: View {
-    let title: String
-    let value: String
-    let icon: String
-    let color: Color
-    let trend: TrendDirection?
-    
-    enum TrendDirection {
-        case up, down, neutral
-        
-        var icon: String {
-            switch self {
-            case .up: return "arrow.up.right"
-            case .down: return "arrow.down.right"
-            case .neutral: return "arrow.right"
-            }
-        }
-        
-        var color: Color {
-            switch self {
-            case .up: return Theme.colors.accentGreen
-            case .down: return Theme.colors.accentRed
-            case .neutral: return Theme.colors.textTertiary
-            }
-        }
-    }
-    
-    init(
-        title: String,
-        value: String,
-        icon: String,
-        color: Color = Theme.colors.accentBlue,
-        trend: TrendDirection? = nil
-    ) {
-        self.title = title
-        self.value = value
-        self.icon = icon
-        self.color = color
-        self.trend = trend
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                ZStack {
-                    Circle()
-                        .fill(color.opacity(0.15))
-                        .frame(width: 32, height: 32)
-                    
-                    Image(systemName: icon)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(color)
-                }
-                
-                Spacer()
-                
-                if let trend = trend {
-                    Image(systemName: trend.icon)
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(trend.color)
-                }
-            }
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(value)
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundStyle(Theme.colors.textPrimary)
-                
-                Text(title)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Theme.colors.textTertiary)
-            }
-        }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .themedCard()
-    }
-}
-
 // MARK: - Preview
 
 #Preview {
     ScreenContainerView(
-        title: "Insights",
-        subtitle: "Your trading patterns and behavior"
+        title: "Preview",
+        subtitle: "Testing the container view"
     ) {
         VStack(spacing: 20) {
             ScreenSectionHeader("Key Metrics", icon: "chart.bar.fill")
             
             HStack(spacing: 12) {
-                StatCard(
+                StatInfoCard(
                     title: "Win Rate",
                     value: "68%",
                     icon: "target",
@@ -356,7 +158,7 @@ struct StatCard: View {
                     trend: .up
                 )
                 
-                StatCard(
+                StatInfoCard(
                     title: "Avg Hold",
                     value: "4.2 days",
                     icon: "clock.fill",
@@ -366,10 +168,10 @@ struct StatCard: View {
             
             ScreenSectionHeader("Recent Activity", icon: "clock.arrow.circlepath")
             
-            ScreenCard {
+            ListInfoCard {
                 VStack(spacing: 0) {
-                    ScreenRow(
-                        icon: "chart.line.uptrend.xyaxis",
+                    InfoCardRow(
+                        icon: "arrow.up.right",
                         iconColor: Theme.colors.accentGreen,
                         title: "NVDA Trade",
                         subtitle: "Closed 2 days ago",
@@ -379,9 +181,10 @@ struct StatCard: View {
                     
                     Divider()
                         .background(Theme.colors.divider)
+                        .padding(.leading, 54)
                     
-                    ScreenRow(
-                        icon: "chart.line.downtrend.xyaxis",
+                    InfoCardRow(
+                        icon: "arrow.down.right",
                         iconColor: Theme.colors.accentRed,
                         title: "AAPL Trade",
                         subtitle: "Closed 5 days ago",
@@ -393,4 +196,3 @@ struct StatCard: View {
         }
     }
 }
-

@@ -2,7 +2,7 @@
 //  DashboardView.swift
 //  TradeLens
 //
-//  Dashboard summary view — uses ScreenContainerView for consistent styling.
+//  Dashboard summary view — uses InfoCardView for consistent styling.
 //
 
 import SwiftUI
@@ -56,29 +56,11 @@ struct DashboardView: View {
     // MARK: - Empty State
     
     private var emptyState: some View {
-        ScreenCard {
-            HStack(spacing: 14) {
-                ZStack {
-                    Circle()
-                        .fill(Theme.colors.textQuaternary.opacity(0.2))
-                        .frame(width: 44, height: 44)
-                    
-                    Image(systemName: "chart.bar.xaxis")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Theme.colors.textQuaternary)
-                }
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("No data yet")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Theme.colors.textSecondary)
-                    
-                    Text("Import trades to see your dashboard")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Theme.colors.textTertiary)
-                }
-            }
-        }
+        EmptyStateCard(
+            icon: "chart.bar.xaxis",
+            title: "No data yet",
+            message: "Import trades to see your dashboard"
+        )
     }
 
     // MARK: - Stats Grid
@@ -89,7 +71,7 @@ struct DashboardView: View {
             
             // Top row - 2 stats
             HStack(spacing: 12) {
-                StatCard(
+                StatInfoCard(
                     title: "Win Rate",
                     value: CurrencyFormatter.formatPercentage(summary.winRate),
                     icon: "target",
@@ -97,7 +79,7 @@ struct DashboardView: View {
                     trend: summary.winRate >= 0.55 ? .up : (summary.winRate >= 0.45 ? .neutral : .down)
                 )
                 
-                StatCard(
+                StatInfoCard(
                     title: "Total Trades",
                     value: "\(summary.totalTrades)",
                     icon: "rectangle.stack.fill",
@@ -107,14 +89,14 @@ struct DashboardView: View {
             
             // Bottom row - 2 stats
             HStack(spacing: 12) {
-                StatCard(
+                StatInfoCard(
                     title: "Avg Hold",
                     value: String(format: "%.1f days", summary.avgHoldDays),
                     icon: "clock.fill",
                     color: Theme.colors.accentPurple
                 )
                 
-                StatCard(
+                StatInfoCard(
                     title: "Total P/L",
                     value: CurrencyFormatter.formatUSD(summary.realizedPnLTotal),
                     icon: summary.realizedPnLTotal >= 0 ? "arrow.up.right" : "arrow.down.right",
@@ -131,8 +113,8 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 16) {
             ScreenSectionHeader("Risk Profile", icon: "shield.fill")
             
-            ScreenCard(accent: riskColor(for: summary.speculativePercent)) {
-                VStack(alignment: .leading, spacing: 12) {
+            InfoCardView(accent: riskColor(for: summary.speculativePercent)) {
+                VStack(alignment: .leading, spacing: 14) {
                     // Risk meter
                     HStack(spacing: 14) {
                         ZStack {
@@ -226,7 +208,7 @@ struct DashboardView: View {
             
             HStack(spacing: 12) {
                 // Best ticker
-                ScreenCard(accent: Theme.colors.accentGreen) {
+                InfoCardView(accent: Theme.colors.accentGreen) {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
                             Image(systemName: "crown.fill")
@@ -240,13 +222,13 @@ struct DashboardView: View {
                         }
                         
                         Text(summary.bestTicker ?? "—")
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
                             .foregroundStyle(Theme.colors.textPrimary)
                     }
                 }
                 
                 // Worst ticker
-                ScreenCard(accent: Theme.colors.accentRed) {
+                InfoCardView(accent: Theme.colors.accentRed) {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
                             Image(systemName: "exclamationmark.triangle.fill")
@@ -260,7 +242,7 @@ struct DashboardView: View {
                         }
                         
                         Text(summary.worstTicker ?? "—")
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
                             .foregroundStyle(Theme.colors.textPrimary)
                     }
                 }
@@ -275,13 +257,14 @@ struct DashboardView: View {
             ScreenSectionHeader("Recent Trades", icon: "clock.arrow.circlepath")
             
             if viewModel.trades.isEmpty {
-                ScreenCard {
+                InfoCardView {
                     Text("No trades yet")
                         .font(.system(size: 14))
                         .foregroundStyle(Theme.colors.textTertiary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
             } else {
-                ScreenCard {
+                ListInfoCard {
                     VStack(spacing: 0) {
                         ForEach(Array(viewModel.trades.prefix(5).enumerated()), id: \.element.id) { index, trade in
                             NavigationLink {
@@ -335,13 +318,13 @@ struct DashboardView: View {
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Theme.colors.textQuaternary)
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, 10)
     }
 
     // MARK: - Error State
 
     private func errorStateView(message: String, retry: @escaping () -> Void) -> some View {
-        ScreenCard(accent: Theme.colors.accentOrange) {
+        InfoCardView(accent: Theme.colors.accentOrange) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 10) {
                     Image(systemName: "exclamationmark.triangle.fill")
