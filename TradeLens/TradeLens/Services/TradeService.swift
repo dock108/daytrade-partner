@@ -23,9 +23,29 @@ class TradeService: ObservableObject {
         try await Task.sleep(nanoseconds: 1_000_000_000)
         
         // Example trades
+        let calendar = Calendar.current
+        let now = Date()
+        let aaplEntry = calendar.date(byAdding: .day, value: -12, to: now) ?? now
+        let aaplExit = calendar.date(byAdding: .day, value: -3, to: now)
+        let googlEntry = calendar.date(byAdding: .day, value: -6, to: now) ?? now
+
         trades = [
-            Trade(symbol: "AAPL", quantity: 10, price: 150.25, type: .buy),
-            Trade(symbol: "GOOGL", quantity: 5, price: 2800.50, type: .buy)
+            Trade(
+                ticker: "AAPL",
+                entryDate: aaplEntry,
+                exitDate: aaplExit,
+                qty: 10,
+                entryPrice: 150.25,
+                exitPrice: 163.40,
+                category: .core
+            ),
+            Trade(
+                ticker: "GOOGL",
+                entryDate: googlEntry,
+                qty: 5,
+                entryPrice: 2800.50,
+                category: .speculative
+            )
         ]
     }
     
