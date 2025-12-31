@@ -34,7 +34,7 @@ struct HomeView: View {
 
                 ScrollView {
                     VStack(spacing: 0) {
-                        if viewModel.response == nil {
+                        if viewModel.response == nil && !viewModel.isLoading {
                             // Landing state — centered search
                             Spacer()
                                 .frame(height: geometry.size.height * 0.18)
@@ -55,23 +55,29 @@ struct HomeView: View {
 
                             Spacer(minLength: 100)
                         } else {
-                            // Response state — search at top
+                            // Response state — search at top, article below
                             compactSearchHeader
                                 .padding(.top, 16)
 
-                            responseSection
-                                .padding(.top, 24)
-                                .transition(.opacity.combined(with: .move(edge: .bottom)))
+                            if viewModel.isLoading {
+                                loadingState
+                                    .padding(.top, 40)
+                            } else if let response = viewModel.response {
+                                articleView(response: response)
+                                    .padding(.top, 24)
+                                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                            }
 
                             Spacer(minLength: 100)
                         }
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, 20)
                 }
                 .scrollDismissesKeyboard(.interactively)
             }
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.85), value: viewModel.response != nil)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.isLoading)
     }
 
     // MARK: - Hero Section
@@ -202,6 +208,155 @@ struct HomeView: View {
         )
     }
 
+    // MARK: - Loading State
+
+    private var loadingState: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 0.4, green: 0.7, blue: 1.0)))
+                .scaleEffect(1.2)
+            
+            Text("Analyzing...")
+                .font(.subheadline)
+                .foregroundStyle(Color.white.opacity(0.5))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 60)
+    }
+
+    // MARK: - Article View
+
+    private func articleView(response: AIResponse) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Query header
+            queryHeader(response.query)
+            
+            // Section cards
+            ForEach(Array(response.sections.enumerated()), id: \.element.id) { index, section in
+                sectionCard(section: section)
+                    .transition(.asymmetric(
+                        insertion: .opacity.combined(with: .move(edge: .bottom)),
+                        removal: .opacity
+                    ))
+            }
+            
+            // Timestamp
+            HStack {
+                Spacer()
+                Text(response.timestamp, style: .time)
+                    .font(.caption2)
+                    .foregroundStyle(Color.white.opacity(0.3))
+            }
+            .padding(.top, 8)
+        }
+    }
+
+    private func queryHeader(_ query: String) -> some View {
+        HStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(red: 0.4, green: 0.7, blue: 1.0),
+                                Color(red: 0.3, green: 0.5, blue: 0.9)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 36, height: 36)
+
+                Image(systemName: "sparkles")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(.white)
+            }
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text("TradeLens")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.white.opacity(0.6))
+                
+                Text(query)
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+            
+            Spacer()
+        }
+        .padding(.bottom, 8)
+    }
+
+    private func sectionCard(section: AIResponse.Section) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Section header
+            HStack(spacing: 10) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(section.type.accentColor.opacity(0.15))
+                        .frame(width: 32, height: 32)
+                    
+                    Image(systemName: section.type.icon)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(section.type.accentColor)
+                }
+                
+                Text(section.type.rawValue)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(section.type.accentColor)
+                    .textCase(.uppercase)
+                    .tracking(0.5)
+            }
+            
+            // Content
+            Text(section.content)
+                .font(.system(size: 15, weight: .regular))
+                .foregroundStyle(Color.white.opacity(0.85))
+                .lineSpacing(5)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            // Bullet points if present
+            if let bullets = section.bulletPoints, !bullets.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(bullets, id: \.self) { bullet in
+                        HStack(alignment: .top, spacing: 10) {
+                            Circle()
+                                .fill(section.type.accentColor.opacity(0.6))
+                                .frame(width: 5, height: 5)
+                                .padding(.top, 7)
+                            
+                            Text(bullet)
+                                .font(.system(size: 14))
+                                .foregroundStyle(Color.white.opacity(0.75))
+                                .lineSpacing(3)
+                        }
+                    }
+                }
+                .padding(.top, 4)
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.05))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [
+                                    section.type.accentColor.opacity(0.2),
+                                    section.type.accentColor.opacity(0.05)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                )
+        )
+    }
+
     // MARK: - Suggested Chips
 
     private var suggestedChips: some View {
@@ -302,74 +457,6 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Response Section
-
-    private var responseSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            if let response = viewModel.response {
-                // Query echo
-                HStack(spacing: 10) {
-                    Circle()
-                        .fill(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.2))
-                        .frame(width: 28, height: 28)
-                        .overlay(
-                            Image(systemName: "person.fill")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0))
-                        )
-
-                    Text(viewModel.lastQuery)
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Color.white.opacity(0.9))
-                }
-                .padding(.bottom, 8)
-
-                // AI Response
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack(spacing: 10) {
-                        ZStack {
-                            Circle()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [
-                                            Color(red: 0.4, green: 0.7, blue: 1.0),
-                                            Color(red: 0.3, green: 0.5, blue: 0.9)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .frame(width: 28, height: 28)
-
-                            Image(systemName: "sparkles")
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(.white)
-                        }
-
-                        Text("TradeLens")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(Color.white.opacity(0.6))
-                    }
-
-                    Text(response)
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundStyle(Color.white.opacity(0.85))
-                        .lineSpacing(6)
-                        .padding(.leading, 38)
-                }
-                .padding(20)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.white.opacity(0.06))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
-                        )
-                )
-            }
-        }
-    }
-
     // MARK: - Grid Pattern
 
     private var gridPattern: some View {
@@ -437,4 +524,3 @@ struct FlowLayout: Layout {
 #Preview {
     HomeView()
 }
-

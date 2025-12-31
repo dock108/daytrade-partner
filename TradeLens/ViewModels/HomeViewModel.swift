@@ -11,9 +11,10 @@ import SwiftUI
 @MainActor
 final class HomeViewModel: ObservableObject {
     @Published var question: String = ""
-    @Published var response: String?
+    @Published var response: AIResponse?
     @Published var lastQuery: String = ""
     @Published var recentSearches: [String] = []
+    @Published var isLoading: Bool = false
 
     let suggestedQuestions: [String] = [
         "What's moving NVDA?",
@@ -39,8 +40,16 @@ final class HomeViewModel: ObservableObject {
             return
         }
 
+        isLoading = true
         lastQuery = trimmed
-        response = service.response(for: trimmed)
+        
+        // Simulate brief loading for feel
+        Task {
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            response = service.structuredResponse(for: trimmed)
+            isLoading = false
+        }
+        
         addToRecentSearches(trimmed)
     }
 
@@ -58,6 +67,7 @@ final class HomeViewModel: ObservableObject {
         question = ""
         response = nil
         lastQuery = ""
+        isLoading = false
     }
 
     func clearRecentSearches() {
@@ -90,4 +100,3 @@ final class HomeViewModel: ObservableObject {
         UserDefaults.standard.set(recentSearches, forKey: recentSearchesKey)
     }
 }
-

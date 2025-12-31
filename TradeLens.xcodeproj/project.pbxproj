@@ -37,6 +37,7 @@
 		TL324 /* TradeAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL325 /* TradeAnalyticsService.swift */; };
 		TL400 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL401 /* HomeView.swift */; };
 		TL402 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL403 /* HomeViewModel.swift */; };
+		TL404 /* AIResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL405 /* AIResponse.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +84,7 @@
 		TL325 /* TradeAnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeAnalyticsService.swift; sourceTree = "<group>"; };
 		TL401 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		TL403 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		TL405 /* AIResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIResponse.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -143,6 +145,7 @@
 			children = (
 				TL010 /* Trade.swift */,
 				TL102 /* UserSummary.swift */,
+				TL405 /* AIResponse.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -349,6 +352,7 @@
 				TL100 /* UserSummary.swift in Sources */,
 				TL400 /* HomeView.swift in Sources */,
 				TL402 /* HomeViewModel.swift in Sources */,
+				TL404 /* AIResponse.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
