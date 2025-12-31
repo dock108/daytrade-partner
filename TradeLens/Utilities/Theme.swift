@@ -19,6 +19,7 @@ struct Theme {
     static let colors = ThemeColors()
     static let spacing = ThemeSpacing()
     static let cornerRadius = ThemeCornerRadius()
+    static let typography = ThemeTypography()
     
     // MARK: - Theme Colors
     
@@ -230,6 +231,130 @@ struct Theme {
         let lg: CGFloat = 16
         let xl: CGFloat = 20
         let pill: CGFloat = 100
+    }
+    
+    // MARK: - Typography
+    
+    struct ThemeTypography {
+        
+        // MARK: - Screen Titles
+        
+        /// Large screen title (28pt bold, rounded)
+        var screenTitle: Font {
+            .system(size: 28, weight: .bold, design: .rounded)
+        }
+        
+        /// Screen subtitle (15pt regular)
+        var screenSubtitle: Font {
+            .system(size: 15, weight: .regular)
+        }
+        
+        // MARK: - Section Headers
+        
+        /// Section header - uppercase label style (11pt medium, tracked)
+        var sectionHeader: Font {
+            .system(size: 11, weight: .medium)
+        }
+        
+        /// Card title inside cards (15pt semibold)
+        var cardTitle: Font {
+            .system(size: 15, weight: .semibold)
+        }
+        
+        /// Card subtitle (12pt regular)
+        var cardSubtitle: Font {
+            .system(size: 12, weight: .regular)
+        }
+        
+        // MARK: - Body Text
+        
+        /// Primary body text (14pt regular, with line spacing)
+        var body: Font {
+            .system(size: 14, weight: .regular)
+        }
+        
+        /// Secondary body text (13pt regular)
+        var bodySmall: Font {
+            .system(size: 13, weight: .regular)
+        }
+        
+        /// Emphasized body text (14pt medium)
+        var bodyEmphasis: Font {
+            .system(size: 14, weight: .medium)
+        }
+        
+        // MARK: - Data Display
+        
+        /// Large stat value (22pt bold, rounded)
+        var statLarge: Font {
+            .system(size: 22, weight: .bold, design: .rounded)
+        }
+        
+        /// Medium stat value (20pt bold, rounded)
+        var statMedium: Font {
+            .system(size: 20, weight: .bold, design: .rounded)
+        }
+        
+        /// Small stat value (15pt semibold)
+        var statSmall: Font {
+            .system(size: 15, weight: .semibold)
+        }
+        
+        /// Stat label (12pt regular)
+        var statLabel: Font {
+            .system(size: 12, weight: .regular)
+        }
+        
+        // MARK: - Interactive Elements
+        
+        /// Row title (15pt medium)
+        var rowTitle: Font {
+            .system(size: 15, weight: .medium)
+        }
+        
+        /// Row subtitle (12pt regular)
+        var rowSubtitle: Font {
+            .system(size: 12, weight: .regular)
+        }
+        
+        /// Button text (14pt semibold)
+        var button: Font {
+            .system(size: 14, weight: .semibold)
+        }
+        
+        /// Small button/chip text (13pt medium)
+        var buttonSmall: Font {
+            .system(size: 13, weight: .medium)
+        }
+        
+        // MARK: - Captions & Labels
+        
+        /// Caption text (11pt regular)
+        var caption: Font {
+            .system(size: 11, weight: .regular)
+        }
+        
+        /// Tiny label (10pt regular)
+        var tiny: Font {
+            .system(size: 10, weight: .regular)
+        }
+        
+        /// Disclaimer/footer text (12pt regular)
+        var disclaimer: Font {
+            .system(size: 12, weight: .regular)
+        }
+        
+        // MARK: - Special
+        
+        /// Ticker symbol (15pt semibold)
+        var ticker: Font {
+            .system(size: 15, weight: .semibold)
+        }
+        
+        /// Quote/insight text (14pt regular, italic available via modifier)
+        var quote: Font {
+            .system(size: 14, weight: .regular)
+        }
     }
 }
 

@@ -76,13 +76,13 @@ struct InfoCardView<Content: View>: View {
             VStack(alignment: .leading, spacing: 2) {
                 if let title = title {
                     Text(title)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(Theme.typography.cardTitle)
                         .foregroundStyle(Theme.colors.textPrimary)
                 }
                 
                 if let subtitle = subtitle {
                     Text(subtitle)
-                        .font(.system(size: 12))
+                        .font(Theme.typography.cardSubtitle)
                         .foregroundStyle(Theme.colors.textTertiary)
                 }
             }
@@ -230,16 +230,16 @@ struct StatInfoCard: View {
                 // Value
                 VStack(alignment: .leading, spacing: 4) {
                     Text(value)
-                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .font(Theme.typography.statLarge)
                         .foregroundStyle(Theme.colors.textPrimary)
                     
                     Text(title)
-                        .font(.system(size: 12))
+                        .font(Theme.typography.statLabel)
                         .foregroundStyle(Theme.colors.textTertiary)
                     
                     if let footer = footer {
                         Text(footer)
-                            .font(.system(size: 10))
+                            .font(Theme.typography.tiny)
                             .foregroundStyle(Theme.colors.textQuaternary)
                             .padding(.top, 2)
                     }
@@ -333,12 +333,12 @@ struct InfoCardRow: View {
                 // Text
                 VStack(alignment: .leading, spacing: 3) {
                     Text(title)
-                        .font(.system(size: 15, weight: .medium))
+                        .font(Theme.typography.rowTitle)
                         .foregroundStyle(Theme.colors.textPrimary)
                     
                     if let subtitle = subtitle {
                         Text(subtitle)
-                            .font(.system(size: 12))
+                            .font(Theme.typography.rowSubtitle)
                             .foregroundStyle(Theme.colors.textTertiary)
                     }
                 }
@@ -348,7 +348,7 @@ struct InfoCardRow: View {
                 // Value or chevron
                 if let value = value {
                     Text(value)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(Theme.typography.statSmall)
                         .foregroundStyle(valueColor ?? Theme.colors.textSecondary)
                 }
                 
@@ -416,18 +416,18 @@ struct InsightInfoCard: View {
                     
                     VStack(alignment: .leading, spacing: 2) {
                         Text(title)
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(Theme.typography.cardTitle)
                             .foregroundStyle(Theme.colors.textPrimary)
                         
                         Text(subtitle)
-                            .font(.system(size: 11))
+                            .font(Theme.typography.caption)
                             .foregroundStyle(Theme.colors.textTertiary)
                     }
                 }
                 
                 // Detail
                 Text(detail)
-                    .font(.system(size: 14))
+                    .font(Theme.typography.body)
                     .foregroundStyle(Theme.colors.textSecondary)
                     .lineSpacing(4)
             }
@@ -474,11 +474,11 @@ struct EmptyStateCard: View {
                 
                 VStack(spacing: 6) {
                     Text(title)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(Theme.typography.cardTitle)
                         .foregroundStyle(Theme.colors.textSecondary)
                     
                     Text(message)
-                        .font(.system(size: 13))
+                        .font(Theme.typography.bodySmall)
                         .foregroundStyle(Theme.colors.textTertiary)
                         .multilineTextAlignment(.center)
                 }
@@ -486,7 +486,7 @@ struct EmptyStateCard: View {
                 if let action = action, let label = actionLabel {
                     Button(action: action) {
                         Text(label)
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(Theme.typography.button)
                             .foregroundStyle(Theme.colors.accentBlue)
                             .padding(.horizontal, 20)
                             .padding(.vertical, 10)

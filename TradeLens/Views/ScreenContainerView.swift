@@ -74,12 +74,12 @@ struct ScreenContainerView<Content: View>: View {
             }
             
             Text(title)
-                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .font(Theme.typography.screenTitle)
                 .foregroundStyle(Theme.colors.textPrimary)
             
             if let subtitle = subtitle {
                 Text(subtitle)
-                    .font(.subheadline)
+                    .font(Theme.typography.screenSubtitle)
                     .foregroundStyle(Theme.colors.textTertiary)
             }
         }
@@ -113,16 +113,15 @@ struct ScreenSectionHeader: View {
             HStack(spacing: 8) {
                 if let icon = icon {
                     Image(systemName: icon)
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(Theme.typography.sectionHeader)
                         .foregroundStyle(Theme.colors.accentBlue.opacity(0.7))
                 }
                 
                 Text(title)
-                    .font(.caption)
-                    .fontWeight(.medium)
+                    .font(Theme.typography.sectionHeader)
                     .foregroundStyle(Theme.colors.textQuaternary)
                     .textCase(.uppercase)
-                    .tracking(0.5)
+                    .tracking(0.8)
             }
             
             Spacer()
@@ -130,7 +129,7 @@ struct ScreenSectionHeader: View {
             if let action = action, let label = actionLabel {
                 Button(action: action) {
                     Text(label)
-                        .font(.caption)
+                        .font(Theme.typography.caption)
                         .foregroundStyle(Theme.colors.textQuaternary)
                 }
             }

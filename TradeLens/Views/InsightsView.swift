@@ -41,7 +41,7 @@ struct InsightsView: View {
                 .scaleEffect(1.2)
             
             Text("Analyzing patterns...")
-                .font(.subheadline)
+                .font(Theme.typography.bodySmall)
                 .foregroundStyle(Theme.colors.textTertiary)
         }
         .frame(maxWidth: .infinity)
@@ -113,7 +113,7 @@ struct InsightsView: View {
             if viewModel.trades.isEmpty {
                 InfoCardView {
                     Text("No trades yet")
-                        .font(.system(size: 14))
+                        .font(Theme.typography.body)
                         .foregroundStyle(Theme.colors.textTertiary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -154,18 +154,18 @@ struct InsightsView: View {
             
             VStack(alignment: .leading, spacing: 3) {
                 Text(trade.ticker)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(Theme.typography.ticker)
                     .foregroundStyle(Theme.colors.textPrimary)
                 
                 Text("\(trade.holdingDays) days")
-                    .font(.system(size: 12))
+                    .font(Theme.typography.rowSubtitle)
                     .foregroundStyle(Theme.colors.textTertiary)
             }
             
             Spacer()
             
             Text(CurrencyFormatter.formatUSD(trade.realizedPnL))
-                .font(.system(size: 15, weight: .semibold))
+                .font(Theme.typography.statSmall)
                 .foregroundStyle(trade.realizedPnL >= 0 ? Theme.colors.accentGreen : Theme.colors.accentRed)
             
             Image(systemName: "chevron.right")
@@ -186,17 +186,17 @@ struct InsightsView: View {
                         .foregroundStyle(Theme.colors.accentOrange)
                     
                     Text("Something went wrong")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(Theme.typography.cardTitle)
                         .foregroundStyle(Theme.colors.textPrimary)
                 }
                 
                 Text(message)
-                    .font(.system(size: 13))
+                    .font(Theme.typography.bodySmall)
                     .foregroundStyle(Theme.colors.textTertiary)
                 
                 Button(action: retry) {
                     Text("Try Again")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(Theme.typography.button)
                         .foregroundStyle(Theme.colors.accentBlue)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)

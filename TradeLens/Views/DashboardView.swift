@@ -46,7 +46,7 @@ struct DashboardView: View {
                 .scaleEffect(1.2)
             
             Text("Loading summary...")
-                .font(.subheadline)
+                .font(Theme.typography.bodySmall)
                 .foregroundStyle(Theme.colors.textTertiary)
         }
         .frame(maxWidth: .infinity)
@@ -129,11 +129,11 @@ struct DashboardView: View {
                         
                         VStack(alignment: .leading, spacing: 4) {
                             Text(riskLabel(for: summary.speculativePercent))
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(Theme.typography.cardTitle)
                                 .foregroundStyle(Theme.colors.textPrimary)
                             
                             Text(viewModel.riskMessage)
-                                .font(.system(size: 13))
+                                .font(Theme.typography.bodySmall)
                                 .foregroundStyle(Theme.colors.textSecondary)
                         }
                     }
@@ -142,13 +142,14 @@ struct DashboardView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Text("Speculative trades")
-                                .font(.system(size: 12))
+                                .font(Theme.typography.statLabel)
                                 .foregroundStyle(Theme.colors.textTertiary)
                             
                             Spacer()
                             
                             Text(CurrencyFormatter.formatPercentage(summary.speculativePercent))
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(Theme.typography.statLabel)
+                                .fontWeight(.semibold)
                                 .foregroundStyle(Theme.colors.textSecondary)
                         }
                         
@@ -212,17 +213,17 @@ struct DashboardView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
                             Image(systemName: "crown.fill")
-                                .font(.system(size: 12))
+                                .font(Theme.typography.caption)
                                 .foregroundStyle(Theme.colors.accentGreen)
                             
                             Text("Best")
-                                .font(.system(size: 11, weight: .medium))
+                                .font(Theme.typography.sectionHeader)
                                 .foregroundStyle(Theme.colors.textTertiary)
                                 .textCase(.uppercase)
                         }
                         
                         Text(summary.bestTicker ?? "—")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .font(Theme.typography.statLarge)
                             .foregroundStyle(Theme.colors.textPrimary)
                     }
                 }
@@ -232,17 +233,17 @@ struct DashboardView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .font(.system(size: 12))
+                                .font(Theme.typography.caption)
                                 .foregroundStyle(Theme.colors.accentRed)
                             
                             Text("Weakest")
-                                .font(.system(size: 11, weight: .medium))
+                                .font(Theme.typography.sectionHeader)
                                 .foregroundStyle(Theme.colors.textTertiary)
                                 .textCase(.uppercase)
                         }
                         
                         Text(summary.worstTicker ?? "—")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .font(Theme.typography.statLarge)
                             .foregroundStyle(Theme.colors.textPrimary)
                     }
                 }
@@ -259,7 +260,7 @@ struct DashboardView: View {
             if viewModel.trades.isEmpty {
                 InfoCardView {
                     Text("No trades yet")
-                        .font(.system(size: 14))
+                        .font(Theme.typography.body)
                         .foregroundStyle(Theme.colors.textTertiary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -294,28 +295,30 @@ struct DashboardView: View {
                     .frame(width: 40, height: 40)
                 
                 Image(systemName: trade.realizedPnL >= 0 ? "arrow.up.right" : "arrow.down.right")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(Theme.typography.body)
+                    .fontWeight(.semibold)
                     .foregroundStyle(trade.realizedPnL >= 0 ? Theme.colors.accentGreen : Theme.colors.accentRed)
             }
             
             VStack(alignment: .leading, spacing: 3) {
                 Text(trade.ticker)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(Theme.typography.ticker)
                     .foregroundStyle(Theme.colors.textPrimary)
                 
                 Text("\(trade.holdingDays) days")
-                    .font(.system(size: 12))
+                    .font(Theme.typography.rowSubtitle)
                     .foregroundStyle(Theme.colors.textTertiary)
             }
             
             Spacer()
             
             Text(CurrencyFormatter.formatUSD(trade.realizedPnL))
-                .font(.system(size: 15, weight: .semibold))
+                .font(Theme.typography.statSmall)
                 .foregroundStyle(trade.realizedPnL >= 0 ? Theme.colors.accentGreen : Theme.colors.accentRed)
             
             Image(systemName: "chevron.right")
-                .font(.system(size: 11, weight: .semibold))
+                .font(Theme.typography.caption)
+                .fontWeight(.semibold)
                 .foregroundStyle(Theme.colors.textQuaternary)
         }
         .padding(.vertical, 10)
@@ -332,17 +335,17 @@ struct DashboardView: View {
                         .foregroundStyle(Theme.colors.accentOrange)
                     
                     Text("Something went wrong")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(Theme.typography.cardTitle)
                         .foregroundStyle(Theme.colors.textPrimary)
                 }
                 
                 Text(message)
-                    .font(.system(size: 13))
+                    .font(Theme.typography.bodySmall)
                     .foregroundStyle(Theme.colors.textTertiary)
                 
                 Button(action: retry) {
                     Text("Try Again")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(Theme.typography.button)
                         .foregroundStyle(Theme.colors.accentBlue)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)

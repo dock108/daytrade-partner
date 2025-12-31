@@ -48,11 +48,11 @@ struct SettingsView: View {
                     
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Simple Explanations")
-                            .font(.system(size: 15, weight: .medium))
+                            .font(Theme.typography.rowTitle)
                             .foregroundStyle(Theme.colors.textPrimary)
                         
                         Text("Plain English, no jargon, helpful analogies")
-                            .font(.system(size: 12))
+                            .font(Theme.typography.rowSubtitle)
                             .foregroundStyle(Theme.colors.textTertiary)
                     }
                     
@@ -66,7 +66,7 @@ struct SettingsView: View {
             
             // Footer text
             Text("When enabled, TradeLens explains things in a way anyone can understand.")
-                .font(.system(size: 12))
+                .font(Theme.typography.disclaimer)
                 .foregroundStyle(Theme.colors.textMuted)
                 .padding(.horizontal, 4)
         }
@@ -95,11 +95,11 @@ struct SettingsView: View {
                         
                         VStack(alignment: .leading, spacing: 3) {
                             Text("Clear History")
-                                .font(.system(size: 15, weight: .medium))
+                                .font(Theme.typography.rowTitle)
                                 .foregroundStyle(Theme.colors.textPrimary)
                             
                             Text("\(historyService.count) questions saved")
-                                .font(.system(size: 12))
+                                .font(Theme.typography.rowSubtitle)
                                 .foregroundStyle(Theme.colors.textTertiary)
                         }
                         
@@ -107,7 +107,8 @@ struct SettingsView: View {
                         
                         if historyService.count > 0 {
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(Theme.typography.caption)
+                                .fontWeight(.semibold)
                                 .foregroundStyle(Theme.colors.textQuaternary)
                         }
                     }
@@ -118,7 +119,7 @@ struct SettingsView: View {
             }
             
             Text("Your questions and answers are stored locally on this device. No account needed.")
-                .font(.system(size: 12))
+                .font(Theme.typography.disclaimer)
                 .foregroundStyle(Theme.colors.textMuted)
                 .padding(.horizontal, 4)
         }
@@ -164,18 +165,19 @@ struct SettingsView: View {
                             
                             VStack(alignment: .leading, spacing: 3) {
                                 Text("Import Mock Trades")
-                                    .font(.system(size: 15, weight: .medium))
+                                    .font(Theme.typography.rowTitle)
                                     .foregroundStyle(Theme.colors.textPrimary)
                                 
                                 Text("Load sample data for testing")
-                                    .font(.system(size: 12))
+                                    .font(Theme.typography.rowSubtitle)
                                     .foregroundStyle(Theme.colors.textTertiary)
                             }
                             
                             Spacer()
                             
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(Theme.typography.caption)
+                                .fontWeight(.semibold)
                                 .foregroundStyle(Theme.colors.textQuaternary)
                         }
                     }
@@ -190,11 +192,11 @@ struct SettingsView: View {
                         
                         HStack(spacing: 10) {
                             Image(systemName: status.contains("Error") ? "xmark.circle.fill" : "checkmark.circle.fill")
-                                .font(.system(size: 14))
+                                .font(Theme.typography.body)
                                 .foregroundStyle(status.contains("Error") ? Theme.colors.accentRed : Theme.colors.accentGreen)
                             
                             Text(status)
-                                .font(.system(size: 13))
+                                .font(Theme.typography.bodySmall)
                                 .foregroundStyle(Theme.colors.textSecondary)
                         }
                         .padding(.top, 12)
@@ -206,7 +208,7 @@ struct SettingsView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             ForEach(viewModel.importDetails, id: \.self) { detail in
                                 Text("• \(detail)")
-                                    .font(.system(size: 11))
+                                    .font(Theme.typography.caption)
                                     .foregroundStyle(Theme.colors.textTertiary)
                             }
                         }
@@ -238,11 +240,11 @@ struct SettingsView: View {
                     
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Brokerage Integration")
-                            .font(.system(size: 15, weight: .medium))
+                            .font(Theme.typography.rowTitle)
                             .foregroundStyle(Theme.colors.textPrimary)
                         
                         Text("Fidelity, Schwab, and more coming soon")
-                            .font(.system(size: 12))
+                            .font(Theme.typography.rowSubtitle)
                             .foregroundStyle(Theme.colors.textTertiary)
                     }
                     
@@ -262,18 +264,18 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Text("TradeLens")
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(Theme.typography.cardTitle)
                             .foregroundStyle(Theme.colors.textPrimary)
                         
                         Spacer()
                         
                         Text("Version 1.0")
-                            .font(.system(size: 13))
+                            .font(Theme.typography.bodySmall)
                             .foregroundStyle(Theme.colors.textTertiary)
                     }
                     
                     Text("Your personal trading companion. Explains markets, tracks patterns, and helps you learn — without giving financial advice.")
-                        .font(.system(size: 13))
+                        .font(Theme.typography.bodySmall)
                         .foregroundStyle(Theme.colors.textSecondary)
                         .lineSpacing(3)
                 }
