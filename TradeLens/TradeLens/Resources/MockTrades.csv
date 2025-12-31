@@ -1,0 +1,7 @@
+ticker,entryDate,exitDate,qty,entryPrice,exitPrice,category
+AAPL,2024-04-01,2024-04-05,10,150.25,162.40,core
+TSLA,2024-03-15,,5,180.10,,speculative
+,2024-03-10,2024-03-12,4,120.00,130.00,core
+MSFT,invalid,2024-03-20,3,310.00,320.00,core
+NVDA,2024-02-01,2024-02-05,-2,700.00,720.00,core
+AMZN,2024-01-05,2024-01-08,2,145.00,150.00,unknown

@@ -18,6 +18,10 @@
 		TL200 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL201 /* AppError.swift */; };
 		TL100 /* UserSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL102 /* UserSummary.swift */; };
 		TL101 /* TradeModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL104 /* TradeModelsTests.swift */; };
+		TL202 /* ImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL206 /* ImportService.swift */; };
+		TL203 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL207 /* SettingsViewModel.swift */; };
+		TL204 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL208 /* SettingsView.swift */; };
+		TL205 /* MockTrades.csv in Resources */ = {isa = PBXBuildFile; fileRef = TL209 /* MockTrades.csv */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +49,10 @@
 		TL102 /* UserSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSummary.swift; sourceTree = "<group>"; };
 		TL103 /* TradeLensTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TradeLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		TL104 /* TradeModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeModelsTests.swift; sourceTree = "<group>"; };
+		TL206 /* ImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportService.swift; sourceTree = "<group>"; };
+		TL207 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		TL208 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		TL209 /* MockTrades.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = MockTrades.csv; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +101,7 @@
 				TL025 /* Views */,
 				TL026 /* ViewModels */,
 				TL027 /* Utilities */,
+				TL210 /* Resources */,
 				TL006 /* Assets.xcassets */,
 				TL028 /* Preview Content */,
 			);
@@ -112,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				TL012 /* TradeService.swift */,
+				TL206 /* ImportService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -120,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				TL004 /* ContentView.swift */,
+				TL208 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -128,6 +139,7 @@
 			isa = PBXGroup;
 			children = (
 				TL014 /* TradeListViewModel.swift */,
+				TL207 /* SettingsViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -147,6 +159,14 @@
 				TL008 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		TL210 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				TL209 /* MockTrades.csv */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		TL106 /* TradeLensTests */ = {
@@ -240,6 +260,7 @@
 			files = (
 				TL007 /* Preview Assets.xcassets in Resources */,
 				TL005 /* Assets.xcassets in Resources */,
+				TL205 /* MockTrades.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,9 +279,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				TL003 /* ContentView.swift in Sources */,
+				TL204 /* SettingsView.swift in Sources */,
 				TL009 /* Trade.swift in Sources */,
 				TL011 /* TradeService.swift in Sources */,
+				TL202 /* ImportService.swift in Sources */,
 				TL013 /* TradeListViewModel.swift in Sources */,
+				TL203 /* SettingsViewModel.swift in Sources */,
 				TL015 /* CurrencyFormatter.swift in Sources */,
 				TL200 /* AppError.swift in Sources */,
 				TL001 /* TradeLensApp.swift in Sources */,
