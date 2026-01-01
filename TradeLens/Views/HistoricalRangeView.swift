@@ -26,9 +26,9 @@ struct HistoricalRangeView: View {
         var explanation: String {
             switch self {
             case .range:
-                return "This shows the typical range of price movement based on how this ticker has behaved in similar past periods. Actual results may be very different."
+                return "This shows the historical range of price movement in similar past periods, so the shape of past moves is easier to see."
             case .distribution:
-                return "The shaded area shows where outcomes have historically clustered. The darker the shade, the more often results landed there. This is backward-looking only."
+                return "The shaded area shows where outcomes have clustered. Darker shading means results landed there more often. This is backward-looking only."
             }
         }
     }
@@ -157,8 +157,8 @@ struct HistoricalRangeView: View {
                     )
                 }
                 
-                // "Most likely" marker
-                mostLikelyMarker(centerX: centerX, width: width, height: height)
+            // "Typical" marker
+            mostLikelyMarker(centerX: centerX, width: width, height: height)
             }
         }
         .frame(height: 80)
@@ -260,7 +260,7 @@ struct HistoricalRangeView: View {
                     .font(.system(size: 14, weight: .semibold, design: .monospaced))
                     .foregroundStyle(Color(red: 1.0, green: 0.6, blue: 0.5))
                 
-                Text("Downside")
+                Text("Lower range")
                     .font(.system(size: 10))
                     .foregroundStyle(Color.white.opacity(0.4))
             }
@@ -286,7 +286,7 @@ struct HistoricalRangeView: View {
                     .font(.system(size: 14, weight: .semibold, design: .monospaced))
                     .foregroundStyle(Color(red: 0.4, green: 0.8, blue: 0.5))
                 
-                Text("Upside")
+                Text("Upper range")
                     .font(.system(size: 10))
                     .foregroundStyle(Color.white.opacity(0.4))
             }
@@ -309,7 +309,7 @@ struct HistoricalRangeView: View {
                         .fill(Color(red: 0.6, green: 0.75, blue: 0.95).opacity(0.3))
                         .frame(width: 16, height: 12)
                     
-                    Text("Shaded area = where most outcomes landed")
+                    Text("Shaded area = where outcomes clustered most often")
                         .font(.system(size: 11))
                         .foregroundStyle(Color.white.opacity(0.5))
                     
@@ -322,7 +322,7 @@ struct HistoricalRangeView: View {
             }
             
             // Disclaimer
-            Text("This reflects past behavior only — not a forecast of future results")
+            Text("This reflects past behavior only — a way to see context, not a forecast")
                 .font(.system(size: 10))
                 .foregroundStyle(Color.white.opacity(0.35))
                 .italic()
@@ -404,4 +404,3 @@ struct TooltipSheet: View {
     }
     .background(Color(red: 0.06, green: 0.08, blue: 0.12))
 }
-
