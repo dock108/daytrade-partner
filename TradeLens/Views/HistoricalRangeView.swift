@@ -404,3 +404,4 @@ struct TooltipSheet: View {
     }
     .background(Color(red: 0.06, green: 0.08, blue: 0.12))
 }
+

@@ -1,0 +1,95 @@
+# AI Coding Rules
+
+## Universal Standards
+
+### Code Quality
+- Write clear, self-documenting code. Comments explain WHY, not WHAT.
+- Small, focused functions. One responsibility per function.
+- No magic numbers or hardcoded strings—use constants.
+- Fail fast. Validate inputs early, handle errors explicitly.
+- No silent failures. Log or surface all errors.
+
+### Change Philosophy
+- Prefer minimal, incremental changes over rewrites.
+- Don't refactor unrelated code while fixing bugs.
+- If something works, don't "improve" it without reason.
+- Leave code cleaner than you found it, but don't go overboard.
+
+### Dependencies
+- Don't add new dependencies casually.
+- Justify any new package inline.
+- Prefer standard library solutions when reasonable.
+
+### Testing
+- Add tests for new logic.
+- If fixing a bug, add a regression test.
+- Tests should be deterministic and fast.
+
+### Documentation
+- Update README if behavior changes.
+- Add CHANGELOG entries for user-facing changes.
+- Document breaking changes explicitly.
+
+### What NOT to Do
+- Don't over-engineer or over-abstract.
+- Don't add features that weren't requested.
+- Don't guess—ask or leave a TODO.
+- Don't use print/console.log in production code.
+
+---
+
+## Tech Stack: Swift / SwiftUI (iOS)
+
+### Architecture
+- MVVM pattern: Views → ViewModels → Models/Services
+- Views should not contain business logic
+- ViewModels handle state and business logic
+- Models are plain data structures (prefer structs)
+- Services handle external concerns (network, persistence)
+
+### Swift Conventions
+- Follow Swift API Design Guidelines
+- Use `camelCase` for properties/functions, `PascalCase` for types
+- Prefer `let` over `var`
+- Use guard for early exits
+- Avoid force unwrapping (!) without guard
+
+### SwiftUI Practices
+- Extract subviews when a view exceeds ~30 lines
+- Use `@State` for view-local state, `@StateObject` for owned objects
+- Support dark mode—use semantic colors
+- Every view file should have a `#Preview`
+- Use `.task` for async work, not `.onAppear` with Task
+
+### File Structure
+```
+AppName/
+├── Models/          # Data structures
+├── Views/           # SwiftUI views
+├── ViewModels/      # ObservableObject classes
+├── Services/        # Network, persistence, utilities
+└── Resources/       # Assets, localized strings
+```
+
+### Prohibited
+- Force unwrapping without guard
+- Empty catch blocks
+- Business logic in Views
+- Network calls without proper error handling
+
+---
+
+## Project: TradeLens (Day Trading Partner)
+
+### Purpose
+iOS app for day trading analysis and tracking.
+
+### Key Directories
+- `TradeLens/Models/` — Trade and market data models
+- `TradeLens/Views/` — Trading UI components
+- `TradeLens/ViewModels/` — Trading logic and state
+- `TradeLens/Services/` — Data services and calculations
+
+### Protected Files
+- `TradeLens.xcodeproj/project.pbxproj` — Don't manually edit
+
