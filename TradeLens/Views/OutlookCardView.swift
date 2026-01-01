@@ -24,11 +24,11 @@ struct OutlookCardView: View {
         var explanation: String {
             switch self {
             case .sentiment:
-                return "This reflects the overall tone of current market conditions and sector trends — not a prediction of future performance."
+                return "This reflects the current tone of market conditions and sector trends — context for what traders may be reacting to, not a prediction."
             case .volatility:
-                return "This shows the typical range of price movement based on historical volatility. Actual results may vary significantly."
+                return "This summarizes how jumpy the price has been in similar windows, helping you see the size of recent swings."
             case .hitRate:
-                return "This is how often the ticker has finished higher over similar past time windows. Past performance does not indicate future results."
+                return "This shows how often similar windows finished higher in the past — a way to see the range of outcomes, not a forecast."
             }
         }
     }
@@ -136,7 +136,7 @@ struct OutlookCardView: View {
             }
             
             VStack(alignment: .leading, spacing: 4) {
-                Text("\(outlook.timeframeDays)-Day Outlook")
+            Text("\(outlook.timeframeDays)-Day Outlook")
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white)
                 
@@ -256,7 +256,7 @@ struct OutlookCardView: View {
                     .fill(Color.orange.opacity(0.08))
             )
             
-            Text("Based on historical volatility over similar periods")
+            Text("Based on how swingy the price has been in similar periods")
                 .font(.system(size: 11))
                 .foregroundStyle(Color.white.opacity(0.35))
                 .italic()
@@ -356,7 +356,7 @@ struct OutlookCardView: View {
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(Color.white.opacity(0.8))
                     
-                    Text("finished higher historically")
+                    Text("closed higher in the past")
                         .font(.system(size: 14))
                         .foregroundStyle(Color.white.opacity(0.5))
                 }
@@ -369,7 +369,7 @@ struct OutlookCardView: View {
                     .fill(Color.purple.opacity(0.08))
             )
             
-            Text("Past performance does not indicate future results")
+            Text("Past outcomes are context, not a forecast")
                 .font(.system(size: 11))
                 .foregroundStyle(Color.white.opacity(0.35))
                 .italic()
@@ -516,7 +516,7 @@ struct OutlookCardView: View {
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundStyle(isWatchEnabled ? Color(red: 0.4, green: 0.7, blue: 1.0) : .white)
                         
-                        Text(isWatchEnabled ? "We'll let you know if something changes" : "Get notified when something important changes")
+                        Text(isWatchEnabled ? "We'll let you know if something changes" : "Get a heads-up when something important changes")
                             .font(.system(size: 12))
                             .foregroundStyle(Color.white.opacity(0.45))
                     }
@@ -561,7 +561,7 @@ struct OutlookCardView: View {
                     Image(systemName: "sparkles")
                         .font(.system(size: 10))
                     
-                    Text("Coming soon: alerts for major moves, earnings, or sentiment shifts")
+                    Text("Coming soon: heads-ups for major moves, earnings, or sentiment shifts")
                         .font(.system(size: 11))
                 }
                 .foregroundStyle(Color.white.opacity(0.3))
@@ -695,12 +695,12 @@ struct WatchButtonStyle: ButtonStyle {
                 "AI infrastructure spending trends",
                 "Next-generation chip launches",
                 "Data center demand signals",
-                "Momentum indicators showing strength"
+                "Momentum indicators showing recent strength"
             ],
             volatilityBand: 0.12,
             historicalHitRate: 0.68,
-            personalContext: "You've traded NVDA 5 times with a 80% win rate — historically one of your stronger names.",
-            volatilityWarning: "This ticker typically swings more than you've indicated you're comfortable with.",
+            personalContext: "You've traded NVDA 5 times with an 80% win rate — a positive lean in your history.",
+            volatilityWarning: "The recent swing range here sits above your comfort setting, which can make moves feel jumpier.",
             timeframeNote: nil,
             generatedAt: Date()
         ))
@@ -708,4 +708,3 @@ struct WatchButtonStyle: ButtonStyle {
     }
     .background(Color(red: 0.06, green: 0.08, blue: 0.12))
 }
-

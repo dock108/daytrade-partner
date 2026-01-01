@@ -155,21 +155,21 @@ final class AIServiceStub {
         
         if simple {
             points.append("You've made \(summary.totalTrades) trades total")
-            points.append("You make money on about \(winRate) of your trades")
+            points.append("About \(winRate) of your trades have closed positive")
             points.append("You typically hold for \(avgHoldDays) days")
-            points.append("Your total profit/loss: \(pnl)")
+            points.append("Total realized P/L so far: \(pnl)")
         } else {
-            points.append("You have \(summary.totalTrades) closed trades with a \(winRate) win rate")
+            points.append("You have \(summary.totalTrades) closed trades; about \(winRate) finished positive")
             points.append("Average hold period: \(avgHoldDays) days")
             points.append("Total realized P/L: \(pnl)")
         }
         
         if let bestTicker = summary.bestTicker {
-            points.append(simple ? "Your best stock: \(bestTicker)" : "Strongest performer: \(bestTicker)")
+            points.append(simple ? "Top P/L ticker: \(bestTicker)" : "Highest P/L ticker: \(bestTicker)")
         }
         
         if let worstTicker = summary.worstTicker {
-            points.append(simple ? "Your toughest stock: \(worstTicker)" : "Weakest performer: \(worstTicker)")
+            points.append(simple ? "Lowest P/L ticker: \(worstTicker)" : "Lowest P/L ticker: \(worstTicker)")
         }
         
         // Add relevant insight
@@ -180,7 +180,7 @@ final class AIServiceStub {
         
         let intro = simple 
             ? "Here's a quick look at your trading:"
-            : "Based on your trading history, here's how this topic relates to your activity:"
+            : "Based on your trading history, here's some context that may relate to this topic:"
         
         return AIResponse.Section(
             type: .yourContext,
@@ -313,12 +313,12 @@ private struct TradingPatternAnalyzer {
         
         if etfWinRate > stockWinRate + 0.15 {
             return simple
-                ? "You've done better with ETFs than single stocks — about \(Int(etfWinRate * 100))% wins vs \(Int(stockWinRate * 100))%."
-                : "Historically, you've shown stronger results with ETFs (\(Int(etfWinRate * 100))% win rate) than individual stocks (\(Int(stockWinRate * 100))%)."
+                ? "Your ETF trades have leaned stronger than single stocks — about \(Int(etfWinRate * 100))% vs \(Int(stockWinRate * 100))%."
+                : "Historically, your ETF trades have leaned stronger (\(Int(etfWinRate * 100))% win rate) than individual stocks (\(Int(stockWinRate * 100))%)."
         } else if stockWinRate > etfWinRate + 0.10 {
             return simple
-                ? "You've actually done better picking individual stocks than trading ETFs."
-                : "Your track record shows stronger performance with individual stocks vs broad ETFs — something to consider."
+                ? "Your individual-stock trades have leaned stronger than ETFs."
+                : "Your history leans stronger in individual stocks than broad ETFs."
         }
         return nil
     }
@@ -328,12 +328,12 @@ private struct TradingPatternAnalyzer {
         
         if volatileWinRate < overallWinRate - 0.15 {
             return simple
-                ? "Quick observation: volatile swings haven't been your best trades — maybe size down on these."
-                : "Worth noting: your win rate on high-volatility moves (\(Int(volatileWinRate * 100))%) is below your overall average — something to watch."
+                ? "Quick observation: volatile swings have been tougher in your history, which can add context."
+                : "Worth noting: your win rate on high-volatility moves (\(Int(volatileWinRate * 100))%) is below your overall average — helpful context when similar moves show up."
         } else if volatileWinRate > overallWinRate + 0.10 {
             return simple
-                ? "Interestingly, you've handled volatile moves better than average."
-                : "You've historically navigated volatility well, with a \(Int(volatileWinRate * 100))% win rate on higher-swing trades."
+                ? "Interestingly, your volatile-move results have leaned better than average."
+                : "Your history in higher-swing trades has leaned positive, with a \(Int(volatileWinRate * 100))% win rate."
         }
         return nil
     }
@@ -343,12 +343,12 @@ private struct TradingPatternAnalyzer {
         
         if longerHoldWinRate > quickExitWinRate + 0.15 {
             return simple
-                ? "Patience has paid off for you — longer holds tend to work better than quick exits."
-                : "Your data suggests patience pays: trades held 7+ days have a \(Int(longerHoldWinRate * 100))% win rate vs \(Int(quickExitWinRate * 100))% for quick exits."
+                ? "Longer holds have lined up with stronger results than quick exits."
+                : "In your data, trades held 7+ days have a \(Int(longerHoldWinRate * 100))% win rate vs \(Int(quickExitWinRate * 100))% for quick exits."
         } else if quickExitWinRate > longerHoldWinRate + 0.10 {
             return simple
-                ? "Quick trades have actually worked well for you — maybe you read momentum well."
-                : "Interestingly, your shorter-duration trades have performed better — possibly a sign of good momentum reads."
+                ? "Quick trades have leaned stronger for you, which can be useful context."
+                : "Your shorter-duration trades have performed better, which can help frame how momentum has shown up for you."
         }
         return nil
     }
@@ -358,12 +358,12 @@ private struct TradingPatternAnalyzer {
         
         if techWinRate > nonTechWinRate + 0.12 {
             return simple
-                ? "Good news: tech has been one of your stronger areas."
-                : "Tech names have been a relative strength in your portfolio — \(Int(techWinRate * 100))% win rate."
+                ? "Tech has been one of your stronger areas historically."
+                : "Tech names have been a relative strength in your history — \(Int(techWinRate * 100))% win rate."
         } else if nonTechWinRate > techWinRate + 0.12 {
             return simple
-                ? "Just a thought: non-tech trades have worked better for you historically."
-                : "Worth considering: your non-tech trades have outperformed tech names historically."
+                ? "Non-tech trades have leaned stronger for you historically."
+                : "Your non-tech trades have leaned stronger than tech names historically."
         }
         return nil
     }
@@ -373,8 +373,8 @@ private struct TradingPatternAnalyzer {
         
         if avgLongerGain > avgQuickGain * 1.5 && hasEnoughHoldingData {
             return simple
-                ? "You tend to exit early during volatile swings — holding longer has worked better for you."
-                : "Pattern: your quick exits during volatility tend to underperform your longer holds — something to watch."
+                ? "During volatile swings, quick exits have landed below longer holds in your history."
+                : "Pattern: during volatility, your quick exits have landed below your longer holds in your history."
         }
         return nil
     }
@@ -406,13 +406,13 @@ private struct DigestBuilder {
         return simple ? defaultSimple : defaultStandard
     }
     
-    private static let nvidiaSimple = "Here's what's going on: NVIDIA is the company making the brains behind AI. Every time you hear about ChatGPT or AI assistants getting smarter, NVIDIA's chips are usually powering it. Big tech companies are spending billions to buy their products. The stock has gone way up because of this — but that also means a lot of good news is already baked into the price. It's like buying a house in a hot neighborhood: great location, but you're paying top dollar."
+    private static let nvidiaSimple = "Here's what's going on: NVIDIA is the company making the brains behind AI. Every time you hear about ChatGPT or AI assistants getting smarter, NVIDIA's chips are usually powering it. Big tech companies are spending billions to buy their products. The stock has moved a lot as expectations rose, which means a lot of good news is already baked into the price."
     
-    private static let nvidiaStandard = "The AI infrastructure buildout has positioned NVIDIA as the de facto supplier of compute power for the industry's largest players. Microsoft, Google, Amazon, and Meta are all racing to scale their AI capabilities, and NVIDIA's H100/H200 chips are the currency of that race. Recent earnings have consistently beaten expectations, driven by data center revenue that now dwarfs gaming. However, the market has priced in substantial future growth — current multiples assume sustained hypergrowth that leaves little room for disappointment. Competition from AMD and custom silicon (Google's TPUs, Amazon's Trainium) represents a longer-term variable."
+    private static let nvidiaStandard = "The AI infrastructure buildout has positioned NVIDIA as a central supplier of compute power for the industry's largest players. Microsoft, Google, Amazon, and Meta are all racing to scale their AI capabilities, and NVIDIA's H100/H200 chips are a key part of that spend. Recent earnings have been strong, driven by data center revenue that now exceeds gaming. However, the market has priced in substantial future growth — current multiples assume sustained hypergrowth that leaves little room for disappointment. Competition from AMD and custom silicon (Google's TPUs, Amazon's Trainium) represents a longer-term variable."
     
     private static let oilSimple = "Oil prices are like a tug of war right now. On one side, countries that produce oil (OPEC) are trying to limit supply to keep prices up. On the other side, people are worried about the economy slowing down, which would mean less demand for oil. China's economy is a big question mark — if they use more oil, prices go up; if their economy stays sluggish, prices stay flat or drop. It's not really about any one company, it's about global supply and demand."
     
-    private static let oilStandard = "Crude oil markets are navigating a complex supply-demand dynamic. OPEC+ continues to manage production cuts aimed at supporting prices, while U.S. shale production has proven more resilient than expected. The demand side hinges heavily on China's economic trajectory — a meaningful recovery would tighten balances, while continued weakness keeps a lid on prices. Geopolitical risk premiums can spike suddenly (Middle East tensions, Russian supply disruptions), but have tended to fade unless actual supply is affected. The macro backdrop — recession risks vs. soft landing — will likely determine direction more than any single catalyst."
+    private static let oilStandard = "Crude oil markets are navigating a complex supply-demand dynamic. OPEC+ continues to manage production cuts aimed at supporting prices, while U.S. shale production has proven more resilient than expected. The demand side hinges heavily on China's economic trajectory — a meaningful recovery would tighten balances, while continued weakness keeps a lid on prices. Geopolitical risk premiums can spike suddenly (Middle East tensions, Russian supply disruptions), but have tended to fade unless actual supply is affected. The macro backdrop — recession risks vs. soft landing — often explains direction more than any single catalyst."
     
     private static let goldSimple = "Gold is behaving like it usually does — it's the thing people buy when they're nervous. Central banks around the world, especially in Asia, have been stockpiling gold as a hedge against uncertainty. But here's the catch: when interest rates are high, bonds and savings accounts pay you a return, while gold just sits there. So gold has been range-bound — up when fears spike, flat when rates dominate the conversation."
     
@@ -420,17 +420,17 @@ private struct DigestBuilder {
     
     private static let qqqSimple = "QQQ is basically a way to own the 100 biggest tech companies at once. When you hear about the 'Magnificent Seven' (Apple, Microsoft, NVIDIA, Amazon, Google, Meta, Tesla) — they're all in there and they dominate the returns. When AI excitement picks up, QQQ rallies. When interest rates go up or growth stocks fall out of favor, QQQ drops. It's more concentrated than most people realize — a few stocks are doing most of the work."
     
-    private static let qqqStandard = "QQQ's performance reflects the bifurcated nature of the current market. Mega-cap tech — particularly AI beneficiaries — has driven the lion's share of returns, while the average Nasdaq stock has lagged. This concentration is a double-edged sword: leadership by the strongest companies is bullish, but it also means QQQ is less diversified than it appears. Duration sensitivity remains a factor — as a growth-heavy index, QQQ is more impacted by changes in rate expectations than the broader market. The AI narrative has provided cover for valuations, but earnings delivery will need to validate multiples."
+    private static let qqqStandard = "QQQ's performance reflects the bifurcated nature of the current market. Mega-cap tech — particularly AI beneficiaries — has driven the lion's share of returns, while the average Nasdaq stock has lagged. This concentration is a double-edged sword: it can boost results when leaders are strong, but it also means QQQ is less diversified than it appears. Duration sensitivity remains a factor — as a growth-heavy index, QQQ is more impacted by changes in rate expectations than the broader market. The AI narrative has supported valuations, and earnings delivery still shapes how that narrative is interpreted."
     
-    private static let spySimple = "SPY tracks the S&P 500 — that's 500 of America's biggest companies across all industries. When people talk about 'the market,' this is usually what they mean. Right now, the mood is cautiously optimistic. Inflation is cooling, the economy hasn't crashed, and companies are still making money. But there's worry about whether rates will stay high for longer and what that might mean for the economy. It's not wildly expensive, but it's not cheap either."
+    private static let spySimple = "SPY tracks the S&P 500 — that's 500 of America's biggest companies across all industries. When people talk about 'the market,' this is usually what they mean. Right now, the mood is mixed: inflation has cooled, the economy has held up, and companies are still making money, but there are questions about how long rates stay high and what that means for growth."
     
-    private static let spyStandard = "The S&P 500 is navigating a 'soft landing' narrative — where inflation moderates without triggering recession. So far, the economic data has cooperated: employment remains robust, consumer spending is resilient, and corporate earnings have exceeded lowered expectations. However, market breadth tells a more nuanced story — much of the index-level strength has been concentrated in a handful of mega-caps. The bull case rests on earnings growth broadening out as the Fed eventually eases. The bear case worries about 'higher for longer' rates eventually breaking something in the economy. Valuations are above historical averages but not extreme."
+    private static let spyStandard = "The S&P 500 is navigating a 'soft landing' narrative — where inflation moderates without triggering recession. So far, the economic data has cooperated: employment remains robust, consumer spending is resilient, and corporate earnings have exceeded lowered expectations. However, market breadth tells a more nuanced story — much of the index-level strength has been concentrated in a handful of mega-caps. One path forward is earnings growth broadening out as the Fed eventually eases, while another path focuses on 'higher for longer' rates tightening financial conditions. Valuations are above historical averages but not extreme."
     
     private static let inflationSimple = "Inflation is cooling down, but it's not gone yet. The easy part — bringing down goods prices like TVs and furniture — has happened. The hard part is services and rent, which are still elevated. The Fed wants to see inflation at 2%, and we're not there yet. That's why they're keeping interest rates high. Think of it like a fever that's come down from 103° to 99° — better, but you're not fully healthy yet."
     
-    private static let inflationStandard = "Headline inflation has decelerated meaningfully from 2022 peaks, but the 'last mile' to the Fed's 2% target is proving elusive. Core services inflation — particularly shelter/rent — remains sticky, though leading indicators suggest it should moderate with a lag. The goods disinflation phase is largely complete as supply chains normalized. The Fed's challenge is calibrating policy: easing too early risks reigniting inflation, while staying too tight risks unnecessary economic damage. Market expectations for rate cuts have repeatedly been pushed back as inflation data has come in hotter than hoped."
+    private static let inflationStandard = "Headline inflation has decelerated meaningfully from 2022 peaks, but the 'last mile' to the Fed's 2% target is proving elusive. Core services inflation — particularly shelter/rent — remains sticky, though leading indicators suggest it tends to moderate with a lag. The goods disinflation phase is largely complete as supply chains normalized. The Fed's challenge is calibrating policy: easing too early risks reigniting inflation, while staying too tight risks unnecessary economic damage. Market expectations for rate cuts have repeatedly been pushed back as inflation data has come in hotter than hoped."
     
-    private static let defaultSimple = "Markets are in a wait-and-see mode. People are trying to figure out whether inflation will keep falling, whether the economy will stay strong, and what the Fed will do with interest rates. There's optimism that we'll get a 'soft landing' — where things cool down without crashing — but nothing is certain. The best approach is to stay informed and not make big bets on predictions."
+    private static let defaultSimple = "Markets are in a wait-and-see mode. People are trying to figure out whether inflation will keep falling, whether the economy will stay strong, and what the Fed will do with interest rates. There's optimism about a 'soft landing' — where things cool down without crashing — but nothing is certain. Seeing how the pieces line up can make the picture feel clearer."
     
     private static let defaultStandard = "Current market dynamics reflect a tug-of-war between soft landing optimism and higher-for-longer rate concerns. Economic data has been resilient enough to support risk assets, but not so hot as to force the Fed into further tightening. Earnings have been adequate, with guidance generally holding up. The key variables remain inflation trajectory, Fed policy, and whether employment holds. Markets are priced for a relatively benign outcome — any deviation from that base case could drive volatility."
 }

@@ -22,7 +22,7 @@ struct TickerInfoService {
             sector: "Technology · Semiconductors",
             marketCap: "$2.1T",
             volatility: .high,
-            summary: "NVIDIA designs graphics processors and AI chips. They're the leading supplier of GPUs used in gaming, data centers, and artificial intelligence training."
+            summary: "NVIDIA designs graphics processors and AI chips. They're a major supplier of GPUs used in gaming, data centers, and artificial intelligence training."
         ),
         "AAPL": TickerInfo(
             ticker: "AAPL",
@@ -46,7 +46,7 @@ struct TickerInfoService {
             sector: "Technology · Software",
             marketCap: "$2.9T",
             volatility: .low,
-            summary: "Microsoft makes Windows, Office, and Azure cloud services. They also own LinkedIn, GitHub, and Xbox gaming. Azure is their fastest-growing business."
+            summary: "Microsoft makes Windows, Office, and Azure cloud services. They also own LinkedIn, GitHub, and Xbox gaming. Azure is a major growth area."
         ),
         "GOOGL": TickerInfo(
             ticker: "GOOGL",
@@ -62,7 +62,7 @@ struct TickerInfoService {
             sector: "Consumer · E-Commerce & Cloud",
             marketCap: "$1.9T",
             volatility: .moderate,
-            summary: "Amazon runs the world's largest online store and AWS cloud platform. AWS generates most of their profit, while retail drives most of their revenue."
+            summary: "Amazon runs a large global online store and the AWS cloud platform. AWS is a primary profit driver, while retail drives most of their revenue."
         ),
         "META": TickerInfo(
             ticker: "META",
@@ -86,7 +86,7 @@ struct TickerInfoService {
             sector: "ETF · Large Cap Blend",
             marketCap: "$500B AUM",
             volatility: .moderate,
-            summary: "SPY tracks the S&P 500 index, giving you exposure to 500 of the largest U.S. companies in a single trade. It's the most actively traded ETF in the world."
+            summary: "SPY tracks the S&P 500 index, representing 500 of the largest U.S. companies in one fund. It's among the most actively traded ETFs."
         ),
         "QQQ": TickerInfo(
             ticker: "QQQ",
@@ -94,7 +94,7 @@ struct TickerInfoService {
             sector: "ETF · Large Cap Growth",
             marketCap: "$250B AUM",
             volatility: .moderate,
-            summary: "QQQ tracks the Nasdaq-100, which is heavy on tech giants like Apple, Microsoft, and NVIDIA. It's more growth-focused and volatile than SPY."
+            summary: "QQQ tracks the Nasdaq-100, which is heavy on tech giants like Apple, Microsoft, and NVIDIA. It has more growth exposure and tends to swing more than SPY."
         ),
         "COIN": TickerInfo(
             ticker: "COIN",
@@ -118,7 +118,7 @@ struct TickerInfoService {
             sector: "ETF · Commodities",
             marketCap: "$1.5B AUM",
             volatility: .high,
-            summary: "USO tracks crude oil prices using futures contracts. It's a way to trade oil without handling actual barrels, but can behave differently than spot oil."
+            summary: "USO tracks crude oil prices using futures contracts. It can move differently from spot oil because of how futures are rolled."
         ),
         "XLE": TickerInfo(
             ticker: "XLE",
@@ -134,7 +134,7 @@ struct TickerInfoService {
             sector: "ETF · Financials",
             marketCap: "$40B AUM",
             volatility: .moderate,
-            summary: "XLF holds big banks and financial firms like JPMorgan, Bank of America, and Berkshire Hathaway. It tends to do well when interest rates are rising."
+            summary: "XLF holds big banks and financial firms like JPMorgan, Bank of America, and Berkshire Hathaway. Interest rate shifts often influence its moves."
         ),
         "VIX": TickerInfo(
             ticker: "VIX",
@@ -142,9 +142,7 @@ struct TickerInfoService {
             sector: "Index · Volatility",
             marketCap: "N/A",
             volatility: .high,
-            summary: "The VIX measures expected market volatility over the next 30 days. It's called the 'fear index' because it spikes when investors are nervous."
+            summary: "The VIX measures expected market volatility over the next 30 days. It's often called the 'fear index' and tends to rise when investors are nervous."
         ),
     ]
 }
-
-

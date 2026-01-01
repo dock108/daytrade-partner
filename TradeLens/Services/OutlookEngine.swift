@@ -33,11 +33,11 @@ struct Outlook: Identifiable {
         var description: String {
             switch self {
             case .positive:
-                return "Current conditions appear favorable based on recent trends and sector momentum."
+                return "Recent trends and sector momentum look constructive, helping explain what traders may be reacting to."
             case .mixed:
-                return "Signals are mixed — some positive indicators balanced by areas of uncertainty."
+                return "Signals are mixed — supportive indicators sit alongside uncertainty."
             case .cautious:
-                return "Conditions suggest elevated uncertainty or headwinds in the near term."
+                return "Recent data points show more uncertainty or headwinds, which can make moves feel less clear."
             }
         }
         
@@ -45,11 +45,11 @@ struct Outlook: Identifiable {
         var simpleDescription: String {
             switch self {
             case .positive:
-                return "Things look pretty good right now based on recent trends."
+                return "Recent trends look constructive, which can make the picture feel clearer."
             case .mixed:
-                return "It's a bit of a mixed bag — some good signs, some uncertainty."
+                return "It's a mixed picture — some good signs, some uncertainty."
             case .cautious:
-                return "There's more uncertainty than usual at the moment."
+                return "There's more uncertainty than usual right now."
             }
         }
         
@@ -345,7 +345,7 @@ final class OutlookEngine {
         // Add a sentiment-appropriate driver
         switch sentiment {
         case .positive:
-            selectedDrivers.append("Momentum indicators showing strength")
+            selectedDrivers.append("Momentum indicators showing recent strength")
         case .cautious:
             selectedDrivers.append("Risk metrics elevated relative to recent history")
         case .mixed:
@@ -472,9 +472,9 @@ final class OutlookEngine {
             let longerWinRate = Double(longerHolds.filter { $0.realizedPnL > 0 }.count) / Double(longerHolds.count)
             
             if earlyWinRate < longerWinRate - 0.15 && isHighVol {
-                observations.append("In similar volatile setups, you've often sold early — your longer holds in this category have tended to work out better.")
+                observations.append("In similar volatile setups, your exits have skewed earlier; longer holds have lined up with stronger results in this category.")
             } else if earlyWinRate > longerWinRate + 0.15 {
-                observations.append("You've historically timed short-term moves well in situations like this — your quick reads have been solid.")
+                observations.append("In similar situations, your short-term moves have lined up with stronger outcomes.")
             }
         }
         
@@ -485,9 +485,9 @@ final class OutlookEngine {
             let bigLosses = volatileOutcomes.filter { $0.returnPct < -0.08 }.count
             
             if bigWins > bigLosses * 2 {
-                observations.append("You've navigated big swings well before — this type of volatility has worked in your favor historically.")
+                observations.append("Big swings have leaned positive for you in the past — useful context for how this volatility can feel.")
             } else if bigLosses > bigWins && isHighVol {
-                observations.append("When things have swung hard in this category, it's cut both ways for you — something to be aware of.")
+                observations.append("When swings have been large in this category, outcomes have been mixed in your history.")
             }
         }
         
@@ -503,7 +503,7 @@ final class OutlookEngine {
             let recoveryRate = Double(recoveredWell) / Double(subsequentTrades.count)
             
             if recoveryRate > 0.65 {
-                observations.append("You've historically bounced back well after setbacks — your next trade after a loss has often been stronger.")
+                observations.append("After setbacks, your next trade has more often been positive — a pattern to note in your history.")
             }
         }
         
@@ -517,7 +517,7 @@ final class OutlookEngine {
             let otherWinRate = Double(otherTrades.filter { $0.realizedPnL > 0 }.count) / Double(otherTrades.count)
             
             if techWinRate > otherWinRate + 0.12 && techTickers.contains(trades.first?.ticker.uppercased() ?? "") {
-                observations.append("Tech has been in your wheelhouse — you've tended to read these names well.")
+                observations.append("Tech names have lined up with stronger results in your history.")
             }
         }
         
@@ -526,7 +526,7 @@ final class OutlookEngine {
         let avgLoss = abs(trades.filter { $0.realizedPnL < 0 }.reduce(0.0) { $0 + $1.realizedPnL } / max(1.0, Double(trades.filter { $0.realizedPnL < 0 }.count)))
         
         if avgWin > avgLoss * 1.5 && trades.count >= 5 {
-            observations.append("Your winners in this category have tended to be larger than your losses — good risk management showing through.")
+            observations.append("In this category, average wins have been larger than average losses in your history.")
         }
         
         return observations
@@ -551,7 +551,7 @@ final class OutlookEngine {
                 let winRate = Double(wins) / Double(sectorTrades.count)
                 
                 if winRate > 0.60 {
-                    return "You've had solid results in the \(metadata.sector) sector overall — \(Int(winRate * 100))% of your trades there have been winners."
+                    return "Your \(metadata.sector) trades have leaned positive overall — \(Int(winRate * 100))% have been winners."
                 }
             }
             return nil
@@ -564,12 +564,12 @@ final class OutlookEngine {
         
         if tickerTrades.count >= 3 {
             if winRate > 0.60 {
-                return "You've traded \(ticker) \(tickerTrades.count) times — this has been one of your more comfortable names historically."
+                return "You've traded \(ticker) \(tickerTrades.count) times — the results have leaned positive in your history."
             } else if avgHoldDays < 5 {
                 return "You've typically traded \(ticker) on shorter timeframes — averaging \(avgHoldDays) days. This outlook looks further out."
             }
         } else if tickerTrades.count >= 1 {
-            return "You have some history with \(ticker) — worth reflecting on how those trades felt."
+            return "You have some history with \(ticker) — that context can help frame how it fits your approach."
         }
         
         return nil
@@ -587,12 +587,12 @@ final class OutlookEngine {
         
         switch userTolerance {
         case .low:
-            return "This ticker typically swings more than you've indicated you're comfortable with. The expected range is about \(percentAbove)% above your preference."
+            return "The recent swing range here sits about \(percentAbove)% above your comfort setting, which can make moves feel jumpier."
         case .moderate:
-            return "Heads up: this shows higher-than-usual volatility for your comfort level."
+            return "Heads up: recent volatility has been higher than your comfort setting."
         case .high:
             // High tolerance users rarely see warnings
-            return "Even for someone comfortable with swings, this one's on the volatile side."
+            return "Even for someone comfortable with swings, this has been on the volatile side lately."
         }
     }
     
@@ -606,7 +606,7 @@ final class OutlookEngine {
         if ratio > 3.0 {
             switch userStyle {
             case .shortTerm:
-                return "This is a longer timeframe than you typically trade. Consider how that changes your approach."
+                return "This is a longer timeframe than you typically trade. The context can feel different at this horizon."
             case .mixed:
                 return nil
             case .longTerm:
@@ -648,4 +648,3 @@ private extension Double {
         return (self * divisor).rounded() / divisor
     }
 }
-
