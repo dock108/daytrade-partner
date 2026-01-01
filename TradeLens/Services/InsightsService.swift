@@ -36,8 +36,8 @@ struct InsightsService {
         let bestRangeLabel = bestHoldingRangeLabel(from: trades) ?? preferredRangeLabel
         return InsightItem(
             title: "Holding Range",
-            subtitle: "Where your strongest PnL appears",
-            detail: "You perform best holding \(bestRangeLabel) days"
+            subtitle: "Where results have tended to cluster",
+            detail: "Your outcomes have leaned strongest around \(bestRangeLabel) days"
         )
     }
 
@@ -67,13 +67,13 @@ struct InsightsService {
         let highVolLosses = trades.filter { highVolTickers.contains($0.ticker) && $0.realizedPnL < 0 }
         let detail: String
         if highVolLosses.isEmpty {
-            detail = "High volatility names have been less of a drag recently"
+            detail = "High volatility names have weighed less on results recently"
         } else {
-            detail = "High volatility names drove \(highVolLosses.count) losing trades"
+            detail = "High volatility names were tied to \(highVolLosses.count) losing trades"
         }
         return InsightItem(
             title: "Volatility Impact",
-            subtitle: "Losses tied to faster movers",
+            subtitle: "How faster movers shaped outcomes",
             detail: detail
         )
     }
@@ -127,9 +127,9 @@ struct InsightsService {
         let losingAverage = analyticsService.averageHoldingDays(for: losingTrades)
         let detail: String
         if winningAverage < losingAverage {
-            detail = "You tend to cut winners faster than losers — this increases drawdowns."
+            detail = "Winners have been cut faster than losers in your history, which can deepen drawdowns."
         } else if winningAverage > losingAverage {
-            detail = "Winners are held longer than losers — exit timing looks balanced."
+            detail = "Winners have been held longer than losers, which has kept exit timing more balanced."
         } else {
             detail = "Winners and losers are held for similar stretches."
         }
