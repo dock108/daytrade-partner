@@ -163,3 +163,4 @@ struct TickerSnapshotCard: View {
     }
 }
 
+
