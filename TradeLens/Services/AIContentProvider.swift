@@ -310,3 +310,4 @@ struct AIContentProvider {
         recap: "Ask about specific things like NVDA, oil, gold, QQQ, SPY, or inflation for more helpful answers."
     )
 }
+
