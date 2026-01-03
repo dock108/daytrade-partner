@@ -42,4 +42,8 @@ extension BackendModels {
         let historicalBehavior: String
         let simpleRecap: String
     }
+
+    struct APIErrorResponse: Codable {
+        let message: String
+    }
 }
