@@ -386,10 +386,10 @@ struct HomeView: View {
     private func articleView(response: AIResponse) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             // Query header
-            queryHeader(response.query)
+            ArticleQueryHeader(query: response.query, isSimpleModeEnabled: userSettings.isSimpleModeEnabled)
 
             if let tickerSnapshot = viewModel.tickerSnapshot {
-                snapshotHeader(snapshot: tickerSnapshot)
+                TickerSnapshotHeader(snapshot: tickerSnapshot)
                     .transition(.opacity.combined(with: .move(edge: .top)))
             }
 
@@ -412,15 +412,21 @@ struct HomeView: View {
             }
             
             // Section cards (with special handling for digest)
-            ForEach(Array(response.sections.enumerated()), id: \.element.id) { index, section in
+            ForEach(Array(response.sections.enumerated()), id: \.element.id) { _, section in
                 if section.type == .digest {
-                    digestCard(section: section)
+                    DigestCard(section: section)
+                        .transition(.asymmetric(
+                            insertion: .opacity.combined(with: .move(edge: .bottom)),
+                            removal: .opacity
+                        ))
+                } else if section.type == .personalNote {
+                    PersonalNoteCard(section: section)
                         .transition(.asymmetric(
                             insertion: .opacity.combined(with: .move(edge: .bottom)),
                             removal: .opacity
                         ))
                 } else {
-                    sectionCard(section: section)
+                    StandardSectionCard(section: section)
                         .transition(.asymmetric(
                             insertion: .opacity.combined(with: .move(edge: .bottom)),
                             removal: .opacity
@@ -430,7 +436,7 @@ struct HomeView: View {
             
             // Sources section (expandable)
             if !response.sources.isEmpty {
-                sourcesSection(sources: response.sources)
+                SourcesSection(sources: response.sources)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
             
@@ -444,450 +450,10 @@ struct HomeView: View {
             .padding(.top, 8)
             
             // Disclaimer footer
-            disclaimerFooter
+            DisclaimerFooter()
         }
     }
     
-    // MARK: - Digest Card (Special Styling)
-    
-    private func digestCard(section: AIResponse.Section) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            // Header with special emphasis
-            HStack(spacing: 10) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Theme.colors.accentGold,
-                                    Color(red: 0.85, green: 0.65, blue: 0.35) // Theme gold variant
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 36, height: 36)
-                    
-                    Image(systemName: "doc.text.fill")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
-                }
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("The Story")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Theme.colors.accentGold.opacity(0.7))
-                        .textCase(.uppercase)
-                        .tracking(0.5)
-                    
-                    Text("Here's what's really going on")
-                        .font(.system(size: 15, weight: .bold))
-                        .foregroundStyle(Theme.colors.accentGold)
-                }
-                
-                Spacer()
-            }
-            
-            // Content with larger, more readable text
-            Text(section.content)
-                .font(.system(size: 16, weight: .regular))
-                .foregroundStyle(Color.white.opacity(0.9))
-                .lineSpacing(7)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 18)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Theme.colors.accentGold.opacity(0.08),
-                            Color(red: 0.85, green: 0.65, blue: 0.35) // Theme gold variant.opacity(0.04)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18)
-                        .strokeBorder(
-                            LinearGradient(
-                                colors: [
-                                    Theme.colors.accentGold.opacity(0.25),
-                                    Color(red: 0.85, green: 0.65, blue: 0.35) // Theme gold variant.opacity(0.08)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                )
-        )
-    }
-    
-    // MARK: - Sources Section (Expandable)
-    
-    @State private var isSourcesExpanded = false
-    
-    private func sourcesSection(sources: [AIResponse.SourceReference]) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Expandable header
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    isSourcesExpanded.toggle()
-                }
-            } label: {
-                HStack(spacing: 12) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "books.vertical.fill")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(Color.white.opacity(0.5))
-                        
-                        Text("Sources & deeper reading")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(Color.white.opacity(0.7))
-                    }
-                    
-                    Spacer()
-                    
-                    HStack(spacing: 6) {
-                        Text("\(sources.count) sources")
-                            .font(.system(size: 12))
-                            .foregroundStyle(Color.white.opacity(0.4))
-                        
-                        Image(systemName: isSourcesExpanded ? "chevron.up" : "chevron.down")
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(Color.white.opacity(0.4))
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
-            }
-            .buttonStyle(.plain)
-            
-            // Expanded content
-            if isSourcesExpanded {
-                Divider()
-                    .background(Color.white.opacity(0.08))
-                
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(sources) { source in
-                        sourceRow(source)
-                        
-                        if source.id != sources.last?.id {
-                            Divider()
-                                .background(Color.white.opacity(0.05))
-                                .padding(.leading, 44)
-                        }
-                    }
-                }
-            }
-        }
-        .background(
-            RoundedRectangle(cornerRadius: 14)
-                .fill(Color.white.opacity(0.04))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
-                )
-        )
-    }
-    
-    private func sourceRow(_ source: AIResponse.SourceReference) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            // Type icon
-            ZStack {
-                Circle()
-                    .fill(source.type.color.opacity(0.15))
-                    .frame(width: 32, height: 32)
-                
-                Image(systemName: source.type.icon)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(source.type.color)
-            }
-            
-            VStack(alignment: .leading, spacing: 4) {
-                // Title
-                Text(source.title)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(Color.white.opacity(0.85))
-                    .lineLimit(2)
-                
-                // Source + type badge
-                HStack(spacing: 8) {
-                    Text(source.source)
-                        .font(.system(size: 11))
-                        .foregroundStyle(Color.white.opacity(0.4))
-                    
-                    Text(source.type.rawValue)
-                        .font(.system(size: 9, weight: .semibold))
-                        .foregroundStyle(source.type.color)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(
-                            Capsule()
-                                .fill(source.type.color.opacity(0.12))
-                        )
-                }
-                
-                // Summary
-                Text(source.summary)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.white.opacity(0.55))
-                    .lineSpacing(2)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            
-            Spacer()
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-    }
-    
-    // MARK: - Disclaimer Footer
-    
-    private var disclaimerFooter: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "info.circle")
-                .font(.system(size: 10))
-            
-            Text("This app explains markets — it does not recommend trades.")
-                .font(.system(size: 11))
-        }
-        .foregroundStyle(Color.white.opacity(0.25))
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
-        .padding(.horizontal, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.white.opacity(0.02))
-        )
-        .padding(.top, 16)
-    }
-
-    private func queryHeader(_ query: String) -> some View {
-        HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Theme.colors.accentBlue,
-                                Theme.colors.accentBlueDark
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 36, height: 36)
-
-                Image(systemName: "sparkles")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(.white)
-            }
-            
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Text("TradeLens")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(Color.white.opacity(0.6))
-                    
-                    if userSettings.isSimpleModeEnabled {
-                        simpleModeIndicator
-                    }
-                }
-                
-                Text(query)
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
-            
-            Spacer()
-        }
-        .padding(.bottom, 8)
-    }
-
-    private func snapshotHeader(snapshot: BackendModels.TickerSnapshot) -> some View {
-        HStack(spacing: 10) {
-            Text(snapshot.symbol)
-                .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(
-                    Capsule()
-                        .fill(Color.white.opacity(0.1))
-                )
-
-            Text(snapshot.price, format: .number.precision(.fractionLength(2)))
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.white)
-
-            Text(changePercentText(snapshot.changePercent))
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(changePercentColor(snapshot.changePercent))
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(
-            RoundedRectangle(cornerRadius: 14)
-                .fill(Color.white.opacity(0.05))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
-                )
-        )
-    }
-    
-    private var simpleModeIndicator: some View {
-        HStack(spacing: 4) {
-            Image(systemName: "leaf.fill")
-                .font(.system(size: 9, weight: .bold))
-            Text("Simple")
-                .font(.system(size: 10, weight: .bold))
-        }
-        .foregroundStyle(Theme.colors.accentGreenMuted)
-        .padding(.horizontal, 6)
-        .padding(.vertical, 3)
-        .background(
-            Capsule()
-                .fill(Theme.colors.accentGreenMuted.opacity(0.15))
-        )
-    }
-
-    private func changePercentText(_ percent: Double) -> String {
-        let sign = percent >= 0 ? "+" : ""
-        return "\(sign)\(String(format: "%.2f", percent))%"
-    }
-
-    private func changePercentColor(_ percent: Double) -> Color {
-        percent >= 0 ? Theme.colors.accentGreen : Theme.colors.accentRed
-    }
-
-    private func sectionCard(section: AIResponse.Section) -> some View {
-        Group {
-            if section.type == .personalNote {
-                // Personal note has a softer, more subtle appearance
-                personalNoteCard(section: section)
-            } else {
-                // Standard section card
-                standardSectionCard(section: section)
-            }
-        }
-    }
-    
-    private func personalNoteCard(section: AIResponse.Section) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            // Subtle icon
-            Image(systemName: section.type.icon)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(section.type.accentColor.opacity(0.7))
-                .padding(.top, 2)
-            
-            VStack(alignment: .leading, spacing: 6) {
-                Text(section.type.displayTitle)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(section.type.accentColor.opacity(0.7))
-                    .textCase(.uppercase)
-                    .tracking(0.3)
-                
-                Text(section.content)
-                    .font(.system(size: 14, weight: .regular))
-                    .foregroundStyle(Color.white.opacity(0.7))
-                    .lineSpacing(4)
-                    .italic()
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(section.type.accentColor.opacity(0.06))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(
-                            section.type.accentColor.opacity(0.12),
-                            lineWidth: 1
-                        )
-                )
-        )
-    }
-    
-    private func standardSectionCard(section: AIResponse.Section) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Section header
-            HStack(spacing: 10) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(section.type.accentColor.opacity(0.15))
-                        .frame(width: 32, height: 32)
-                    
-                    Image(systemName: section.type.icon)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(section.type.accentColor)
-                }
-                
-                Text(section.type.displayTitle)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(section.type.accentColor)
-                    .textCase(.uppercase)
-                    .tracking(0.5)
-            }
-            
-            // Content
-            if !section.content.isEmpty {
-                Text(section.content)
-                    .font(.system(size: 15, weight: .regular))
-                    .foregroundStyle(Color.white.opacity(0.85))
-                    .lineSpacing(5)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            
-            // Bullet points if present
-            if let bullets = section.bulletPoints, !bullets.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(bullets, id: \.self) { bullet in
-                        HStack(alignment: .top, spacing: 10) {
-                            Circle()
-                                .fill(section.type.accentColor.opacity(0.6))
-                                .frame(width: 5, height: 5)
-                                .padding(.top, 7)
-                            
-                            Text(bullet)
-                                .font(.system(size: 14))
-                                .foregroundStyle(Color.white.opacity(0.75))
-                                .lineSpacing(3)
-                        }
-                    }
-                }
-                .padding(.top, 4)
-            }
-        }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.05))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .strokeBorder(
-                            LinearGradient(
-                                colors: [
-                                    section.type.accentColor.opacity(0.2),
-                                    section.type.accentColor.opacity(0.05)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                )
-        )
-    }
-
     // MARK: - Guided Suggestions
 
     private var suggestedChips: some View {
@@ -1141,82 +707,7 @@ struct HomeView: View {
 
 }
 
-// MARK: - Flow Layout for Chips
-
-struct FlowLayout: Layout {
-    var spacing: CGFloat = 8
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let containerWidth = proposal.width ?? .infinity
-        var currentX: CGFloat = 0
-        var currentY: CGFloat = 0
-        var lineHeight: CGFloat = 0
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if currentX + size.width > containerWidth && currentX > 0 {
-                currentX = 0
-                currentY += lineHeight + spacing
-                lineHeight = 0
-            }
-            lineHeight = max(lineHeight, size.height)
-            currentX += size.width + spacing
-        }
-
-        return CGSize(width: containerWidth, height: currentY + lineHeight)
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        var currentX: CGFloat = bounds.minX
-        var currentY: CGFloat = bounds.minY
-        var lineHeight: CGFloat = 0
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if currentX + size.width > bounds.maxX && currentX > bounds.minX {
-                currentX = bounds.minX
-                currentY += lineHeight + spacing
-                lineHeight = 0
-            }
-            subview.place(at: CGPoint(x: currentX, y: currentY), proposal: .unspecified)
-            lineHeight = max(lineHeight, size.height)
-            currentX += size.width + spacing
-        }
-    }
-}
-
-// MARK: - Button Styles
-
-struct SuggestionButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .contentShape(RoundedRectangle(cornerRadius: 12))
-            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
-            .opacity(configuration.isPressed ? 0.75 : 1.0)
-            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
-    }
-}
-
-struct MicButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .contentShape(Circle())
-            .scaleEffect(configuration.isPressed ? 0.85 : 1.0)
-            .opacity(configuration.isPressed ? 0.7 : 1.0)
-            .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
-    }
-}
-
-struct ConversationCardButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .contentShape(RoundedRectangle(cornerRadius: 16))
-            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
-            .opacity(configuration.isPressed ? 0.85 : 1.0)
-            .brightness(configuration.isPressed ? 0.03 : 0)
-            .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
-    }
-}
+// MARK: - Preview
 
 #Preview {
     HomeView()

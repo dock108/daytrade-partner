@@ -30,13 +30,12 @@ TradeLens/
     │   ├── MockPriceService.swift # Mock price data
     │   ├── TickerInfoService.swift # Ticker metadata
     │   ├── SpeechRecognitionService.swift # Voice input
-    │   ├── UserSettings.swift  # Settings persistence
-    │   ├── TradeService.swift  # Trade data operations
-    │   └── ImportService.swift # Data import handling
+    │   └── UserSettings.swift  # Settings persistence
     │
     ├── Views/                  # SwiftUI view components
     │   ├── ContentView.swift   # Tab navigation container
     │   ├── HomeView.swift      # AI-first home screen
+    │   ├── HomeArticleComponents.swift # Article display components
     │   ├── DashboardView.swift # Trading summary dashboard
     │   ├── InsightsView.swift  # Patterns & insights
     │   ├── SettingsView.swift  # App settings
@@ -52,12 +51,7 @@ TradeLens/
     │
     ├── ViewModels/             # View state and presentation logic
     │   ├── HomeViewModel.swift # Home screen state
-    │   ├── DashboardViewModel.swift # Dashboard state
-    │   ├── InsightsViewModel.swift # Insights state
-    │   ├── SettingsViewModel.swift # Settings state
-    │   ├── TradeDetailViewModel.swift # Trade detail state
-    │   └── TradeListViewModel.swift # Trade list state
-    │   (Note: AskView/AskViewModel removed — replaced by HomeView/HomeViewModel)
+    │   └── TradeDetailViewModel.swift # Trade detail state
     │
     ├── Utilities/              # Helper functions and extensions
     │   ├── Theme.swift         # Colors, typography, spacing, button styles
@@ -98,8 +92,10 @@ Presentation logic and view state. ViewModels should:
 - Expose `@Published` properties
 
 ### Utilities
-- **Theme.swift**: Centralized design system (colors, typography, spacing, button styles)
+- **Theme.swift**: Centralized design system (colors, typography, spacing, button styles, FlowLayout)
 - **CurrencyFormatter.swift**: Number formatting utilities
+- **AppError.swift**: Unified error handling
+- **BackendConfig.swift**: Backend configuration
 
 ## Key Features
 
@@ -110,6 +106,13 @@ The app centers around an AI home screen (`HomeView`) that:
 - Shows price charts and ticker knowledge cards
 - Supports voice input via `SpeechRecognitionService`
 - Maintains conversation history locally
+
+### Sample Data Mode
+Dashboard and Insights tabs currently show sample/preview data:
+- Clearly labeled as "Sample Data Preview"
+- Demonstrates what personal tracking will look like
+- Uses only public market data and AI explanations
+- Trade import via brokerage connections is a planned feature
 
 ### Outlook Engine
 `OutlookEngine.swift` synthesizes market outlooks:

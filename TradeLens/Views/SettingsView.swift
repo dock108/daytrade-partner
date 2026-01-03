@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @StateObject private var viewModel = SettingsViewModel()
     @ObservedObject private var userSettings = UserSettings.shared
     @ObservedObject private var historyService = ConversationHistoryService.shared
     @State private var showClearHistoryAlert = false
@@ -137,86 +136,51 @@ struct SettingsView: View {
     
     private var importSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            ScreenSectionHeader("Data Import", icon: "square.and.arrow.down.fill")
+            ScreenSectionHeader("Import Trades", icon: "square.and.arrow.down.fill")
             
-            InfoCardView {
-                VStack(spacing: 0) {
-                    Button {
-                        Task {
-                            await viewModel.importTrades()
-                        }
-                    } label: {
-                        HStack(spacing: 14) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Theme.colors.accentBlue.opacity(0.15))
-                                    .frame(width: 40, height: 40)
-                                
-                                if viewModel.isImporting {
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: Theme.colors.accentBlue))
-                                        .scaleEffect(0.8)
-                                } else {
-                                    Image(systemName: "doc.badge.plus")
-                                        .font(.system(size: 16, weight: .medium))
-                                        .foregroundStyle(Theme.colors.accentBlue)
-                                }
-                            }
-                            
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text("Import Mock Trades")
-                                    .font(Theme.typography.rowTitle)
-                                    .foregroundStyle(Theme.colors.textPrimary)
-                                
-                                Text("Load sample data for testing")
-                                    .font(Theme.typography.rowSubtitle)
-                                    .foregroundStyle(Theme.colors.textTertiary)
-                            }
-                            
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .font(Theme.typography.caption)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(Theme.colors.textQuaternary)
-                        }
-                    }
-                    .buttonStyle(RowButtonStyle())
-                    .disabled(viewModel.isImporting)
-                    
-                    // Import status
-                    if let status = viewModel.importStatusMessage {
-                        Divider()
-                            .background(Theme.colors.divider)
-                            .padding(.leading, 54)
+            InfoCardView(accent: Theme.colors.textQuaternary) {
+                HStack(spacing: 14) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Theme.colors.textQuaternary.opacity(0.15))
+                            .frame(width: 40, height: 40)
                         
-                        HStack(spacing: 10) {
-                            Image(systemName: status.contains("Error") ? "xmark.circle.fill" : "checkmark.circle.fill")
-                                .font(Theme.typography.body)
-                                .foregroundStyle(status.contains("Error") ? Theme.colors.accentRed : Theme.colors.accentGreen)
-                            
-                            Text(status)
-                                .font(Theme.typography.bodySmall)
-                                .foregroundStyle(Theme.colors.textSecondary)
-                        }
-                        .padding(.top, 12)
-                        .padding(.bottom, 4)
+                        Image(systemName: "doc.badge.plus")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(Theme.colors.textQuaternary)
                     }
                     
-                    // Import details
-                    if !viewModel.importDetails.isEmpty {
-                        VStack(alignment: .leading, spacing: 4) {
-                            ForEach(viewModel.importDetails, id: \.self) { detail in
-                                Text("• \(detail)")
-                                    .font(Theme.typography.caption)
-                                    .foregroundStyle(Theme.colors.textTertiary)
-                            }
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(spacing: 8) {
+                            Text("Import Trade History")
+                                .font(Theme.typography.rowTitle)
+                                .foregroundStyle(Theme.colors.textSecondary)
+                            
+                            Text("Planned")
+                                .font(Theme.typography.tiny)
+                                .fontWeight(.medium)
+                                .foregroundStyle(Theme.colors.accentPurple)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(
+                                    Capsule()
+                                        .fill(Theme.colors.accentPurple.opacity(0.15))
+                                )
                         }
-                        .padding(.leading, 54)
-                        .padding(.top, 8)
+                        
+                        Text("Brokerage connections are not available in this version")
+                            .font(Theme.typography.rowSubtitle)
+                            .foregroundStyle(Theme.colors.textTertiary)
                     }
+                    
+                    Spacer()
                 }
             }
+            
+            Text("Future updates will support importing trades from Fidelity, Schwab, and other brokerages.")
+                .font(Theme.typography.disclaimer)
+                .foregroundStyle(Theme.colors.textMuted)
+                .padding(.horizontal, 4)
         }
     }
     
@@ -280,6 +244,18 @@ struct SettingsView: View {
                         .lineSpacing(3)
                 }
             }
+            
+            // Data footnote
+            HStack(spacing: 8) {
+                Image(systemName: "info.circle")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.colors.textMuted)
+                
+                Text("Current version uses only public market data and AI explanations.")
+                    .font(Theme.typography.disclaimer)
+                    .foregroundStyle(Theme.colors.textMuted)
+            }
+            .padding(.horizontal, 4)
         }
     }
 }
@@ -287,3 +263,4 @@ struct SettingsView: View {
 #Preview {
     SettingsView()
 }
+

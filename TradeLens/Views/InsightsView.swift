@@ -3,12 +3,37 @@
 //  TradeLens
 //
 //  Patterns & Insights screen — uses InfoCardView for consistent styling.
+//  Shows sample insights until user trade history is connected.
 //
 
 import SwiftUI
 
 struct InsightsView: View {
-    @StateObject private var viewModel = InsightsViewModel()
+    // Sample insights for preview mode (no real trades connected yet)
+    private struct SampleInsight: Identifiable {
+        let id = UUID()
+        let title: String
+        let subtitle: String
+        let detail: String
+    }
+    
+    private let sampleInsights: [SampleInsight] = [
+        SampleInsight(
+            title: "Win Rate Pattern",
+            subtitle: "Sample observation",
+            detail: "Traders who maintain a win rate above 55% typically see consistent growth over time. This metric will reflect your actual trades once connected."
+        ),
+        SampleInsight(
+            title: "Hold Time Matters",
+            subtitle: "Sample observation",
+            detail: "Studies show that average holding periods between 2-5 days often balance risk and opportunity for day traders."
+        ),
+        SampleInsight(
+            title: "Risk Management",
+            subtitle: "Sample observation",
+            detail: "Keeping speculative trades under 30% of your portfolio is a common strategy to manage downside risk while maintaining growth potential."
+        )
+    ]
 
     var body: some View {
         ScreenContainerView(
@@ -16,60 +41,57 @@ struct InsightsView: View {
             subtitle: "Patterns from your trading activity"
         ) {
             VStack(alignment: .leading, spacing: 24) {
-                if let errorMessage = viewModel.errorMessage {
-                    errorStateView(message: errorMessage) {
-                        Task {
-                            await viewModel.loadInsights()
-                        }
-                    }
-                } else if viewModel.isLoading {
-                    loadingState
-                } else {
-                    insightCards
-                    tradesSection
-                }
+                sampleDataBanner
+                sampleInsightCards
+                comingSoonSection
+                dataFootnote
             }
         }
     }
     
-    // MARK: - Loading State
+    // MARK: - Sample Data Banner
     
-    private var loadingState: some View {
-        VStack(spacing: 16) {
-            ProgressView()
-                .progressViewStyle(CircularProgressViewStyle(tint: Theme.colors.accentBlue))
-                .scaleEffect(1.2)
-            
-            Text("Analyzing patterns...")
-                .font(Theme.typography.bodySmall)
-                .foregroundStyle(Theme.colors.textTertiary)
+    private var sampleDataBanner: some View {
+        InfoCardView(accent: Theme.colors.accentPurple) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(Theme.colors.accentPurple.opacity(0.15))
+                        .frame(width: 40, height: 40)
+                    
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(Theme.colors.accentPurple)
+                }
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Sample Insights Preview")
+                        .font(Theme.typography.cardTitle)
+                        .foregroundStyle(Theme.colors.textPrimary)
+                    
+                    Text("These are example patterns. Personalized insights will appear once trade history is connected.")
+                        .font(Theme.typography.bodySmall)
+                        .foregroundStyle(Theme.colors.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 60)
     }
 
-    // MARK: - Insight Cards
+    // MARK: - Sample Insight Cards
 
-    private var insightCards: some View {
+    private var sampleInsightCards: some View {
         VStack(alignment: .leading, spacing: 16) {
-            ScreenSectionHeader("Key Observations", icon: "lightbulb.fill")
+            ScreenSectionHeader("Example Observations", icon: "lightbulb.fill")
             
-            if viewModel.insights.isEmpty {
-                EmptyStateCard(
-                    icon: "sparkles",
-                    title: "No insights yet",
-                    message: "Add more trades to see personalized patterns"
+            ForEach(sampleInsights) { insight in
+                InsightInfoCard(
+                    title: insight.title,
+                    subtitle: insight.subtitle,
+                    detail: insight.detail,
+                    icon: icon(for: insight.title),
+                    color: accentColor(for: insight.title)
                 )
-            } else {
-                ForEach(viewModel.insights) { insight in
-                    InsightInfoCard(
-                        title: insight.title,
-                        subtitle: insight.subtitle,
-                        detail: insight.detail,
-                        icon: icon(for: insight.title),
-                        color: accentColor(for: insight.title)
-                    )
-                }
             }
         }
     }
@@ -104,110 +126,53 @@ struct InsightsView: View {
         }
     }
 
-    // MARK: - Trades Section
-
-    private var tradesSection: some View {
+    // MARK: - Coming Soon Section
+    
+    private var comingSoonSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            ScreenSectionHeader("Recent Trades", icon: "clock.arrow.circlepath")
+            ScreenSectionHeader("Personal Analysis", icon: "person.crop.circle.badge.checkmark")
             
-            if viewModel.trades.isEmpty {
-                InfoCardView {
-                    Text("No trades yet")
-                        .font(Theme.typography.body)
-                        .foregroundStyle(Theme.colors.textTertiary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            } else {
-                ListInfoCard {
-                    VStack(spacing: 0) {
-                        ForEach(Array(viewModel.trades.prefix(5).enumerated()), id: \.element.id) { index, trade in
-                            NavigationLink {
-                                TradeDetailView(trade: trade)
-                            } label: {
-                                tradeRow(trade)
-                                    .contentShape(Rectangle())
-                            }
-                            .buttonStyle(RowButtonStyle())
-                            
-                            if index < min(4, viewModel.trades.count - 1) {
-                                Divider()
-                                    .background(Theme.colors.divider)
-                                    .padding(.leading, 54)
-                            }
-                        }
+            InfoCardView(accent: Theme.colors.accentBlue) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(Theme.colors.accentBlue.opacity(0.15))
+                            .frame(width: 40, height: 40)
+                        
+                        Image(systemName: "chart.xyaxis.line")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(Theme.colors.accentBlue)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Your Patterns Coming Soon")
+                            .font(Theme.typography.cardTitle)
+                            .foregroundStyle(Theme.colors.textPrimary)
+                        
+                        Text("This section will analyze your unique trading behavior once brokerage connections are available.")
+                            .font(Theme.typography.bodySmall)
+                            .foregroundStyle(Theme.colors.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
             }
         }
     }
     
-    private func tradeRow(_ trade: MockTrade) -> some View {
-        HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(trade.realizedPnL >= 0 ? Theme.colors.accentGreen.opacity(0.15) : Theme.colors.accentRed.opacity(0.15))
-                    .frame(width: 40, height: 40)
-                
-                Image(systemName: trade.realizedPnL >= 0 ? "arrow.up.right" : "arrow.down.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(trade.realizedPnL >= 0 ? Theme.colors.accentGreen : Theme.colors.accentRed)
-            }
+    // MARK: - Data Footnote
+    
+    private var dataFootnote: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "info.circle")
+                .font(.system(size: 12))
+                .foregroundStyle(Theme.colors.textMuted)
             
-            VStack(alignment: .leading, spacing: 3) {
-                Text(trade.ticker)
-                    .font(Theme.typography.ticker)
-                    .foregroundStyle(Theme.colors.textPrimary)
-                
-                Text("\(trade.holdingDays) days")
-                    .font(Theme.typography.rowSubtitle)
-                    .foregroundStyle(Theme.colors.textTertiary)
-            }
-            
-            Spacer()
-            
-            Text(CurrencyFormatter.formatUSD(trade.realizedPnL))
-                .font(Theme.typography.statSmall)
-                .foregroundStyle(trade.realizedPnL >= 0 ? Theme.colors.accentGreen : Theme.colors.accentRed)
-            
-            Image(systemName: "chevron.right")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Theme.colors.textQuaternary)
+            Text("Current version uses only public market data and AI explanations.")
+                .font(Theme.typography.disclaimer)
+                .foregroundStyle(Theme.colors.textMuted)
         }
-        .padding(.vertical, 10)
-    }
-
-    // MARK: - Error State
-
-    private func errorStateView(message: String, retry: @escaping () -> Void) -> some View {
-        InfoCardView(accent: Theme.colors.accentOrange) {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 10) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Theme.colors.accentOrange)
-                    
-                    Text("Something went wrong")
-                        .font(Theme.typography.cardTitle)
-                        .foregroundStyle(Theme.colors.textPrimary)
-                }
-                
-                Text(message)
-                    .font(Theme.typography.bodySmall)
-                    .foregroundStyle(Theme.colors.textTertiary)
-                
-                Button(action: retry) {
-                    Text("Try Again")
-                        .font(Theme.typography.button)
-                        .foregroundStyle(Theme.colors.accentBlue)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(
-                            Capsule()
-                                .fill(Theme.colors.accentBlue.opacity(0.15))
-                        )
-                }
-            }
-        }
+        .padding(.horizontal, 4)
+        .padding(.top, 8)
     }
 }
 

@@ -3,64 +3,66 @@
 //  TradeLens
 //
 //  Dashboard summary view — uses InfoCardView for consistent styling.
+//  Shows sample data until user trade history is connected.
 //
 
 import SwiftUI
 
 struct DashboardView: View {
-    @StateObject private var viewModel = DashboardViewModel()
-
+    // Sample data for preview mode (no real trades connected yet)
+    private let sampleSummary = UserSummary(
+        totalTrades: 47,
+        winRate: 0.62,
+        avgHoldDays: 3.8,
+        bestTicker: "NVDA",
+        worstTicker: "COIN",
+        speculativePercent: 0.35,
+        realizedPnLTotal: 2847.50
+    )
+    
     var body: some View {
         ScreenContainerView(
             title: "Dashboard",
             subtitle: "Your trading summary at a glance"
         ) {
             VStack(alignment: .leading, spacing: 24) {
-                if let errorMessage = viewModel.errorMessage {
-                    errorStateView(message: errorMessage) {
-                        Task {
-                            await viewModel.loadDashboard()
-                        }
-                    }
-                } else if viewModel.isLoading {
-                    loadingState
-                } else if let summary = viewModel.summary {
-                    statsGrid(summary: summary)
-                    insightSection(summary: summary)
-                    tickerSection(summary: summary)
-                    tradesSection
-                } else {
-                    emptyState
+                sampleDataBanner
+                statsGrid(summary: sampleSummary)
+                insightSection(summary: sampleSummary)
+                tickerSection(summary: sampleSummary)
+                comingSoonSection
+                dataFootnote
+            }
+        }
+    }
+    
+    // MARK: - Sample Data Banner
+    
+    private var sampleDataBanner: some View {
+        InfoCardView(accent: Theme.colors.accentPurple) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(Theme.colors.accentPurple.opacity(0.15))
+                        .frame(width: 40, height: 40)
+                    
+                    Image(systemName: "wand.and.stars")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(Theme.colors.accentPurple)
+                }
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Sample Data Preview")
+                        .font(Theme.typography.cardTitle)
+                        .foregroundStyle(Theme.colors.textPrimary)
+                    
+                    Text("This dashboard shows example stats. Personal tracking will be available once trade history is connected.")
+                        .font(Theme.typography.bodySmall)
+                        .foregroundStyle(Theme.colors.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: viewModel.isLoading)
-    }
-    
-    // MARK: - Loading State
-    
-    private var loadingState: some View {
-        VStack(spacing: 16) {
-            ProgressView()
-                .progressViewStyle(CircularProgressViewStyle(tint: Theme.colors.accentBlue))
-                .scaleEffect(1.2)
-            
-            Text("Loading summary...")
-                .font(Theme.typography.bodySmall)
-                .foregroundStyle(Theme.colors.textTertiary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 60)
-    }
-    
-    // MARK: - Empty State
-    
-    private var emptyState: some View {
-        EmptyStateCard(
-            icon: "chart.bar.xaxis",
-            title: "No data yet",
-            message: "Import trades to see your dashboard"
-        )
     }
 
     // MARK: - Stats Grid
@@ -132,7 +134,7 @@ struct DashboardView: View {
                                 .font(Theme.typography.cardTitle)
                                 .foregroundStyle(Theme.colors.textPrimary)
                             
-                            Text(viewModel.riskMessage)
+                            Text(riskMessage(for: summary.speculativePercent))
                                 .font(Theme.typography.bodySmall)
                                 .foregroundStyle(Theme.colors.textSecondary)
                         }
@@ -200,6 +202,17 @@ struct DashboardView: View {
             return "flame.fill"
         }
     }
+    
+    private func riskMessage(for speculativePercent: Double) -> String {
+        switch speculativePercent {
+        case ..<0.3:
+            return "Leans risk-averse"
+        case 0.3..<0.6:
+            return "Balances core and speculative"
+        default:
+            return "Leans risk-on"
+        }
+    }
 
     // MARK: - Ticker Section
 
@@ -251,112 +264,53 @@ struct DashboardView: View {
         }
     }
 
-    // MARK: - Trades Section
-
-    private var tradesSection: some View {
+    // MARK: - Coming Soon Section
+    
+    private var comingSoonSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            ScreenSectionHeader("Recent Trades", icon: "clock.arrow.circlepath")
+            ScreenSectionHeader("Trade Tracking", icon: "clock.arrow.circlepath")
             
-            if viewModel.trades.isEmpty {
-                InfoCardView {
-                    Text("No trades yet")
-                        .font(Theme.typography.body)
-                        .foregroundStyle(Theme.colors.textTertiary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            } else {
-                ListInfoCard {
-                    VStack(spacing: 0) {
-                        ForEach(Array(viewModel.trades.prefix(5).enumerated()), id: \.element.id) { index, trade in
-                            NavigationLink {
-                                TradeDetailView(trade: trade)
-                            } label: {
-                                tradeRow(trade)
-                                    .contentShape(Rectangle())
-                            }
-                            .buttonStyle(RowButtonStyle())
-                            
-                            if index < min(4, viewModel.trades.count - 1) {
-                                Divider()
-                                    .background(Theme.colors.divider)
-                                    .padding(.leading, 54)
-                            }
-                        }
+            InfoCardView(accent: Theme.colors.accentBlue) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(Theme.colors.accentBlue.opacity(0.15))
+                            .frame(width: 40, height: 40)
+                        
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(Theme.colors.accentBlue)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Personal Stats Coming Soon")
+                            .font(Theme.typography.cardTitle)
+                            .foregroundStyle(Theme.colors.textPrimary)
+                        
+                        Text("This section will show your real trade history once brokerage connections are available.")
+                            .font(Theme.typography.bodySmall)
+                            .foregroundStyle(Theme.colors.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
             }
         }
     }
     
-    private func tradeRow(_ trade: MockTrade) -> some View {
-        HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(trade.realizedPnL >= 0 ? Theme.colors.accentGreen.opacity(0.15) : Theme.colors.accentRed.opacity(0.15))
-                    .frame(width: 40, height: 40)
-                
-                Image(systemName: trade.realizedPnL >= 0 ? "arrow.up.right" : "arrow.down.right")
-                    .font(Theme.typography.body)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(trade.realizedPnL >= 0 ? Theme.colors.accentGreen : Theme.colors.accentRed)
-            }
+    // MARK: - Data Footnote
+    
+    private var dataFootnote: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "info.circle")
+                .font(.system(size: 12))
+                .foregroundStyle(Theme.colors.textMuted)
             
-            VStack(alignment: .leading, spacing: 3) {
-                Text(trade.ticker)
-                    .font(Theme.typography.ticker)
-                    .foregroundStyle(Theme.colors.textPrimary)
-                
-                Text("\(trade.holdingDays) days")
-                    .font(Theme.typography.rowSubtitle)
-                    .foregroundStyle(Theme.colors.textTertiary)
-            }
-            
-            Spacer()
-            
-            Text(CurrencyFormatter.formatUSD(trade.realizedPnL))
-                .font(Theme.typography.statSmall)
-                .foregroundStyle(trade.realizedPnL >= 0 ? Theme.colors.accentGreen : Theme.colors.accentRed)
-            
-            Image(systemName: "chevron.right")
-                .font(Theme.typography.caption)
-                .fontWeight(.semibold)
-                .foregroundStyle(Theme.colors.textQuaternary)
+            Text("Current version uses only public market data and AI explanations.")
+                .font(Theme.typography.disclaimer)
+                .foregroundStyle(Theme.colors.textMuted)
         }
-        .padding(.vertical, 10)
-    }
-
-    // MARK: - Error State
-
-    private func errorStateView(message: String, retry: @escaping () -> Void) -> some View {
-        InfoCardView(accent: Theme.colors.accentOrange) {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 10) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Theme.colors.accentOrange)
-                    
-                    Text("Something went wrong")
-                        .font(Theme.typography.cardTitle)
-                        .foregroundStyle(Theme.colors.textPrimary)
-                }
-                
-                Text(message)
-                    .font(Theme.typography.bodySmall)
-                    .foregroundStyle(Theme.colors.textTertiary)
-                
-                Button(action: retry) {
-                    Text("Try Again")
-                        .font(Theme.typography.button)
-                        .foregroundStyle(Theme.colors.accentBlue)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(
-                            Capsule()
-                                .fill(Theme.colors.accentBlue.opacity(0.15))
-                        )
-                }
-            }
-        }
+        .padding(.horizontal, 4)
+        .padding(.top, 8)
     }
 }
 
