@@ -2,7 +2,7 @@
 
 ## Project Structure
 
-The project follows a clean MVVM architecture with clear separation of concerns:
+The project follows a clean MVVM architecture with centralized data stores for single-source-of-truth data management.
 
 ```
 TradeLens/
@@ -14,21 +14,26 @@ TradeLens/
     ├── Models/                 # Data models and business entities
     │   ├── Trade.swift         # Trade entity & MockTrade
     │   ├── AIResponse.swift    # Structured AI response model
+    │   ├── BackendModels.swift # Backend API response models
     │   ├── ConversationHistory.swift # Chat history persistence
     │   ├── PriceData.swift     # Price chart data structures
     │   ├── TickerInfo.swift    # Ticker knowledge panel data
     │   ├── UserSummary.swift   # Trading summary analytics
     │   └── UserPreferences.swift # User settings model
     │
-    ├── Services/               # Business logic and data management
-    │   ├── AIServiceStub.swift # AI response generation (mock)
-    │   ├── AIContentProvider.swift # Topic content for AI responses
+    ├── DataStores/             # Centralized data management (single source of truth)
+    │   ├── DataStoreManager.swift # Central coordinator
+    │   ├── PriceStore.swift    # Ticker snapshots
+    │   ├── HistoryStore.swift  # Price history
+    │   ├── OutlookStore.swift  # AI responses
+    │   └── NewsStore.swift     # News items (placeholder)
+    │
+    ├── Services/               # Business logic and API clients
+    │   ├── APIClient.swift     # Backend HTTP client
+    │   ├── QueryParser.swift   # Query parsing (ticker detection, timeframe)
     │   ├── OutlookEngine.swift # Market outlook synthesis
     │   ├── MockTradeDataService.swift # Mock trade generation
-    │   ├── TradeAnalyticsService.swift # Trade analytics calculations
-    │   ├── InsightsService.swift # Behavioral insights
-    │   ├── MockPriceService.swift # Mock price data
-    │   ├── TickerInfoService.swift # Ticker metadata
+    │   ├── MockPriceService.swift # Fallback price data
     │   ├── SpeechRecognitionService.swift # Voice input
     │   └── UserSettings.swift  # Settings persistence
     │
@@ -41,20 +46,19 @@ TradeLens/
     │   ├── SettingsView.swift  # App settings
     │   ├── OutlookCardView.swift # Market outlook card
     │   ├── TickerChartView.swift # Price chart component
-    │   ├── TickerSnapshotCard.swift # Ticker info panel
     │   ├── HistoricalRangeView.swift # Bell curve visualization
     │   ├── InfoCardView.swift  # Reusable card components
     │   ├── ScreenContainerView.swift # Screen layout wrapper
-    │   ├── TradeDetailView.swift # Individual trade view
-    │   ├── TradeRowView.swift  # Trade list row
-    │   └── OnboardingView.swift # First-run experience
+    │   ├── OnboardingView.swift # First-run experience
+    │   └── Shared/             # Shared view components
+    │       └── MiniChartView.swift # Compact chart
     │
     ├── ViewModels/             # View state and presentation logic
-    │   ├── HomeViewModel.swift # Home screen state
-    │   └── TradeDetailViewModel.swift # Trade detail state
+    │   └── HomeViewModel.swift # Home screen state (uses DataStores)
     │
     ├── Utilities/              # Helper functions and extensions
     │   ├── Theme.swift         # Colors, typography, spacing, button styles
+    │   ├── BackendConfig.swift # Backend URL configuration
     │   ├── CurrencyFormatter.swift # Currency/percentage formatting
     │   └── AppError.swift      # Error handling
     │
@@ -66,11 +70,31 @@ TradeLens/
 
 ## Architecture Overview
 
+### Data Flow
+
+```
+Views → ViewModels → DataStores → APIClient → Backend
+                ↓
+         @Published updates propagate back to Views
+```
+
+**Key principle:** No view or ViewModel makes direct HTTP calls. All data flows through shared DataStores for cache management and consistency.
+
 ### Models
 Data structures and business entities. Models should be:
 - **Codable** for JSON serialization
 - **Identifiable** when used in SwiftUI lists
 - **Immutable** when possible (use `let` instead of `var`)
+
+### DataStores
+Centralized observable stores that own all market data:
+- **PriceStore**: Ticker snapshots (60s cache)
+- **HistoryStore**: Price history (5min cache)
+- **OutlookStore**: AI responses (5min cache)
+- **NewsStore**: News items (placeholder for future API)
+- **DataStoreManager**: Coordinates stores, provides sync status
+
+See [`DataStoreArchitecture.md`](DataStoreArchitecture.md) for detailed documentation.
 
 ### Services
 Business logic, API clients, and data management. Services should:
@@ -90,12 +114,13 @@ Presentation logic and view state. ViewModels should:
 - Use `@MainActor` annotation
 - Conform to `ObservableObject`
 - Expose `@Published` properties
+- **Use DataStores** for all data fetching (not APIClient directly)
 
 ### Utilities
 - **Theme.swift**: Centralized design system (colors, typography, spacing, button styles, FlowLayout)
+- **BackendConfig.swift**: Backend URL configuration (localhost/production)
 - **CurrencyFormatter.swift**: Number formatting utilities
 - **AppError.swift**: Unified error handling
-- **BackendConfig.swift**: Backend configuration
 
 ## Key Features
 

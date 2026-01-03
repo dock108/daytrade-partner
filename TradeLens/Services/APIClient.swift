@@ -25,10 +25,10 @@ final class APIClient {
     typealias AIResponse = BackendModels.AIResponse
 
     private enum Endpoint {
-        static let snapshot = "/snapshot"
-        static let history = "/history"
+        static func snapshot(symbol: String) -> String { "/ticker/\(symbol)/snapshot" }
+        static func history(symbol: String) -> String { "/ticker/\(symbol)/history" }
         static let outlook = "/outlook"
-        static let ask = "/ask"
+        static let ask = "/explain"
     }
 
     private enum HeaderValue {
@@ -44,6 +44,25 @@ final class APIClient {
         let symbol: String?
         let timeframeDays: Int?
         let simpleMode: Bool
+    }
+
+    // Raw backend response types for mapping to app models
+    private struct RawSnapshotResponse: Decodable {
+        let ticker: String
+        let company_name: String
+        let current_price: Double
+        let change_percent: Double
+        let week_52_high: Double
+        let week_52_low: Double
+    }
+
+    private struct RawHistoryResponse: Decodable {
+        let points: [RawPricePoint]
+    }
+
+    private struct RawPricePoint: Decodable {
+        let date: Date
+        let close: Double
     }
 
     private let session: URLSession
@@ -63,22 +82,40 @@ final class APIClient {
     }
 
     func fetchSnapshot(symbol: String) async throws -> TickerSnapshot {
-        let request = try makeRequest(
-            path: Endpoint.snapshot,
-            queryItems: [URLQueryItem(name: "symbol", value: symbol)]
+        // Backend returns different field names, so we decode raw and map
+        let request = try makeRequest(path: Endpoint.snapshot(symbol: symbol))
+        let raw: RawSnapshotResponse = try await performRequest(request)
+        return TickerSnapshot(
+            symbol: raw.ticker,
+            name: raw.company_name,
+            price: raw.current_price,
+            changePercent: raw.change_percent,
+            high52w: raw.week_52_high,
+            low52w: raw.week_52_low,
+            currency: "USD"
         )
-        return try await performRequest(request)
     }
 
     func fetchHistory(symbol: String, range: String) async throws -> [PricePoint] {
+        // Map iOS range format to backend format
+        let backendRange = mapRangeToBackend(range)
         let request = try makeRequest(
-            path: Endpoint.history,
-            queryItems: [
-                URLQueryItem(name: "symbol", value: symbol),
-                URLQueryItem(name: "range", value: range)
-            ]
+            path: Endpoint.history(symbol: symbol),
+            queryItems: [URLQueryItem(name: "range", value: backendRange)]
         )
-        return try await performRequest(request)
+        let raw: RawHistoryResponse = try await performRequest(request)
+        return raw.points.map { PricePoint(date: $0.date, close: $0.close) }
+    }
+
+    private func mapRangeToBackend(_ range: String) -> String {
+        // Map common formats to backend's expected format
+        switch range.lowercased() {
+        case "1d", "1day": return "1D"
+        case "1mo", "1m", "1month": return "1M"
+        case "6mo", "6m": return "6M"
+        case "1y", "1yr", "1year": return "1Y"
+        default: return "1M"
+        }
     }
 
     func requestOutlook(symbol: String, timeframeDays: Int?) async throws -> Outlook {

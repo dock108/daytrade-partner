@@ -8,10 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		0211D00796E10272DBB14559 /* BackendConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4266B835822850D9CD722A6 /* BackendConfig.swift */; };
+		1ADF5AE70E4AB85C7A7B777C /* DataStoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21AB0BB4BEC782BD399DA456 /* DataStoreManager.swift */; };
 		219A183334FEBB535B90A380 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A50B43ABF0F6B206233244B /* APIClient.swift */; };
+		233F02092114604E5DDB2B6D /* PriceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63909D307C812FA7023C74A4 /* PriceStore.swift */; };
 		46B015FC6B1D159E97D22EAE /* QueryParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03846330796FF502A0F61F13 /* QueryParser.swift */; };
 		853DB544E24AE25958B7A11E /* MiniChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A2A1512058864FBBBC34F2 /* MiniChartView.swift */; };
+		9845E92FA5DABBC7034CBBBF /* OutlookStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BFB1C5BCF7C89E448B7C901 /* OutlookStore.swift */; };
+		9B3C60AF5FA86978C217B21D /* NewsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4CD716F1D83139CA8670CE /* NewsStore.swift */; };
 		A7201AA482BD37877A08D955 /* HomeArticleComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47BF8FC5BCFCBB9CF7D5C34D /* HomeArticleComponents.swift */; };
+		A72B64853F1505107D621138 /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EC8A8B2216EB16637D7178 /* HistoryStore.swift */; };
 		E7F7E07D28886B96DBB89890 /* BackendModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CBB30F7D6466BF25EF629C /* BackendModels.swift */; };
 		TL001 /* TradeLensApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL002 /* TradeLensApp.swift */; };
 		TL003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL004 /* ContentView.swift */; };
@@ -25,14 +30,8 @@
 		TL204 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL208 /* SettingsView.swift */; };
 		TL205 /* MockTrades.csv in Resources */ = {isa = PBXBuildFile; fileRef = TL209 /* MockTrades.csv */; };
 		TL300 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL301 /* DashboardView.swift */; };
-		TL302 /* TradeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL303 /* TradeDetailView.swift */; };
-		TL304 /* TradeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL305 /* TradeRowView.swift */; };
 		TL306 /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL307 /* InsightsView.swift */; };
-		TL314 /* TradeDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL315 /* TradeDetailViewModel.swift */; };
-		TL318 /* AIServiceStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL319 /* AIServiceStub.swift */; };
-		TL320 /* InsightsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL321 /* InsightsService.swift */; };
 		TL322 /* MockTradeDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL323 /* MockTradeDataService.swift */; };
-		TL324 /* TradeAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL325 /* TradeAnalyticsService.swift */; };
 		TL400 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL401 /* HomeView.swift */; };
 		TL402 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL403 /* HomeViewModel.swift */; };
 		TL404 /* AIResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL405 /* AIResponse.swift */; };
@@ -40,8 +39,6 @@
 		TL408 /* MockPriceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL409 /* MockPriceService.swift */; };
 		TL410 /* TickerChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL411 /* TickerChartView.swift */; };
 		TL412 /* TickerInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL413 /* TickerInfo.swift */; };
-		TL414 /* TickerInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL415 /* TickerInfoService.swift */; };
-		TL416 /* TickerSnapshotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL417 /* TickerSnapshotCard.swift */; };
 		TL418 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL419 /* UserSettings.swift */; };
 		TL420 /* SpeechRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL421 /* SpeechRecognitionService.swift */; };
 		TL422 /* ConversationHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL423 /* ConversationHistory.swift */; };
@@ -53,7 +50,6 @@
 		TL434 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL435 /* Theme.swift */; };
 		TL436 /* ScreenContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL437 /* ScreenContainerView.swift */; };
 		TL438 /* InfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL439 /* InfoCardView.swift */; };
-		TL440 /* AIContentProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL441 /* AIContentProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,10 +64,15 @@
 
 /* Begin PBXFileReference section */
 		03846330796FF502A0F61F13 /* QueryParser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QueryParser.swift; sourceTree = "<group>"; };
+		21AB0BB4BEC782BD399DA456 /* DataStoreManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DataStoreManager.swift; sourceTree = "<group>"; };
 		27A2A1512058864FBBBC34F2 /* MiniChartView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MiniChartView.swift; sourceTree = "<group>"; };
 		2A50B43ABF0F6B206233244B /* APIClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		47BF8FC5BCFCBB9CF7D5C34D /* HomeArticleComponents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeArticleComponents.swift; sourceTree = "<group>"; };
+		63909D307C812FA7023C74A4 /* PriceStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PriceStore.swift; sourceTree = "<group>"; };
+		6BFB1C5BCF7C89E448B7C901 /* OutlookStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OutlookStore.swift; sourceTree = "<group>"; };
+		AA4CD716F1D83139CA8670CE /* NewsStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NewsStore.swift; sourceTree = "<group>"; };
 		B5CBB30F7D6466BF25EF629C /* BackendModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackendModels.swift; sourceTree = "<group>"; };
+		B5EC8A8B2216EB16637D7178 /* HistoryStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
 		D4266B835822850D9CD722A6 /* BackendConfig.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackendConfig.swift; sourceTree = "<group>"; };
 		TL002 /* TradeLensApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeLensApp.swift; sourceTree = "<group>"; };
 		TL004 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -88,14 +89,8 @@
 		TL208 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		TL209 /* MockTrades.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = MockTrades.csv; sourceTree = "<group>"; };
 		TL301 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
-		TL303 /* TradeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeDetailView.swift; sourceTree = "<group>"; };
-		TL305 /* TradeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeRowView.swift; sourceTree = "<group>"; };
 		TL307 /* InsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsView.swift; sourceTree = "<group>"; };
-		TL315 /* TradeDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeDetailViewModel.swift; sourceTree = "<group>"; };
-		TL319 /* AIServiceStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIServiceStub.swift; sourceTree = "<group>"; };
-		TL321 /* InsightsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsService.swift; sourceTree = "<group>"; };
 		TL323 /* MockTradeDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTradeDataService.swift; sourceTree = "<group>"; };
-		TL325 /* TradeAnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeAnalyticsService.swift; sourceTree = "<group>"; };
 		TL401 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		TL403 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		TL405 /* AIResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIResponse.swift; sourceTree = "<group>"; };
@@ -103,8 +98,6 @@
 		TL409 /* MockPriceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockPriceService.swift; sourceTree = "<group>"; };
 		TL411 /* TickerChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerChartView.swift; sourceTree = "<group>"; };
 		TL413 /* TickerInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerInfo.swift; sourceTree = "<group>"; };
-		TL415 /* TickerInfoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerInfoService.swift; sourceTree = "<group>"; };
-		TL417 /* TickerSnapshotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerSnapshotCard.swift; sourceTree = "<group>"; };
 		TL419 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
 		TL421 /* SpeechRecognitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognitionService.swift; sourceTree = "<group>"; };
 		TL423 /* ConversationHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationHistory.swift; sourceTree = "<group>"; };
@@ -116,7 +109,6 @@
 		TL435 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		TL437 /* ScreenContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenContainerView.swift; sourceTree = "<group>"; };
 		TL439 /* InfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoCardView.swift; sourceTree = "<group>"; };
-		TL441 /* AIContentProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIContentProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +129,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		200A62901A84A0C9D8958FBC /* DataStores */ = {
+			isa = PBXGroup;
+			children = (
+				63909D307C812FA7023C74A4 /* PriceStore.swift */,
+				B5EC8A8B2216EB16637D7178 /* HistoryStore.swift */,
+				6BFB1C5BCF7C89E448B7C901 /* OutlookStore.swift */,
+				AA4CD716F1D83139CA8670CE /* NewsStore.swift */,
+				21AB0BB4BEC782BD399DA456 /* DataStoreManager.swift */,
+			);
+			name = DataStores;
+			path = DataStores;
+			sourceTree = "<group>";
+		};
 		3FF3FB002576E1BCE5D85369 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
@@ -168,6 +173,7 @@
 				TL210 /* Resources */,
 				TL006 /* Assets.xcassets */,
 				TL028 /* Preview Content */,
+				200A62901A84A0C9D8958FBC /* DataStores */,
 			);
 			path = TradeLens;
 			sourceTree = "<group>";
@@ -199,13 +205,8 @@
 		TL024 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				TL319 /* AIServiceStub.swift */,
-				TL441 /* AIContentProvider.swift */,
-				TL321 /* InsightsService.swift */,
 				TL323 /* MockTradeDataService.swift */,
-				TL325 /* TradeAnalyticsService.swift */,
 				TL409 /* MockPriceService.swift */,
-				TL415 /* TickerInfoService.swift */,
 				TL419 /* UserSettings.swift */,
 				TL421 /* SpeechRecognitionService.swift */,
 				TL425 /* OutlookEngine.swift */,
@@ -221,7 +222,6 @@
 				TL004 /* ContentView.swift */,
 				TL401 /* HomeView.swift */,
 				TL411 /* TickerChartView.swift */,
-				TL417 /* TickerSnapshotCard.swift */,
 				TL427 /* OutlookCardView.swift */,
 				TL431 /* OnboardingView.swift */,
 				TL433 /* HistoricalRangeView.swift */,
@@ -229,8 +229,6 @@
 				TL439 /* InfoCardView.swift */,
 				TL208 /* SettingsView.swift */,
 				TL301 /* DashboardView.swift */,
-				TL303 /* TradeDetailView.swift */,
-				TL305 /* TradeRowView.swift */,
 				TL307 /* InsightsView.swift */,
 				47BF8FC5BCFCBB9CF7D5C34D /* HomeArticleComponents.swift */,
 				3FF3FB002576E1BCE5D85369 /* Shared */,
@@ -242,7 +240,6 @@
 			isa = PBXGroup;
 			children = (
 				TL403 /* HomeViewModel.swift */,
-				TL315 /* TradeDetailViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -386,16 +383,9 @@
 				TL003 /* ContentView.swift in Sources */,
 				TL204 /* SettingsView.swift in Sources */,
 				TL300 /* DashboardView.swift in Sources */,
-				TL302 /* TradeDetailView.swift in Sources */,
-				TL304 /* TradeRowView.swift in Sources */,
 				TL306 /* InsightsView.swift in Sources */,
 				TL009 /* Trade.swift in Sources */,
-				TL318 /* AIServiceStub.swift in Sources */,
-				TL440 /* AIContentProvider.swift in Sources */,
-				TL320 /* InsightsService.swift in Sources */,
 				TL322 /* MockTradeDataService.swift in Sources */,
-				TL324 /* TradeAnalyticsService.swift in Sources */,
-				TL314 /* TradeDetailViewModel.swift in Sources */,
 				TL015 /* CurrencyFormatter.swift in Sources */,
 				TL200 /* AppError.swift in Sources */,
 				TL001 /* TradeLensApp.swift in Sources */,
@@ -407,8 +397,6 @@
 				TL408 /* MockPriceService.swift in Sources */,
 				TL410 /* TickerChartView.swift in Sources */,
 				TL412 /* TickerInfo.swift in Sources */,
-				TL414 /* TickerInfoService.swift in Sources */,
-				TL416 /* TickerSnapshotCard.swift in Sources */,
 				TL418 /* UserSettings.swift in Sources */,
 				TL420 /* SpeechRecognitionService.swift in Sources */,
 				TL422 /* ConversationHistory.swift in Sources */,
@@ -426,6 +414,11 @@
 				46B015FC6B1D159E97D22EAE /* QueryParser.swift in Sources */,
 				0211D00796E10272DBB14559 /* BackendConfig.swift in Sources */,
 				853DB544E24AE25958B7A11E /* MiniChartView.swift in Sources */,
+				233F02092114604E5DDB2B6D /* PriceStore.swift in Sources */,
+				A72B64853F1505107D621138 /* HistoryStore.swift in Sources */,
+				9845E92FA5DABBC7034CBBBF /* OutlookStore.swift in Sources */,
+				9B3C60AF5FA86978C217B21D /* NewsStore.swift in Sources */,
+				1ADF5AE70E4AB85C7A7B777C /* DataStoreManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

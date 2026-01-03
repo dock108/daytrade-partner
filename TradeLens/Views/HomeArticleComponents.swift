@@ -287,6 +287,35 @@ struct StandardSectionCard: View {
     }
 }
 
+// MARK: - Recap Card
+
+/// Gentle, subdued card for the simple recap — small text, muted styling
+struct RecapCard: View {
+    let content: String
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "text.quote")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(Color.white.opacity(0.35))
+                .padding(.top, 2)
+            
+            Text(content)
+                .font(.system(size: 13, weight: .regular))
+                .foregroundStyle(Color.white.opacity(0.5))
+                .lineSpacing(4)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.white.opacity(0.025))
+        )
+    }
+}
+
 // MARK: - Personal Note Card
 
 /// Subtle card for personal notes/insights

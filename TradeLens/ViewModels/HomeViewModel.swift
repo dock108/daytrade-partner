@@ -29,7 +29,12 @@ final class HomeViewModel: ObservableObject {
     @Published var isListening: Bool = false
     @Published var speechError: String?
 
-    private let apiClient: APIClientProtocol
+    // MARK: - Shared Data Stores (Single Source of Truth)
+    private let dataStoreManager: DataStoreManager
+    private let priceStore: PriceStore
+    private let historyStore: HistoryStore
+    private let outlookStore: OutlookStore
+    
     private let tradeService: MockTradeDataService
     private let speechService: SpeechRecognitionService
     private let historyService: ConversationHistoryService
@@ -39,7 +44,13 @@ final class HomeViewModel: ObservableObject {
     private let recentSearchesKey = "TradeLens.RecentSearches"
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "TradeLens", category: "HomeViewModel")
     private enum Constants {
-        static let historyRange = "1mo"
+        static let historyRange = "1M"
+    }
+    
+    /// Sync timestamp for UI display (dev-visible)
+    var syncTimeString: String? {
+        guard let ticker = detectedTicker else { return nil }
+        return dataStoreManager.syncTimeString(for: ticker)
     }
     
     /// Keywords that trigger outlook generation
@@ -61,14 +72,17 @@ final class HomeViewModel: ObservableObject {
     }
 
     init(
-        apiClient: APIClientProtocol = APIClient(),
+        dataStoreManager: DataStoreManager = .shared,
         tradeService: MockTradeDataService = MockTradeDataService(),
         speechService: SpeechRecognitionService = SpeechRecognitionService(),
         historyService: ConversationHistoryService = .shared,
         outlookEngine: OutlookEngine = OutlookEngine(),
         userSettings: UserSettings = .shared
     ) {
-        self.apiClient = apiClient
+        self.dataStoreManager = dataStoreManager
+        self.priceStore = dataStoreManager.priceStore
+        self.historyStore = dataStoreManager.historyStore
+        self.outlookStore = dataStoreManager.outlookStore
         self.tradeService = tradeService
         self.speechService = speechService
         self.historyService = historyService
@@ -167,50 +181,78 @@ final class HomeViewModel: ObservableObject {
         
         Task {
             defer { isLoading = false }
-            do {
-                let backendResponse = try await apiClient.askAI(
-                    question: trimmed,
-                    symbol: detectedTicker,
-                    timeframeDays: timeframeDays,
-                    simpleMode: simpleMode
-                )
-                let aiResponse = buildAIResponse(from: backendResponse, query: trimmed)
-                response = aiResponse
-                if let ticker = detectedTicker {
-                    tickerSnapshot = await fetchSnapshot(for: ticker)
-                    Task {
-                        await fetchHistoryPoints(for: ticker)
-                    }
-                }
-                
-                // Generate outlook if applicable
-                if shouldShowOutlook, let ticker = detectedTicker {
-                    outlook = await outlookEngine.generateOutlook(
-                        for: ticker,
-                        timeframeDays: timeframeDays,
-                        includePersonalContext: true
-                    )
+            
+            // Use shared OutlookStore for AI responses
+            guard let backendResponse = await outlookStore.ask(
+                question: trimmed,
+                symbol: detectedTicker,
+                timeframeDays: timeframeDays,
+                simpleMode: simpleMode
+            ) else {
+                // Check for error from store
+                let cacheKey = trimmed.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+                if let storeError = outlookStore.errors[cacheKey] {
+                    errorMessage = storeError
                 } else {
-                    outlook = nil
+                    errorMessage = "Unable to get response. Please try again."
                 }
-                
-                // Save to conversation history
-                historyService.save(
-                    question: trimmed,
-                    response: aiResponse,
-                    detectedTicker: detectedTicker
-                )
-                refreshConversationHistory()
-            } catch is CancellationError {
-                return
-            } catch {
-                let appError = AppError(error)
-                errorMessage = appError.userMessage
                 response = nil
                 tickerSnapshot = nil
                 outlook = nil
                 historyPoints = nil
+                return
             }
+            
+            let aiResponse = buildAIResponse(from: backendResponse, query: trimmed)
+            response = aiResponse
+            
+            // Use shared stores for price data (no direct API calls)
+            if let ticker = detectedTicker {
+                // Refresh all data through stores
+                await dataStoreManager.refreshAll(for: ticker)
+                
+                // Get snapshot from store
+                tickerSnapshot = priceStore.snapshot(for: ticker)
+                
+                // Get history from store and map to local model
+                if let storePoints = historyStore.points(for: ticker, range: Constants.historyRange) {
+                    historyPoints = storePoints.map { backendPoint in
+                        PricePoint(
+                            date: backendPoint.date,
+                            close: backendPoint.close,
+                            high: backendPoint.close,
+                            low: backendPoint.close
+                        )
+                    }
+                }
+                
+                #if DEBUG
+                // Validate price consistency in debug builds
+                let warnings = dataStoreManager.validatePriceConsistency(for: ticker)
+                for warning in warnings {
+                    logger.warning("⚠️ \(warning)")
+                }
+                #endif
+            }
+            
+            // Generate outlook if applicable
+            if shouldShowOutlook, let ticker = detectedTicker {
+                outlook = await outlookEngine.generateOutlook(
+                    for: ticker,
+                    timeframeDays: timeframeDays,
+                    includePersonalContext: true
+                )
+            } else {
+                outlook = nil
+            }
+            
+            // Save to conversation history
+            historyService.save(
+                question: trimmed,
+                response: aiResponse,
+                detectedTicker: detectedTicker
+            )
+            refreshConversationHistory()
         }
         
         addToRecentSearches(trimmed)
@@ -239,14 +281,27 @@ final class HomeViewModel: ObservableObject {
         tickerSnapshot = nil
         historyPoints = nil
         
-        // Reload price data and ticker snapshot if applicable
+        // Reload price data using shared stores
         if let ticker = entry.detectedTicker {
             priceHistory = MockPriceService.priceHistory(for: ticker, range: .oneMonth)
+            
             Task {
-                tickerSnapshot = await fetchSnapshot(for: ticker)
-            }
-            Task {
-                await fetchHistoryPoints(for: ticker)
+                // Refresh all data through stores
+                await dataStoreManager.refreshAll(for: ticker)
+                
+                // Get data from stores
+                tickerSnapshot = priceStore.snapshot(for: ticker)
+                
+                if let storePoints = historyStore.points(for: ticker, range: Constants.historyRange) {
+                    historyPoints = storePoints.map { backendPoint in
+                        PricePoint(
+                            date: backendPoint.date,
+                            close: backendPoint.close,
+                            high: backendPoint.close,
+                            low: backendPoint.close
+                        )
+                    }
+                }
             }
             
             // Regenerate outlook if applicable
@@ -456,28 +511,6 @@ final class HomeViewModel: ObservableObject {
         return AIResponse(query: query, sections: sections)
     }
 
-    private func fetchSnapshot(for symbol: String) async -> BackendModels.TickerSnapshot? {
-        do {
-            return try await apiClient.fetchSnapshot(symbol: symbol)
-        } catch {
-            return nil
-        }
-    }
-
-    private func fetchHistoryPoints(for symbol: String) async {
-        do {
-            let backendPoints = try await apiClient.fetchHistory(symbol: symbol, range: Constants.historyRange)
-            historyPoints = backendPoints.map { backendPoint in
-                PricePoint(
-                    date: backendPoint.date,
-                    close: backendPoint.close,
-                    high: backendPoint.close,
-                    low: backendPoint.close
-                )
-            }
-        } catch {
-            historyPoints = nil
-            logger.error("Failed to fetch history for \(symbol, privacy: .public): \(error.localizedDescription, privacy: .public)")
-        }
-    }
+    // NOTE: Direct API calls removed — all data fetching now goes through shared stores
+    // (PriceStore, HistoryStore, OutlookStore) to ensure single source of truth
 }

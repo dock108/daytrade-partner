@@ -425,6 +425,12 @@ struct HomeView: View {
                             insertion: .opacity.combined(with: .move(edge: .bottom)),
                             removal: .opacity
                         ))
+                } else if section.type == .recap {
+                    RecapCard(content: section.content)
+                        .transition(.asymmetric(
+                            insertion: .opacity.combined(with: .move(edge: .bottom)),
+                            removal: .opacity
+                        ))
                 } else {
                     StandardSectionCard(section: section)
                         .transition(.asymmetric(
@@ -448,6 +454,20 @@ struct HomeView: View {
                     .foregroundStyle(Color.white.opacity(0.3))
             }
             .padding(.top, 8)
+            
+            #if DEBUG
+            // Dev-visible sync timestamp indicator
+            if let syncTime = viewModel.syncTimeString {
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                        .font(.system(size: 10))
+                    Text(syncTime)
+                        .font(.system(size: 11))
+                }
+                .foregroundStyle(Color.white.opacity(0.25))
+                .padding(.top, 4)
+            }
+            #endif
             
             // Disclaimer footer
             DisclaimerFooter()
