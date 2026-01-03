@@ -106,4 +106,60 @@ final class BackendModelDecodingTests: XCTestCase {
         XCTAssertEqual(response.historicalBehavior, "Typically consolidates after large gaps.")
         XCTAssertEqual(response.simpleRecap, "Positive momentum with some near-term risk.")
     }
+
+    func testDecodesOutlookModel() throws {
+        let json = """
+        {
+          "symbol": "TSLA",
+          "timeframeDays": 14,
+          "catalysts": [
+            {
+              "title": "Delivery report",
+              "impact": "positive",
+              "timeframeDays": 7
+            }
+          ],
+          "news": [
+            {
+              "headline": "Tesla demand holds steady",
+              "source": "MarketWatch",
+              "publishedAt": "2024-06-14T00:00:00Z",
+              "url": "https://example.com/tesla-demand"
+            }
+          ],
+          "expectedRange": {
+            "low": 168.5,
+            "high": 192.3,
+            "percentMove": 12.4
+          },
+          "historicalStats": {
+            "winRate": 0.58,
+            "averageMovePercent": 8.2,
+            "medianMovePercent": 7.5,
+            "sampleSize": 42
+          }
+        }
+        """
+
+        let data = try XCTUnwrap(json.data(using: .utf8))
+        let outlook = try decoder.decode(BackendModels.OutlookModel.self, from: data)
+
+        XCTAssertEqual(outlook.symbol, "TSLA")
+        XCTAssertEqual(outlook.timeframeDays, 14)
+        XCTAssertEqual(outlook.catalysts.count, 1)
+        XCTAssertEqual(outlook.catalysts.first?.title, "Delivery report")
+        XCTAssertEqual(outlook.catalysts.first?.impact, "positive")
+        XCTAssertEqual(outlook.catalysts.first?.timeframeDays, 7)
+        XCTAssertEqual(outlook.news.count, 1)
+        XCTAssertEqual(outlook.news.first?.headline, "Tesla demand holds steady")
+        XCTAssertEqual(outlook.news.first?.source, "MarketWatch")
+        XCTAssertEqual(outlook.news.first?.url.absoluteString, "https://example.com/tesla-demand")
+        XCTAssertEqual(outlook.expectedRange.low, 168.5, accuracy: 0.001)
+        XCTAssertEqual(outlook.expectedRange.high, 192.3, accuracy: 0.001)
+        XCTAssertEqual(outlook.expectedRange.percentMove, 12.4, accuracy: 0.001)
+        XCTAssertEqual(outlook.historicalStats.winRate, 0.58, accuracy: 0.001)
+        XCTAssertEqual(outlook.historicalStats.averageMovePercent, 8.2, accuracy: 0.001)
+        XCTAssertEqual(outlook.historicalStats.medianMovePercent, 7.5, accuracy: 0.001)
+        XCTAssertEqual(outlook.historicalStats.sampleSize, 42)
+    }
 }
