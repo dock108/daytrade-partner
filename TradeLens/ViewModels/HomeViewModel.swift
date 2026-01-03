@@ -51,10 +51,10 @@ final class HomeViewModel: ObservableObject {
         static let historyRange = "1M"
     }
     
-    /// Sync timestamp for UI display (dev-visible)
-    var syncTimeString: String? {
+    /// Banner text for UI display (shared sync status)
+    func dataSyncBannerText(referenceDate: Date = Date()) -> String? {
         guard let ticker = detectedTicker else { return nil }
-        return dataStoreManager.syncTimeString(for: ticker)
+        return dataStoreManager.dataSyncBannerText(for: ticker, referenceDate: referenceDate)
     }
     
     /// Keywords that trigger outlook generation

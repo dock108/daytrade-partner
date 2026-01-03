@@ -28,6 +28,14 @@ final class DataStoreManager: ObservableObject {
     @Published private(set) var isMockMode: Bool = false
     
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "TradeLens", category: "DataStoreManager")
+    private enum Constants {
+        static let bannerSuffix = "outlook updates periodically"
+        static let bannerSyncedPrefix = "Data synced"
+        static let bannerFromPrefix = "Data from"
+        static let justNowText = "just now"
+        static let minutesUnit = "minute"
+        static let minutesUnitPlural = "minutes"
+    }
     
     // MARK: - Init
     
@@ -73,6 +81,27 @@ final class DataStoreManager: ObservableObject {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return "Data synced at \(formatter.string(from: date))"
+    }
+
+    /// Banner text for sync status with relative age
+    func dataSyncBannerText(for symbol: String, referenceDate: Date = Date()) -> String? {
+        guard let date = mostRecentSync(for: symbol) else { return nil }
+
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        let minutesAgo = max(0, Int(referenceDate.timeIntervalSince(date) / 60))
+        let relativeSegment = relativeAgeSegment(minutesAgo: minutesAgo)
+        let syncSegment = "\(Constants.bannerSyncedPrefix) \(formatter.string(from: date))"
+        return "\(relativeSegment) — \(syncSegment) — \(Constants.bannerSuffix)"
+    }
+
+    private func relativeAgeSegment(minutesAgo: Int) -> String {
+        if minutesAgo < 1 {
+            return "\(Constants.bannerFromPrefix) \(Constants.justNowText)"
+        }
+
+        let unit = minutesAgo == 1 ? Constants.minutesUnit : Constants.minutesUnitPlural
+        return "\(Constants.bannerFromPrefix) \(minutesAgo) \(unit) ago"
     }
     
     /// Check if any data is stale for a symbol
@@ -147,4 +176,3 @@ extension DataStoreManager {
     }
 }
 #endif
-
