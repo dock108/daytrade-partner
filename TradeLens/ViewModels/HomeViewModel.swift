@@ -7,12 +7,14 @@
 
 import Foundation
 import SwiftUI
+import os
 
 @MainActor
 final class HomeViewModel: ObservableObject {
     @Published var question: String = ""
     @Published var response: AIResponse?
     @Published var priceHistory: PriceHistory?
+    @Published var historyPoints: [PricePoint]?
     @Published var tickerSnapshot: BackendModels.TickerSnapshot?
     @Published var detectedTicker: String?
     @Published var lastQuery: String = ""
@@ -35,6 +37,10 @@ final class HomeViewModel: ObservableObject {
     private let userSettings: UserSettings
     private let maxRecentSearches = 5
     private let recentSearchesKey = "TradeLens.RecentSearches"
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "TradeLens", category: "HomeViewModel")
+    private enum Constants {
+        static let historyRange = "1mo"
+    }
     
     /// Keywords that trigger outlook generation
     private let outlookKeywords = ["buy", "up", "down", "outlook", "expect", "will", "should", "30 days", "next month", "forecast", "prediction"]
@@ -131,6 +137,7 @@ final class HomeViewModel: ObservableObject {
         guard !trimmed.isEmpty else {
             response = nil
             priceHistory = nil
+            historyPoints = nil
             tickerSnapshot = nil
             detectedTicker = nil
             outlook = nil
@@ -150,6 +157,7 @@ final class HomeViewModel: ObservableObject {
         } else {
             priceHistory = nil
         }
+        historyPoints = nil
         tickerSnapshot = nil
         
         // Check if this is an outlook-type query
@@ -170,6 +178,9 @@ final class HomeViewModel: ObservableObject {
                 response = aiResponse
                 if let ticker = detectedTicker {
                     tickerSnapshot = await fetchSnapshot(for: ticker)
+                    Task {
+                        await fetchHistoryPoints(for: ticker)
+                    }
                 }
                 
                 // Generate outlook if applicable
@@ -198,6 +209,7 @@ final class HomeViewModel: ObservableObject {
                 response = nil
                 tickerSnapshot = nil
                 outlook = nil
+                historyPoints = nil
             }
         }
         
@@ -225,12 +237,16 @@ final class HomeViewModel: ObservableObject {
         detectedTicker = entry.detectedTicker
         errorMessage = nil
         tickerSnapshot = nil
+        historyPoints = nil
         
         // Reload price data and ticker snapshot if applicable
         if let ticker = entry.detectedTicker {
             priceHistory = MockPriceService.priceHistory(for: ticker, range: .oneMonth)
             Task {
                 tickerSnapshot = await fetchSnapshot(for: ticker)
+            }
+            Task {
+                await fetchHistoryPoints(for: ticker)
             }
             
             // Regenerate outlook if applicable
@@ -249,6 +265,7 @@ final class HomeViewModel: ObservableObject {
             priceHistory = nil
             tickerSnapshot = nil
             outlook = nil
+            historyPoints = nil
         }
     }
     
@@ -288,6 +305,7 @@ final class HomeViewModel: ObservableObject {
         lastQuery = ""
         errorMessage = nil
         isLoading = false
+        historyPoints = nil
     }
     
     func updateChartRange(_ range: ChartTimeRange) {
@@ -443,6 +461,23 @@ final class HomeViewModel: ObservableObject {
             return try await apiClient.fetchSnapshot(symbol: symbol)
         } catch {
             return nil
+        }
+    }
+
+    private func fetchHistoryPoints(for symbol: String) async {
+        do {
+            let backendPoints = try await apiClient.fetchHistory(symbol: symbol, range: Constants.historyRange)
+            historyPoints = backendPoints.map { backendPoint in
+                PricePoint(
+                    date: backendPoint.date,
+                    close: backendPoint.close,
+                    high: backendPoint.close,
+                    low: backendPoint.close
+                )
+            }
+        } catch {
+            historyPoints = nil
+            logger.error("Failed to fetch history for \(symbol, privacy: .public): \(error.localizedDescription, privacy: .public)")
         }
     }
 }

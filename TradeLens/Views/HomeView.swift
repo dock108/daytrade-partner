@@ -392,6 +392,11 @@ struct HomeView: View {
                 snapshotHeader(snapshot: tickerSnapshot)
                     .transition(.opacity.combined(with: .move(edge: .top)))
             }
+
+            if let historyPoints = viewModel.historyPoints, historyPoints.count > 1 {
+                MiniChartView(points: historyPoints)
+                    .transition(.opacity.combined(with: .scale(scale: 0.98)))
+            }
             
             // Price chart if ticker detected
             if let priceHistory = viewModel.priceHistory {
