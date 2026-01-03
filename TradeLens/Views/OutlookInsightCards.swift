@@ -9,6 +9,7 @@ import SwiftUI
 
 struct UpcomingCatalystsCard: View {
     let catalysts: [CatalystInsight]
+    let highlightVolatility: Bool
 
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -66,19 +67,31 @@ struct UpcomingCatalystsCard: View {
         HStack(spacing: 10) {
             Image(systemName: "calendar.badge.clock")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(Theme.colors.accentBlue)
+                .foregroundStyle(highlightVolatility ? Theme.colors.accentOrange : Theme.colors.accentBlue)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Upcoming Catalysts")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(Color.white.opacity(0.9))
 
-                Text("Next scheduled signals")
+                Text(highlightVolatility ? "Volatility watch around these dates" : "Next scheduled signals")
                     .font(.system(size: 11))
                     .foregroundStyle(Color.white.opacity(0.45))
             }
 
             Spacer()
+
+            if highlightVolatility {
+                Text("Volatility focus")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(Theme.colors.accentOrange)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(Theme.colors.accentOrange.opacity(0.16))
+                    )
+            }
         }
     }
 
@@ -207,6 +220,7 @@ struct RecentNewsCard: View {
 struct ExpectedRangeCard: View {
     let expectedSwingPercent: Double
     let volatilityLabel: String
+    let isRiskAverse: Bool
 
     private let maxRange: Double = 0.3
 
@@ -234,7 +248,7 @@ struct ExpectedRangeCard: View {
 
             rangeBar
 
-            Text("based on historical analogs, not predictions")
+            Text(isRiskAverse ? "Based on past ranges — a gentle context check." : "based on historical analogs, not predictions")
                 .font(.system(size: 10))
                 .foregroundStyle(Color.white.opacity(0.4))
         }
@@ -422,9 +436,9 @@ private struct NewsLinkDestination: Identifiable {
 
     return ScrollView {
         VStack(spacing: 16) {
-            UpcomingCatalystsCard(catalysts: sampleCatalysts)
+            UpcomingCatalystsCard(catalysts: sampleCatalysts, highlightVolatility: false)
             RecentNewsCard(newsItems: sampleNews)
-            ExpectedRangeCard(expectedSwingPercent: 0.12, volatilityLabel: "High")
+            ExpectedRangeCard(expectedSwingPercent: 0.12, volatilityLabel: "High", isRiskAverse: false)
             PatternInsightCard(insightText: "Similar setups have tended to drift sideways into earnings")
         }
         .padding(20)

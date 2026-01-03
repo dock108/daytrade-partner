@@ -10,6 +10,7 @@ import SwiftUI
 
 struct OutlookCardView: View {
     let outlook: BackendModels.Outlook
+    @ObservedObject private var preferencesManager = UserPreferencesManager.shared
     @State private var expandedInfo: InfoType? = nil
     @State private var isWatchEnabled = false
     @State private var showWatchConfirmation = false
@@ -240,7 +241,7 @@ struct OutlookCardView: View {
                     .fill(Color.orange.opacity(0.08))
             )
             
-            Text("Based on how swingy the price has been in similar periods")
+            Text(expectedSwingsHelperText)
                 .font(.system(size: 11))
                 .foregroundStyle(Color.white.opacity(0.35))
                 .italic()
@@ -347,7 +348,7 @@ struct OutlookCardView: View {
                     .fill(Color.purple.opacity(0.08))
             )
             
-            Text("Past outcomes are context, not a forecast")
+            Text(historicalHelperText)
                 .font(.system(size: 11))
                 .foregroundStyle(Color.white.opacity(0.35))
                 .italic()
@@ -614,6 +615,22 @@ struct OutlookCardView: View {
             return value / 100
         }
         return value
+    }
+
+    private var isRiskAverse: Bool {
+        preferencesManager.preferences.riskTolerance == .low
+    }
+
+    private var expectedSwingsHelperText: String {
+        isRiskAverse
+            ? "Based on past ranges to keep the context gentle."
+            : "Based on how swingy the price has been in similar periods"
+    }
+
+    private var historicalHelperText: String {
+        isRiskAverse
+            ? "Past outcomes are just context, not a forecast"
+            : "Past outcomes are context, not a forecast"
     }
 }
 
