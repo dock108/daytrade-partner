@@ -3,7 +3,7 @@
 //  TradeLens
 //
 //  Lightweight user preferences captured during onboarding.
-//  Informs OutlookEngine output tone and thresholds.
+//  Informs outlook display preferences and defaults.
 //
 
 import Foundation
@@ -188,7 +188,6 @@ final class UserPreferencesManager: ObservableObject {
         }
     }
 }
-
 
 
 

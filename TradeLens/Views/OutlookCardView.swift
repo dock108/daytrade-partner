@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct OutlookCardView: View {
-    let outlook: Outlook
+    let outlook: BackendModels.Outlook
     @State private var expandedInfo: InfoType? = nil
     @State private var isWatchEnabled = false
     @State private var showWatchConfirmation = false
@@ -32,6 +32,12 @@ struct OutlookCardView: View {
             }
         }
     }
+
+    private enum SentimentTone {
+        case positive
+        case mixed
+        case cautious
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -45,41 +51,19 @@ struct OutlookCardView: View {
             VStack(alignment: .leading, spacing: 20) {
                 bigPictureSection
                 
-                // Timeframe note if applicable
-                if let timeframeNote = outlook.timeframeNote {
-                    preferenceNoteCard(
-                        message: timeframeNote,
-                        icon: "clock.badge.exclamationmark",
-                        color: Color(red: 0.4, green: 0.7, blue: 1.0)
-                    )
-                }
-                
                 keyDriversSection
                 
                 expectedSwingsSection
-                
-                // Volatility warning if applicable
-                if let volatilityWarning = outlook.volatilityWarning {
-                    preferenceNoteCard(
-                        message: volatilityWarning,
-                        icon: "exclamationmark.triangle",
-                        color: .orange
-                    )
-                }
                 
                 historicalSection
                 
                 // Visual distribution chart - "Typical 30-day range based on past moves"
                 HistoricalRangeView(
-                    ticker: outlook.ticker,
+                    ticker: outlook.symbol,
                     timeframeDays: outlook.timeframeDays,
-                    volatilityBand: outlook.volatilityBand,
-                    historicalHitRate: outlook.historicalHitRate
+                    typicalRangePercent: normalizedTypicalRangePercent,
+                    historicalHitRate: normalizedHitRate
                 )
-                
-                if let personalContext = outlook.personalContext {
-                    personalNoteSection(personalContext)
-                }
                 
                 // Watch This For Me - Future Hook
                 watchThisButton
@@ -130,7 +114,7 @@ struct OutlookCardView: View {
                     .fill(sentimentColor.opacity(0.15))
                     .frame(width: 52, height: 52)
                 
-                Text(outlook.ticker)
+                Text(outlook.symbol)
                     .font(.system(size: 16, weight: .bold, design: .monospaced))
                     .foregroundStyle(sentimentColor)
             }
@@ -141,10 +125,10 @@ struct OutlookCardView: View {
                     .foregroundStyle(.white)
                 
                 HStack(spacing: 6) {
-                    Image(systemName: outlook.sentimentSummary.icon)
+                    Image(systemName: sentimentIcon)
                         .font(.system(size: 11, weight: .semibold))
                     
-                    Text(outlook.sentimentSummary.rawValue)
+                    Text(outlook.sentimentSummary)
                         .font(.system(size: 13, weight: .medium))
                 }
                 .foregroundStyle(sentimentColor)
@@ -172,7 +156,7 @@ struct OutlookCardView: View {
         VStack(alignment: .leading, spacing: 10) {
             sectionHeader(title: "Big Picture", icon: "globe.americas.fill", color: .blue)
             
-            Text(outlook.sentimentSummary.description)
+            Text(outlook.sentimentSummary)
                 .font(.system(size: 15))
                 .foregroundStyle(Color.white.opacity(0.8))
                 .lineSpacing(4)
@@ -239,7 +223,7 @@ struct OutlookCardView: View {
                             .font(.system(size: 20, weight: .medium))
                             .foregroundStyle(Color.orange.opacity(0.7))
                         
-                        Text(formatPercentage(outlook.volatilityBand))
+                        Text(formatPercentage(normalizedTypicalRangePercent))
                             .font(.system(size: 28, weight: .bold, design: .rounded))
                             .foregroundStyle(Color.orange)
                     }
@@ -281,7 +265,7 @@ struct OutlookCardView: View {
     }
     
     private var volatilityLevel: Int {
-        switch outlook.volatilityBand {
+        switch normalizedTypicalRangePercent {
         case ..<0.05: return 1
         case 0.05..<0.08: return 2
         case 0.08..<0.12: return 3
@@ -291,13 +275,7 @@ struct OutlookCardView: View {
     }
     
     private var volatilityLabel: String {
-        switch volatilityLevel {
-        case 1: return "Low"
-        case 2: return "Moderate"
-        case 3: return "Medium"
-        case 4: return "High"
-        default: return "Very High"
-        }
+        outlook.volatilityLabel
     }
     
     private var volatilityLabelColor: Color {
@@ -338,7 +316,7 @@ struct OutlookCardView: View {
                         .frame(width: 70, height: 70)
                     
                     Circle()
-                        .trim(from: 0, to: outlook.historicalHitRate)
+                        .trim(from: 0, to: normalizedHitRate)
                         .stroke(
                             Color.purple,
                             style: StrokeStyle(lineWidth: 6, lineCap: .round)
@@ -346,7 +324,7 @@ struct OutlookCardView: View {
                         .frame(width: 70, height: 70)
                         .rotationEffect(.degrees(-90))
                     
-                    Text("\(Int(outlook.historicalHitRate * 100))%")
+                    Text("\(Int(normalizedHitRate * 100))%")
                         .font(.system(size: 18, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                 }
@@ -512,7 +490,7 @@ struct OutlookCardView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 3) {
-                        Text(isWatchEnabled ? "Watching \(outlook.ticker)" : "Watch this for me")
+                        Text(isWatchEnabled ? "Watching \(outlook.symbol)" : "Watch this for me")
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundStyle(isWatchEnabled ? Color(red: 0.4, green: 0.7, blue: 1.0) : .white)
                         
@@ -568,38 +546,11 @@ struct OutlookCardView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        .alert("Watching \(outlook.ticker)", isPresented: $showWatchConfirmation) {
+        .alert("Watching \(outlook.symbol)", isPresented: $showWatchConfirmation) {
             Button("Got it", role: .cancel) { }
         } message: {
             Text("This feature is coming soon! When it's ready, you'll get a gentle heads-up if:\n\n• A major price move happens\n• Earnings are approaching\n• Market sentiment shifts\n\nNo spam — just the important stuff.")
         }
-    }
-    
-    // MARK: - Preference Note Card
-    
-    private func preferenceNoteCard(message: String, icon: String, color: Color) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(color)
-                .padding(.top, 2)
-            
-            Text(message)
-                .font(.system(size: 13))
-                .foregroundStyle(Color.white.opacity(0.75))
-                .lineSpacing(3)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(color.opacity(0.08))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .strokeBorder(color.opacity(0.15), lineWidth: 1)
-                )
-        )
     }
     
     // MARK: - Helpers
@@ -619,16 +570,50 @@ struct OutlookCardView: View {
     }
     
     private var sentimentColor: Color {
-        switch outlook.sentimentSummary {
+        switch sentimentTone {
         case .positive: return Color(red: 0.4, green: 0.8, blue: 0.5)
         case .mixed: return Color(red: 0.95, green: 0.75, blue: 0.3)
         case .cautious: return Color(red: 1.0, green: 0.5, blue: 0.4)
         }
     }
+
+    private var sentimentIcon: String {
+        switch sentimentTone {
+        case .positive: return "arrow.up.right.circle.fill"
+        case .mixed: return "arrow.left.arrow.right.circle.fill"
+        case .cautious: return "exclamationmark.triangle.fill"
+        }
+    }
+
+    private var sentimentTone: SentimentTone {
+        let value = outlook.sentimentSummary.lowercased()
+        if value.contains("positive") || value.contains("bull") || value.contains("constructive") {
+            return .positive
+        }
+        if value.contains("cautious") || value.contains("negative") || value.contains("bear") {
+            return .cautious
+        }
+        return .mixed
+    }
+
+    private var normalizedTypicalRangePercent: Double {
+        normalizePercent(outlook.typicalRangePercent)
+    }
+
+    private var normalizedHitRate: Double {
+        normalizePercent(outlook.historicalHitRate)
+    }
     
     private func formatPercentage(_ value: Double) -> String {
         let percent = value * 100
         return String(format: "%.1f%%", percent)
+    }
+
+    private func normalizePercent(_ value: Double) -> Double {
+        if value > 1 {
+            return value / 100
+        }
+        return value
     }
 }
 
@@ -687,22 +672,18 @@ struct WatchButtonStyle: ButtonStyle {
 
 #Preview {
     ScrollView {
-        OutlookCardView(outlook: Outlook(
-            ticker: "NVDA",
+        OutlookCardView(outlook: BackendModels.Outlook(
+            symbol: "NVDA",
             timeframeDays: 30,
-            sentimentSummary: .positive,
+            historicalHitRate: 0.68,
+            typicalRangePercent: 0.12,
+            volatilityLabel: "High",
             keyDrivers: [
                 "AI infrastructure spending trends",
                 "Next-generation chip launches",
                 "Data center demand signals",
                 "Momentum indicators showing recent strength"
-            ],
-            volatilityBand: 0.12,
-            historicalHitRate: 0.68,
-            personalContext: "You've traded NVDA 5 times with an 80% win rate — a positive lean in your history.",
-            volatilityWarning: "The recent swing range here sits above your comfort setting, which can make moves feel jumpier.",
-            timeframeNote: nil,
-            generatedAt: Date()
+            ]
         ))
         .padding(20)
     }

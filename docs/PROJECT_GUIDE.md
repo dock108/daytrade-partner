@@ -25,13 +25,13 @@ TradeLens/
     │   ├── DataStoreManager.swift # Central coordinator
     │   ├── PriceStore.swift    # Ticker snapshots
     │   ├── HistoryStore.swift  # Price history
-    │   ├── OutlookStore.swift  # AI responses
+    │   ├── OutlookStore.swift  # AI responses + outlook data
     │   └── NewsStore.swift     # News items (placeholder)
     │
     ├── Services/               # Business logic and API clients
     │   ├── APIClient.swift     # Backend HTTP client
     │   ├── QueryParser.swift   # Query parsing (ticker detection, timeframe)
-    │   ├── OutlookEngine.swift # Market outlook synthesis
+    │   ├── OutlookEngine.swift # Legacy local outlook synthesis
     │   ├── MockTradeDataService.swift # Mock trade generation
     │   ├── MockPriceService.swift # Fallback price data
     │   ├── SpeechRecognitionService.swift # Voice input
@@ -90,7 +90,8 @@ Data structures and business entities. Models should be:
 Centralized observable stores that own all market data:
 - **PriceStore**: Ticker snapshots (60s cache)
 - **HistoryStore**: Price history (5min cache)
-- **OutlookStore**: AI responses (5min cache)
+- **AIResponseStore**: AI responses (5min cache)
+- **OutlookStore**: Backend outlook data (5min cache)
 - **NewsStore**: News items (placeholder for future API)
 - **DataStoreManager**: Coordinates stores, provides sync status
 
@@ -139,12 +140,11 @@ Dashboard and Insights tabs currently show sample/preview data:
 - Uses only public market data and AI explanations
 - Trade import via brokerage connections is a planned feature
 
-### Outlook Engine
-`OutlookEngine.swift` synthesizes market outlooks:
-- Generates structured `Outlook` objects
-- Combines ticker data, volatility, sector trends
-- Adds personalized context from trade history
-- No financial advice — descriptive metrics only
+### Outlook Data
+Market outlooks are fetched from the backend via `OutlookStore`:
+- Uses `/outlook/{ticker}` only
+- Cached for up to 5 minutes
+- UI renders backend text directly (no local synthesis)
 
 ### Theming System
 `Theme.swift` provides:

@@ -10,6 +10,7 @@ import Foundation
 protocol APIClientProtocol {
     func fetchSnapshot(symbol: String) async throws -> BackendModels.TickerSnapshot
     func fetchHistory(symbol: String, range: String) async throws -> [BackendModels.PricePoint]
+    func requestOutlook(symbol: String, timeframeDays: Int?) async throws -> BackendModels.Outlook
     func askAI(
         question: String,
         symbol: String?,
@@ -27,7 +28,7 @@ final class APIClient {
     private enum Endpoint {
         static func snapshot(symbol: String) -> String { "/ticker/\(symbol)/snapshot" }
         static func history(symbol: String) -> String { "/ticker/\(symbol)/history" }
-        static let outlook = "/outlook"
+        static func outlook(symbol: String) -> String { "/outlook/\(symbol)" }
         static let ask = "/explain"
     }
 
@@ -119,12 +120,12 @@ final class APIClient {
     }
 
     func requestOutlook(symbol: String, timeframeDays: Int?) async throws -> Outlook {
-        var queryItems = [URLQueryItem(name: "symbol", value: symbol)]
+        var queryItems: [URLQueryItem] = []
         if let timeframeDays {
             queryItems.append(URLQueryItem(name: "timeframeDays", value: String(timeframeDays)))
         }
 
-        let request = try makeRequest(path: Endpoint.outlook, queryItems: queryItems)
+        let request = try makeRequest(path: Endpoint.outlook(symbol: symbol), queryItems: queryItems)
         return try await performRequest(request)
     }
 

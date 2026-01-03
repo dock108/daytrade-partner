@@ -18,6 +18,7 @@ final class DataStoreManager: ObservableObject {
     
     let priceStore: PriceStore
     let historyStore: HistoryStore
+    let aiResponseStore: AIResponseStore
     let outlookStore: OutlookStore
     let newsStore: NewsStore
     
@@ -33,11 +34,13 @@ final class DataStoreManager: ObservableObject {
     init(
         priceStore: PriceStore = .shared,
         historyStore: HistoryStore = .shared,
+        aiResponseStore: AIResponseStore = .shared,
         outlookStore: OutlookStore = .shared,
         newsStore: NewsStore = .shared
     ) {
         self.priceStore = priceStore
         self.historyStore = historyStore
+        self.aiResponseStore = aiResponseStore
         self.outlookStore = outlookStore
         self.newsStore = newsStore
     }
@@ -144,5 +147,4 @@ extension DataStoreManager {
     }
 }
 #endif
-
 

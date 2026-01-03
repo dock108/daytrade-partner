@@ -11,7 +11,7 @@ import SwiftUI
 struct HistoricalRangeView: View {
     let ticker: String
     let timeframeDays: Int
-    let volatilityBand: Double      // e.g., 0.12 for ±12%
+    let typicalRangePercent: Double      // e.g., 0.12 for ±12%
     let historicalHitRate: Double   // e.g., 0.65 for 65% finished higher
     
     @State private var showTooltip: TooltipType? = nil
@@ -131,7 +131,7 @@ struct HistoricalRangeView: View {
                 dashedLine(at: centerX + width * 0.2, height: height)
                 
                 // Typical outcome zone (based on hit rate)
-                if historicalHitRate > 0.55 {
+                if normalizedHistoricalHitRate > 0.55 {
                     // Skew slightly positive
                     highlightZone(
                         startX: centerX - width * 0.05,
@@ -139,7 +139,7 @@ struct HistoricalRangeView: View {
                         height: height,
                         color: Color(red: 0.4, green: 0.8, blue: 0.5)
                     )
-                } else if historicalHitRate < 0.45 {
+                } else if normalizedHistoricalHitRate < 0.45 {
                     // Skew slightly negative
                     highlightZone(
                         startX: centerX - width * 0.25,
@@ -229,10 +229,10 @@ struct HistoricalRangeView: View {
     
     private func mostLikelyMarker(centerX: CGFloat, width: CGFloat, height: CGFloat) -> some View {
         let offsetX: CGFloat = {
-            if historicalHitRate > 0.55 {
-                return width * 0.08 * (historicalHitRate - 0.5) * 2
-            } else if historicalHitRate < 0.45 {
-                return -width * 0.08 * (0.5 - historicalHitRate) * 2
+            if normalizedHistoricalHitRate > 0.55 {
+                return width * 0.08 * (normalizedHistoricalHitRate - 0.5) * 2
+            } else if normalizedHistoricalHitRate < 0.45 {
+                return -width * 0.08 * (0.5 - normalizedHistoricalHitRate) * 2
             }
             return 0
         }()
@@ -256,7 +256,7 @@ struct HistoricalRangeView: View {
         HStack {
             // Left (downside)
             VStack(alignment: .leading, spacing: 2) {
-                Text("-\(formatPercent(volatilityBand))")
+                Text("-\(formatPercent(typicalRangePercent))")
                     .font(.system(size: 14, weight: .semibold, design: .monospaced))
                     .foregroundStyle(Color(red: 1.0, green: 0.6, blue: 0.5))
                 
@@ -282,7 +282,7 @@ struct HistoricalRangeView: View {
             
             // Right (upside)
             VStack(alignment: .trailing, spacing: 2) {
-                Text("+\(formatPercent(volatilityBand))")
+                Text("+\(formatPercent(typicalRangePercent))")
                     .font(.system(size: 14, weight: .semibold, design: .monospaced))
                     .foregroundStyle(Color(red: 0.4, green: 0.8, blue: 0.5))
                 
@@ -332,7 +332,18 @@ struct HistoricalRangeView: View {
     // MARK: - Helpers
     
     private func formatPercent(_ value: Double) -> String {
-        return String(format: "%.0f%%", value * 100)
+        return String(format: "%.0f%%", normalizePercent(value) * 100)
+    }
+
+    private func normalizePercent(_ value: Double) -> Double {
+        if value > 1 {
+            return value / 100
+        }
+        return value
+    }
+
+    private var normalizedHistoricalHitRate: Double {
+        normalizePercent(historicalHitRate)
     }
 }
 
@@ -382,21 +393,21 @@ struct TooltipSheet: View {
             HistoricalRangeView(
                 ticker: "NVDA",
                 timeframeDays: 30,
-                volatilityBand: 0.12,
+                typicalRangePercent: 0.12,
                 historicalHitRate: 0.68
             )
             
             HistoricalRangeView(
                 ticker: "SPY",
                 timeframeDays: 30,
-                volatilityBand: 0.05,
+                typicalRangePercent: 0.05,
                 historicalHitRate: 0.52
             )
             
             HistoricalRangeView(
                 ticker: "COIN",
                 timeframeDays: 30,
-                volatilityBand: 0.22,
+                typicalRangePercent: 0.22,
                 historicalHitRate: 0.42
             )
         }
@@ -404,7 +415,4 @@ struct TooltipSheet: View {
     }
     .background(Color(red: 0.06, green: 0.08, blue: 0.12))
 }
-
-
-
 

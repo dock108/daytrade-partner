@@ -79,6 +79,44 @@ final class APIClientTests: XCTestCase {
         }
     }
 
+    func testRequestOutlookUsesTickerPath() async throws {
+        let session = makeSession()
+        let client = APIClient(session: session, baseURL: "https://example.com")
+        let json = """
+        {
+          "symbol": "AAPL",
+          "timeframeDays": 30,
+          "sentimentSummary": "Positive",
+          "historicalHitRate": 0.62,
+          "typicalRangePercent": 0.08,
+          "volatilityLabel": "Moderate",
+          "keyDrivers": ["Earnings season", "Macro data"]
+        }
+        """
+
+        MockURLProtocol.requestHandler = { request in
+            let url = try XCTUnwrap(request.url)
+            let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+            let timeframe = components?.queryItems?.first(where: { $0.name == "timeframeDays" })?.value
+
+            XCTAssertEqual(url.path, "/outlook/AAPL")
+            XCTAssertEqual(timeframe, "30")
+
+            let response = HTTPURLResponse(
+                url: url,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: ["Content-Type": "application/json"]
+            )
+            return (try XCTUnwrap(response), Data(json.utf8))
+        }
+
+        let outlook = try await client.requestOutlook(symbol: "AAPL", timeframeDays: 30)
+
+        XCTAssertEqual(outlook.symbol, "AAPL")
+        XCTAssertEqual(outlook.volatilityLabel, "Moderate")
+    }
+
     private func makeSession() -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
