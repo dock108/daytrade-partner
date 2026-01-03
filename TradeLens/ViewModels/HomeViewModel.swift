@@ -13,11 +13,12 @@ final class HomeViewModel: ObservableObject {
     @Published var question: String = ""
     @Published var response: AIResponse?
     @Published var priceHistory: PriceHistory?
-    @Published var tickerInfo: TickerInfo?
+    @Published var tickerSnapshot: BackendModels.TickerSnapshot?
     @Published var detectedTicker: String?
     @Published var lastQuery: String = ""
     @Published var recentSearches: [String] = []
     @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
     @Published var guidedSuggestions: [GuidedSuggestion] = []
     @Published var conversationHistory: [ConversationEntry] = []
     @Published var outlook: Outlook?
@@ -26,11 +27,12 @@ final class HomeViewModel: ObservableObject {
     @Published var isListening: Bool = false
     @Published var speechError: String?
 
-    private let service: AIServiceStub
+    private let apiClient: APIClientProtocol
     private let tradeService: MockTradeDataService
     private let speechService: SpeechRecognitionService
     private let historyService: ConversationHistoryService
     private let outlookEngine: OutlookEngine
+    private let userSettings: UserSettings
     private let maxRecentSearches = 5
     private let recentSearchesKey = "TradeLens.RecentSearches"
     
@@ -53,17 +55,19 @@ final class HomeViewModel: ObservableObject {
     }
 
     init(
-        service: AIServiceStub = AIServiceStub(),
+        apiClient: APIClientProtocol = APIClient(),
         tradeService: MockTradeDataService = MockTradeDataService(),
         speechService: SpeechRecognitionService = SpeechRecognitionService(),
         historyService: ConversationHistoryService = .shared,
-        outlookEngine: OutlookEngine = OutlookEngine()
+        outlookEngine: OutlookEngine = OutlookEngine(),
+        userSettings: UserSettings = .shared
     ) {
-        self.service = service
+        self.apiClient = apiClient
         self.tradeService = tradeService
         self.speechService = speechService
         self.historyService = historyService
         self.outlookEngine = outlookEngine
+        self.userSettings = userSettings
         self.conversationHistory = historyService.recentEntries(limit: 10)
         loadRecentSearches()
         loadGuidedSuggestions()
@@ -127,54 +131,74 @@ final class HomeViewModel: ObservableObject {
         guard !trimmed.isEmpty else {
             response = nil
             priceHistory = nil
-            tickerInfo = nil
+            tickerSnapshot = nil
             detectedTicker = nil
             outlook = nil
+            errorMessage = nil
             return
         }
 
         isLoading = true
+        errorMessage = nil
         lastQuery = trimmed
+        response = nil
         
-        // Detect ticker and load price data + info immediately (non-blocking)
-        detectedTicker = MockPriceService.detectTicker(in: trimmed)
+        // Detect ticker and load price data immediately (non-blocking)
+        detectedTicker = QueryParser.detectTicker(in: trimmed)
         if let ticker = detectedTicker {
             priceHistory = MockPriceService.priceHistory(for: ticker, range: .oneMonth)
-            tickerInfo = TickerInfoService.info(for: ticker)
         } else {
             priceHistory = nil
-            tickerInfo = nil
         }
+        tickerSnapshot = nil
         
         // Check if this is an outlook-type query
         let shouldShowOutlook = shouldGenerateOutlook(for: trimmed)
+        let timeframeDays = QueryParser.extractTimeframeDays(from: trimmed)
+        let simpleMode = userSettings.isSimpleModeEnabled
         
-        // Simulate brief loading for AI response
         Task {
-            try? await Task.sleep(nanoseconds: 300_000_000)
-            let aiResponse = service.structuredResponse(for: trimmed)
-            response = aiResponse
-            
-            // Generate outlook if applicable
-            if shouldShowOutlook, let ticker = detectedTicker {
-                outlook = await outlookEngine.generateOutlook(
-                    for: ticker,
-                    timeframeDays: extractTimeframe(from: trimmed),
-                    includePersonalContext: true
+            defer { isLoading = false }
+            do {
+                let backendResponse = try await apiClient.askAI(
+                    question: trimmed,
+                    symbol: detectedTicker,
+                    timeframeDays: timeframeDays,
+                    simpleMode: simpleMode
                 )
-            } else {
+                let aiResponse = buildAIResponse(from: backendResponse, query: trimmed)
+                response = aiResponse
+                if let ticker = detectedTicker {
+                    tickerSnapshot = await fetchSnapshot(for: ticker)
+                }
+                
+                // Generate outlook if applicable
+                if shouldShowOutlook, let ticker = detectedTicker {
+                    outlook = await outlookEngine.generateOutlook(
+                        for: ticker,
+                        timeframeDays: timeframeDays,
+                        includePersonalContext: true
+                    )
+                } else {
+                    outlook = nil
+                }
+                
+                // Save to conversation history
+                historyService.save(
+                    question: trimmed,
+                    response: aiResponse,
+                    detectedTicker: detectedTicker
+                )
+                refreshConversationHistory()
+            } catch is CancellationError {
+                return
+            } catch {
+                let appError = AppError(error)
+                errorMessage = appError.userMessage
+                response = nil
+                tickerSnapshot = nil
                 outlook = nil
             }
-            
-            isLoading = false
-            
-            // Save to conversation history
-            historyService.save(
-                question: trimmed,
-                response: aiResponse,
-                detectedTicker: detectedTicker
-            )
-            refreshConversationHistory()
         }
         
         addToRecentSearches(trimmed)
@@ -185,32 +209,12 @@ final class HomeViewModel: ObservableObject {
         let lowercased = query.lowercased()
         
         // Must have a ticker to show outlook
-        guard MockPriceService.detectTicker(in: query) != nil else {
+        guard QueryParser.detectTicker(in: query) != nil else {
             return false
         }
         
         // Check for outlook keywords
         return outlookKeywords.contains { lowercased.contains($0) }
-    }
-    
-    /// Extract timeframe from query (default 30 days)
-    private func extractTimeframe(from query: String) -> Int {
-        let lowercased = query.lowercased()
-        
-        if lowercased.contains("week") || lowercased.contains("7 day") {
-            return 7
-        } else if lowercased.contains("2 week") || lowercased.contains("14 day") {
-            return 14
-        } else if lowercased.contains("3 month") || lowercased.contains("90 day") || lowercased.contains("quarter") {
-            return 90
-        } else if lowercased.contains("6 month") || lowercased.contains("180 day") {
-            return 180
-        } else if lowercased.contains("year") || lowercased.contains("12 month") || lowercased.contains("365 day") {
-            return 365
-        }
-        
-        // Default to 30 days
-        return 30
     }
     
     /// Load a past conversation from history
@@ -219,18 +223,22 @@ final class HomeViewModel: ObservableObject {
         lastQuery = entry.question
         response = entry.toAIResponse()
         detectedTicker = entry.detectedTicker
+        errorMessage = nil
+        tickerSnapshot = nil
         
-        // Reload price data and ticker info if applicable
+        // Reload price data and ticker snapshot if applicable
         if let ticker = entry.detectedTicker {
             priceHistory = MockPriceService.priceHistory(for: ticker, range: .oneMonth)
-            tickerInfo = TickerInfoService.info(for: ticker)
+            Task {
+                tickerSnapshot = await fetchSnapshot(for: ticker)
+            }
             
             // Regenerate outlook if applicable
             if shouldGenerateOutlook(for: entry.question) {
                 Task {
                     outlook = await outlookEngine.generateOutlook(
                         for: ticker,
-                        timeframeDays: extractTimeframe(from: entry.question),
+                        timeframeDays: QueryParser.extractTimeframeDays(from: entry.question),
                         includePersonalContext: true
                     )
                 }
@@ -239,7 +247,7 @@ final class HomeViewModel: ObservableObject {
             }
         } else {
             priceHistory = nil
-            tickerInfo = nil
+            tickerSnapshot = nil
             outlook = nil
         }
     }
@@ -274,10 +282,11 @@ final class HomeViewModel: ObservableObject {
         question = ""
         response = nil
         priceHistory = nil
-        tickerInfo = nil
+        tickerSnapshot = nil
         detectedTicker = nil
         outlook = nil
         lastQuery = ""
+        errorMessage = nil
         isLoading = false
     }
     
@@ -415,5 +424,25 @@ final class HomeViewModel: ObservableObject {
 
     private func saveRecentSearches() {
         UserDefaults.standard.set(recentSearches, forKey: recentSearchesKey)
+    }
+
+    private func buildAIResponse(from response: BackendModels.AIResponse, query: String) -> AIResponse {
+        let sections = [
+            AIResponse.Section(type: .currentSituation, content: response.whatsHappeningNow),
+            AIResponse.Section(type: .keyDrivers, content: "", bulletPoints: response.keyDrivers),
+            AIResponse.Section(type: .riskOpportunity, content: response.riskVsOpportunity),
+            AIResponse.Section(type: .historical, content: response.historicalBehavior),
+            AIResponse.Section(type: .recap, content: response.simpleRecap)
+        ]
+
+        return AIResponse(query: query, sections: sections)
+    }
+
+    private func fetchSnapshot(for symbol: String) async -> BackendModels.TickerSnapshot? {
+        do {
+            return try await apiClient.fetchSnapshot(symbol: symbol)
+        } catch {
+            return nil
+        }
     }
 }

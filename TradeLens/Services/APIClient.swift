@@ -7,6 +7,16 @@
 
 import Foundation
 
+protocol APIClientProtocol {
+    func fetchSnapshot(symbol: String) async throws -> BackendModels.TickerSnapshot
+    func askAI(
+        question: String,
+        symbol: String?,
+        timeframeDays: Int?,
+        simpleMode: Bool
+    ) async throws -> BackendModels.AIResponse
+}
+
 final class APIClient {
     typealias TickerSnapshot = BackendModels.TickerSnapshot
     typealias PricePoint = BackendModels.PricePoint
@@ -178,3 +188,5 @@ final class APIClient {
         return try? decoder.decode(BackendModels.APIErrorResponse.self, from: data).message
     }
 }
+
+extension APIClient: APIClientProtocol {}

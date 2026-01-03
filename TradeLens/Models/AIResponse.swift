@@ -71,6 +71,23 @@ struct AIResponse: Identifiable {
             case .digest: return Color(red: 0.95, green: 0.85, blue: 0.55)
             }
         }
+
+        var displayTitle: String {
+            switch self {
+            case .currentSituation:
+                return "What's happening now"
+            case .keyDrivers:
+                return "Key drivers"
+            case .riskOpportunity:
+                return "Risk vs opportunity"
+            case .historical:
+                return "Historical behavior"
+            case .recap:
+                return "Simple recap"
+            default:
+                return rawValue
+            }
+        }
     }
     
     /// Source reference for deeper reading
@@ -107,4 +124,3 @@ struct AIResponse: Identifiable {
         }
     }
 }
-
