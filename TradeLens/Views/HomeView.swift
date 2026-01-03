@@ -409,6 +409,9 @@ struct HomeView: View {
                 OutlookCardView(outlook: outlook)
                     .transition(.opacity.combined(with: .scale(scale: 0.98)))
                     .padding(.top, 8)
+
+                outlookInsightCards(outlook: outlook)
+                    .transition(.opacity.combined(with: .scale(scale: 0.98)))
             }
             
             // Section cards (with special handling for digest)
@@ -472,6 +475,26 @@ struct HomeView: View {
             // Disclaimer footer
             DisclaimerFooter()
         }
+    }
+
+    private func outlookInsightCards(outlook: BackendModels.Outlook) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if !viewModel.upcomingCatalysts.isEmpty {
+                UpcomingCatalystsCard(catalysts: viewModel.upcomingCatalysts)
+            }
+
+            RecentNewsCard(newsItems: viewModel.recentNewsItems)
+
+            ExpectedRangeCard(
+                expectedSwingPercent: outlook.typicalRangePercent,
+                volatilityLabel: outlook.volatilityLabel
+            )
+
+            if let insight = viewModel.patternInsight {
+                PatternInsightCard(insightText: insight)
+            }
+        }
+        .padding(.top, 8)
     }
     
     // MARK: - Guided Suggestions
