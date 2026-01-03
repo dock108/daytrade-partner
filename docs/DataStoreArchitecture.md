@@ -27,16 +27,16 @@ TradeLens uses a centralized data store architecture to ensure consistent data d
 │        Coordinates all stores, provides sync status         │
 └──────────────────────┬──────────────────────────────────────┘
                        │
-        ┌──────────────┼──────────────┬──────────────┐
-        ▼              ▼              ▼              ▼
-┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐
-│ PriceStore │  │HistoryStore│  │OutlookStore│  │ NewsStore  │
-│            │  │            │  │            │  │            │
-│ Snapshots  │  │ Price      │  │ AI         │  │ News       │
-│ Last Price │  │ History    │  │ Responses  │  │ Items      │
-└──────┬─────┘  └──────┬─────┘  └──────┬─────┘  └──────┬─────┘
-       │               │               │               │
-       └───────────────┴───────────────┴───────────────┘
+        ┌──────────────┼──────────────┼──────────────┬──────────────┐
+        ▼              ▼              ▼              ▼              ▼
+┌────────────┐  ┌────────────┐  ┌──────────────┐  ┌────────────┐  ┌────────────┐
+│ PriceStore │  │HistoryStore│  │AIResponseStore│ │OutlookStore│  │ NewsStore  │
+│            │  │            │  │              │  │            │  │            │
+│ Snapshots  │  │ Price      │  │ AI           │  │ Outlook    │  │ News       │
+│ Last Price │  │ History    │  │ Responses    │  │ Data       │  │ Items      │
+└──────┬─────┘  └──────┬─────┘  └──────┬───────┘  └──────┬─────┘  └──────┬─────┘
+       │               │               │               │               │
+       └───────────────┴───────────────┴───────────────┴───────────────┘
                        │
                        ▼
 ┌─────────────────────────────────────────────────────────────┐
@@ -92,7 +92,7 @@ let points = HistoryStore.shared.points(for: "AAPL", range: "1M")
 await HistoryStore.shared.refresh(symbol: "AAPL", range: "1M")
 ```
 
-### OutlookStore
+### AIResponseStore
 
 **Purpose:** AI-generated explanations and analysis
 
@@ -106,11 +106,30 @@ await HistoryStore.shared.refresh(symbol: "AAPL", range: "1M")
 **Usage:**
 ```swift
 // Ask AI (returns cached if fresh)
-let response = await OutlookStore.shared.ask(
+let response = await AIResponseStore.shared.ask(
     question: "What's happening with AAPL?",
     symbol: "AAPL",
     timeframeDays: 30,
     simpleMode: true
+)
+```
+
+### OutlookStore
+
+**Purpose:** Market outlook data fetched from the backend
+
+**Location:** `TradeLens/DataStores/OutlookStore.swift`
+
+**Key Features:**
+- Fetches from `/outlook/{ticker}` only
+- 5-minute cache window
+- Publishes loading + fallback state for stale cache reuse
+
+**Usage:**
+```swift
+let outlook = await OutlookStore.shared.fetchOutlook(
+    symbol: "AAPL",
+    timeframeDays: 30
 )
 ```
 
@@ -185,7 +204,7 @@ TradeLens/
 │   ├── DataStoreManager.swift   # Central coordinator
 │   ├── PriceStore.swift         # Ticker snapshots
 │   ├── HistoryStore.swift       # Price history
-│   ├── OutlookStore.swift       # AI responses
+│   ├── OutlookStore.swift       # AI responses + outlook data
 │   └── NewsStore.swift          # News items
 ├── Services/
 │   └── APIClient.swift          # HTTP calls (only stores use this)
@@ -199,6 +218,7 @@ TradeLens/
 |-------|--------------|-----------------|
 | PriceStore | 60 seconds | 120 seconds |
 | HistoryStore | 5 minutes | 10 minutes |
+| AIResponseStore | 5 minutes | 10 minutes |
 | OutlookStore | 5 minutes | 10 minutes |
 | NewsStore | 10 minutes | 30 minutes |
 
@@ -208,5 +228,3 @@ TradeLens/
 - [ ] Implement news API when backend supports it
 - [ ] Add offline caching with persistence
 - [ ] Implement data prefetching for common symbols
-
-

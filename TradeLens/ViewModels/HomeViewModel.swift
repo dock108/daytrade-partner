@@ -23,7 +23,7 @@ final class HomeViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var guidedSuggestions: [GuidedSuggestion] = []
     @Published var conversationHistory: [ConversationEntry] = []
-    @Published var outlook: Outlook?
+    @Published var outlook: BackendModels.Outlook?
     
     // Voice input state
     @Published var isListening: Bool = false
@@ -33,12 +33,12 @@ final class HomeViewModel: ObservableObject {
     private let dataStoreManager: DataStoreManager
     private let priceStore: PriceStore
     private let historyStore: HistoryStore
+    private let aiResponseStore: AIResponseStore
     private let outlookStore: OutlookStore
     
     private let tradeService: MockTradeDataService
     private let speechService: SpeechRecognitionService
     private let historyService: ConversationHistoryService
-    private let outlookEngine: OutlookEngine
     private let userSettings: UserSettings
     private let maxRecentSearches = 5
     private let recentSearchesKey = "TradeLens.RecentSearches"
@@ -76,17 +76,16 @@ final class HomeViewModel: ObservableObject {
         tradeService: MockTradeDataService = MockTradeDataService(),
         speechService: SpeechRecognitionService = SpeechRecognitionService(),
         historyService: ConversationHistoryService = .shared,
-        outlookEngine: OutlookEngine = OutlookEngine(),
         userSettings: UserSettings = .shared
     ) {
         self.dataStoreManager = dataStoreManager
         self.priceStore = dataStoreManager.priceStore
         self.historyStore = dataStoreManager.historyStore
+        self.aiResponseStore = dataStoreManager.aiResponseStore
         self.outlookStore = dataStoreManager.outlookStore
         self.tradeService = tradeService
         self.speechService = speechService
         self.historyService = historyService
-        self.outlookEngine = outlookEngine
         self.userSettings = userSettings
         self.conversationHistory = historyService.recentEntries(limit: 10)
         loadRecentSearches()
@@ -178,8 +177,8 @@ final class HomeViewModel: ObservableObject {
         Task {
             defer { isLoading = false }
             
-            // Use shared OutlookStore for AI responses
-            guard let backendResponse = await outlookStore.ask(
+            // Use shared AIResponseStore for AI responses
+            guard let backendResponse = await aiResponseStore.ask(
                 question: trimmed,
                 symbol: detectedTicker,
                 timeframeDays: timeframeDays,
@@ -187,7 +186,7 @@ final class HomeViewModel: ObservableObject {
             ) else {
                 // Check for error from store
                 let cacheKey = trimmed.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
-                if let storeError = outlookStore.errors[cacheKey] {
+                if let storeError = aiResponseStore.errors[cacheKey] {
                     errorMessage = storeError
                 } else {
                     errorMessage = "Unable to get response. Please try again."
@@ -249,11 +248,7 @@ final class HomeViewModel: ObservableObject {
             
             // Generate outlook if applicable
             if shouldShowOutlook, let ticker = detectedTicker {
-                outlook = await outlookEngine.generateOutlook(
-                    for: ticker,
-                    timeframeDays: timeframeDays,
-                    includePersonalContext: true
-                )
+                outlook = await outlookStore.fetchOutlook(symbol: ticker, timeframeDays: timeframeDays)
             } else {
                 outlook = nil
             }
@@ -333,10 +328,9 @@ final class HomeViewModel: ObservableObject {
             // Regenerate outlook if applicable
             if shouldGenerateOutlook(for: entry.question) {
                 Task {
-                    outlook = await outlookEngine.generateOutlook(
-                        for: ticker,
-                        timeframeDays: QueryParser.extractTimeframeDays(from: entry.question),
-                        includePersonalContext: true
+                    outlook = await outlookStore.fetchOutlook(
+                        symbol: ticker,
+                        timeframeDays: QueryParser.extractTimeframeDays(from: entry.question)
                     )
                 }
             } else {
@@ -577,5 +571,5 @@ final class HomeViewModel: ObservableObject {
     }
 
     // NOTE: Direct API calls removed — all data fetching now goes through shared stores
-    // (PriceStore, HistoryStore, OutlookStore) to ensure single source of truth
+    // (PriceStore, HistoryStore, AIResponseStore, OutlookStore) to ensure single source of truth
 }

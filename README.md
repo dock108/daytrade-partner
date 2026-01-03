@@ -6,6 +6,8 @@ A clean, modern iOS trading companion app built with SwiftUI.
 
 TradeLens is designed to be a powerful yet simple trading partner application. It provides a clean foundation for tracking trades, analyzing performance, and making informed trading decisions.
 
+Outlook insights are fetched from the backend and cached briefly to keep AI content consistent across the app.
+
 ## Local Setup
 
 1. Open `TradeLens.xcodeproj` in Xcode.
