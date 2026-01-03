@@ -9,6 +9,7 @@ import Foundation
 
 protocol APIClientProtocol {
     func fetchSnapshot(symbol: String) async throws -> BackendModels.TickerSnapshot
+    func fetchHistory(symbol: String, range: String) async throws -> [BackendModels.PricePoint]
     func askAI(
         question: String,
         symbol: String?,
