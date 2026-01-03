@@ -24,6 +24,9 @@ final class HomeViewModel: ObservableObject {
     @Published var guidedSuggestions: [GuidedSuggestion] = []
     @Published var conversationHistory: [ConversationEntry] = []
     @Published var outlook: BackendModels.Outlook?
+    @Published var upcomingCatalysts: [CatalystInsight] = []
+    @Published var recentNewsItems: [NewsStore.NewsItem] = []
+    @Published var patternInsight: String?
     
     // Voice input state
     @Published var isListening: Bool = false
@@ -35,6 +38,7 @@ final class HomeViewModel: ObservableObject {
     private let historyStore: HistoryStore
     private let aiResponseStore: AIResponseStore
     private let outlookStore: OutlookStore
+    private let newsStore: NewsStore
     
     private let tradeService: MockTradeDataService
     private let speechService: SpeechRecognitionService
@@ -83,6 +87,7 @@ final class HomeViewModel: ObservableObject {
         self.historyStore = dataStoreManager.historyStore
         self.aiResponseStore = dataStoreManager.aiResponseStore
         self.outlookStore = dataStoreManager.outlookStore
+        self.newsStore = dataStoreManager.newsStore
         self.tradeService = tradeService
         self.speechService = speechService
         self.historyService = historyService
@@ -154,6 +159,7 @@ final class HomeViewModel: ObservableObject {
             tickerSnapshot = nil
             detectedTicker = nil
             outlook = nil
+            resetSupplementalOutlookData()
             errorMessage = nil
             return
         }
@@ -248,9 +254,12 @@ final class HomeViewModel: ObservableObject {
             
             // Generate outlook if applicable
             if shouldShowOutlook, let ticker = detectedTicker {
-                outlook = await outlookStore.fetchOutlook(symbol: ticker, timeframeDays: timeframeDays)
+                let fetchedOutlook = await outlookStore.fetchOutlook(symbol: ticker, timeframeDays: timeframeDays)
+                outlook = fetchedOutlook
+                updateSupplementalOutlookData(for: ticker, outlook: fetchedOutlook)
             } else {
                 outlook = nil
+                resetSupplementalOutlookData()
             }
             
             // Save to conversation history
@@ -328,19 +337,23 @@ final class HomeViewModel: ObservableObject {
             // Regenerate outlook if applicable
             if shouldGenerateOutlook(for: entry.question) {
                 Task {
-                    outlook = await outlookStore.fetchOutlook(
+                    let fetchedOutlook = await outlookStore.fetchOutlook(
                         symbol: ticker,
                         timeframeDays: QueryParser.extractTimeframeDays(from: entry.question)
                     )
+                    outlook = fetchedOutlook
+                    updateSupplementalOutlookData(for: ticker, outlook: fetchedOutlook)
                 }
             } else {
                 outlook = nil
+                resetSupplementalOutlookData()
             }
         } else {
             priceHistory = nil
             tickerSnapshot = nil
             outlook = nil
             historyPoints = nil
+            resetSupplementalOutlookData()
         }
     }
     
@@ -377,6 +390,7 @@ final class HomeViewModel: ObservableObject {
         tickerSnapshot = nil
         detectedTicker = nil
         outlook = nil
+        resetSupplementalOutlookData()
         lastQuery = ""
         errorMessage = nil
         isLoading = false
@@ -422,10 +436,53 @@ final class HomeViewModel: ObservableObject {
                         change: change,
                         changePercent: snapshot.changePercent
                     )
-                }
             }
         }
     }
+
+    private func updateSupplementalOutlookData(for ticker: String, outlook: BackendModels.Outlook?) {
+        upcomingCatalysts = buildSampleCatalysts(for: ticker)
+        recentNewsItems = newsStore.newsItems(for: ticker)
+        patternInsight = buildPatternInsight(for: ticker, outlook: outlook)
+    }
+
+    private func resetSupplementalOutlookData() {
+        upcomingCatalysts = []
+        recentNewsItems = []
+        patternInsight = nil
+    }
+
+    private func buildSampleCatalysts(for ticker: String) -> [CatalystInsight] {
+        [
+            CatalystInsight(
+                date: Date().addingTimeInterval(86400 * 3),
+                category: "Earnings",
+                summary: "\(ticker.uppercased()) guidance update and leadership commentary",
+                whyItMatters: "Forward guidance can reset expectations for near-term demand."
+            ),
+            CatalystInsight(
+                date: Date().addingTimeInterval(86400 * 8),
+                category: "Macro",
+                summary: "Inflation data and rate commentary",
+                whyItMatters: "Macro tone can influence risk appetite and multiple expansion."
+            ),
+            CatalystInsight(
+                date: Date().addingTimeInterval(86400 * 14),
+                category: "Sector",
+                summary: "Peer earnings and industry signals",
+                whyItMatters: "Read-throughs from peers often shape sentiment into the next window."
+            )
+        ]
+    }
+
+    private func buildPatternInsight(for ticker: String, outlook: BackendModels.Outlook?) -> String {
+        if let outlook, outlook.sentimentSummary.lowercased().contains("mixed") {
+            return "Similar setups have tended to drift sideways into earnings"
+        }
+
+        return "Similar setups have tended to drift sideways into earnings"
+    }
+}
 
     func clearRecentSearches() {
         recentSearches = []
