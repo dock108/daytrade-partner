@@ -414,6 +414,9 @@ struct HomeView: View {
                 outlookInsightCards(outlook: outlook)
                     .transition(.opacity.combined(with: .scale(scale: 0.98)))
             }
+
+            DataSyncBannerView(textProvider: viewModel.dataSyncBannerText)
+                .transition(.opacity.combined(with: .move(edge: .top)))
             
             // Section cards (with special handling for digest)
             ForEach(Array(orderedSections(for: response).enumerated()), id: \.element.id) { _, section in
@@ -458,20 +461,6 @@ struct HomeView: View {
                     .foregroundStyle(Color.white.opacity(0.3))
             }
             .padding(.top, 8)
-            
-            #if DEBUG
-            // Dev-visible sync timestamp indicator
-            if let syncTime = viewModel.syncTimeString {
-                HStack(spacing: 6) {
-                    Image(systemName: "arrow.triangle.2.circlepath")
-                        .font(.system(size: 10))
-                    Text(syncTime)
-                        .font(.system(size: 11))
-                }
-                .foregroundStyle(Color.white.opacity(0.25))
-                .padding(.top, 4)
-            }
-            #endif
             
             // Disclaimer footer
             DisclaimerFooter()
