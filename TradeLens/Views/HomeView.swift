@@ -417,6 +417,11 @@ struct HomeView: View {
 
             DataSyncBannerView(textProvider: viewModel.dataSyncBannerText)
                 .transition(.opacity.combined(with: .move(edge: .top)))
+
+            if userSettings.isDevModeEnabled {
+                ConsistencyCheckerView(snapshot: viewModel.consistencyDebugSnapshot)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
             
             // Section cards (with special handling for digest)
             ForEach(Array(orderedSections(for: response).enumerated()), id: \.element.id) { _, section in
