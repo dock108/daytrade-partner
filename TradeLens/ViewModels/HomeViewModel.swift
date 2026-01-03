@@ -27,6 +27,7 @@ final class HomeViewModel: ObservableObject {
     @Published var upcomingCatalysts: [CatalystInsight] = []
     @Published var recentNewsItems: [NewsStore.NewsItem] = []
     @Published var patternInsight: String?
+    @Published private(set) var lastOutlookTimeframeDays: Int?
     
     // Voice input state
     @Published var isListening: Bool = false
@@ -49,6 +50,7 @@ final class HomeViewModel: ObservableObject {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "TradeLens", category: "HomeViewModel")
     private enum Constants {
         static let historyRange = "1M"
+        static let unknownText = "Unknown"
     }
     
     /// Banner text for UI display (shared sync status)
@@ -159,6 +161,7 @@ final class HomeViewModel: ObservableObject {
             tickerSnapshot = nil
             detectedTicker = nil
             outlook = nil
+            lastOutlookTimeframeDays = nil
             resetSupplementalOutlookData()
             errorMessage = nil
             return
@@ -179,6 +182,7 @@ final class HomeViewModel: ObservableObject {
         let shouldShowOutlook = shouldGenerateOutlook(for: trimmed)
         let timeframeDays = QueryParser.extractTimeframeDays(from: trimmed)
         let simpleMode = userSettings.isSimpleModeEnabled
+        lastOutlookTimeframeDays = timeframeDays
         
         Task {
             defer { isLoading = false }
@@ -625,6 +629,37 @@ final class HomeViewModel: ObservableObject {
         ]
 
         return AIResponse(query: query, sections: sections)
+    }
+
+    struct ConsistencyDebugSnapshot: Equatable {
+        let symbol: String
+        let lastPriceSource: String
+        let outlookTimestamp: Date?
+        let chartTimestamp: Date?
+        let mismatchWarnings: [String]
+    }
+
+    var consistencyDebugSnapshot: ConsistencyDebugSnapshot? {
+        guard let ticker = detectedTicker else { return nil }
+
+        let lastSource = priceStore.lastSource(for: ticker)?.rawValue ?? Constants.unknownText
+        let outlookTimestamp = outlookStore.lastUpdateTime(
+            for: ticker,
+            timeframeDays: lastOutlookTimeframeDays
+        )
+        let chartTimestamp = historyStore.lastUpdateTime(
+            for: ticker,
+            range: Constants.historyRange
+        )
+        let mismatchWarnings = dataStoreManager.consistencyWarnings(for: ticker)
+
+        return ConsistencyDebugSnapshot(
+            symbol: ticker,
+            lastPriceSource: lastSource,
+            outlookTimestamp: outlookTimestamp,
+            chartTimestamp: chartTimestamp,
+            mismatchWarnings: mismatchWarnings
+        )
     }
 
     // NOTE: Direct API calls removed — all data fetching now goes through shared stores

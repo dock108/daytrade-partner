@@ -108,6 +108,15 @@ final class DataStoreManager: ObservableObject {
     func hasStaleData(for symbol: String) -> Bool {
         priceStore.isStale(symbol: symbol) || historyStore.isStale(symbol: symbol)
     }
+
+    /// Consistency warnings across stores for a symbol
+    func consistencyWarnings(for symbol: String) -> [String] {
+        #if DEBUG
+        return validatePriceConsistency(for: symbol)
+        #else
+        return []
+        #endif
+    }
     
     #if DEBUG
     /// Validate price consistency across all stores for a symbol

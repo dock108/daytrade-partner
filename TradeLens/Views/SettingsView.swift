@@ -11,6 +11,8 @@ struct SettingsView: View {
     @ObservedObject private var userSettings = UserSettings.shared
     @ObservedObject private var historyService = ConversationHistoryService.shared
     @State private var showClearHistoryAlert = false
+    @State private var devModeTapCount = 0
+    @State private var isDevModeToggleUnlocked = false
 
     var body: some View {
         ScreenContainerView(
@@ -23,6 +25,9 @@ struct SettingsView: View {
                 importSection
                 comingSoonSection
                 appInfoSection
+                if isDevModeToggleVisible {
+                    developerSection
+                }
             }
         }
     }
@@ -236,6 +241,9 @@ struct SettingsView: View {
                         Text("Version 1.0")
                             .font(Theme.typography.bodySmall)
                             .foregroundStyle(Theme.colors.textTertiary)
+                            .onTapGesture {
+                                handleDevModeTap()
+                            }
                     }
                     
                     Text("Your personal trading companion. Explains markets, tracks patterns, and helps you learn — without giving financial advice.")
@@ -258,9 +266,56 @@ struct SettingsView: View {
             .padding(.horizontal, 4)
         }
     }
+
+    private var developerSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            ScreenSectionHeader("Developer", icon: "wrench.and.screwdriver.fill")
+
+            InfoCardView {
+                HStack(spacing: 14) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Theme.colors.accentPurple.opacity(0.15))
+                            .frame(width: 40, height: 40)
+
+                        Image(systemName: "ladybug.fill")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(Theme.colors.accentPurple)
+                    }
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Developer Mode")
+                            .font(Theme.typography.rowTitle)
+                            .foregroundStyle(Theme.colors.textPrimary)
+
+                        Text("Show consistency diagnostics on the home screen")
+                            .font(Theme.typography.rowSubtitle)
+                            .foregroundStyle(Theme.colors.textTertiary)
+                    }
+
+                    Spacer()
+
+                    Toggle("", isOn: $userSettings.isDevModeEnabled)
+                        .tint(Theme.colors.accentPurple)
+                        .labelsHidden()
+                }
+            }
+        }
+    }
+
+    private var isDevModeToggleVisible: Bool {
+        isDevModeToggleUnlocked || userSettings.isDevModeEnabled
+    }
+
+    private func handleDevModeTap() {
+        guard !isDevModeToggleUnlocked else { return }
+        devModeTapCount += 1
+        if devModeTapCount >= 5 {
+            isDevModeToggleUnlocked = true
+        }
+    }
 }
 
 #Preview {
     SettingsView()
 }
-

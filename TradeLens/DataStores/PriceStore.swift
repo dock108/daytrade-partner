@@ -14,12 +14,18 @@ import os
 final class PriceStore: ObservableObject {
     static let shared = PriceStore()
     
+    enum PriceSource: String {
+        case api = "API"
+        case cache = "Cache"
+    }
+    
     // MARK: - Published State
     
     @Published private(set) var snapshots: [String: BackendModels.TickerSnapshot] = [:]
     @Published private(set) var lastUpdated: [String: Date] = [:]
     @Published private(set) var isLoading: [String: Bool] = [:]
     @Published private(set) var errors: [String: String] = [:]
+    @Published private(set) var lastPriceSource: [String: PriceSource] = [:]
     
     // MARK: - Configuration
     
@@ -47,6 +53,8 @@ final class PriceStore: ObservableObject {
         // Trigger fetch if not cached or stale
         if shouldRefresh(symbol: normalized) {
             Task { await fetch(symbol: normalized) }
+        } else if snapshots[normalized] != nil {
+            lastPriceSource[normalized] = .cache
         }
         
         return snapshots[normalized]
@@ -60,6 +68,11 @@ final class PriceStore: ObservableObject {
     /// Get last update time for a symbol
     func lastUpdateTime(for symbol: String) -> Date? {
         lastUpdated[symbol.uppercased()]
+    }
+
+    /// Get last price source for a symbol
+    func lastSource(for symbol: String) -> PriceSource? {
+        lastPriceSource[symbol.uppercased()]
     }
     
     /// Check if data is stale (for debug warnings)
@@ -85,6 +98,7 @@ final class PriceStore: ObservableObject {
             let snapshot = try await apiClient.fetchSnapshot(symbol: symbol)
             snapshots[symbol] = snapshot
             lastUpdated[symbol] = Date()
+            lastPriceSource[symbol] = .api
             logger.info("Fetched snapshot for \(symbol)")
             
             #if DEBUG
@@ -113,5 +127,4 @@ final class PriceStore: ObservableObject {
     }
     #endif
 }
-
 
