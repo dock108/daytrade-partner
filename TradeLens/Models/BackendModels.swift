@@ -43,6 +43,41 @@ extension BackendModels {
         let simpleRecap: String
     }
 
+    struct OutlookModel: Codable {
+        let symbol: String
+        let timeframeDays: Int
+        let catalysts: [Catalyst]
+        let news: [NewsItem]
+        let expectedRange: ExpectedRange
+        let historicalStats: HistoricalStats
+    }
+
+    struct Catalyst: Codable {
+        let title: String
+        let impact: String
+        let timeframeDays: Int
+    }
+
+    struct NewsItem: Codable {
+        let headline: String
+        let source: String
+        let publishedAt: Date
+        let url: URL
+    }
+
+    struct ExpectedRange: Codable {
+        let low: Double
+        let high: Double
+        let percentMove: Double
+    }
+
+    struct HistoricalStats: Codable {
+        let winRate: Double
+        let averageMovePercent: Double
+        let medianMovePercent: Double
+        let sampleSize: Int
+    }
+
     struct APIErrorResponse: Codable {
         let message: String
     }
