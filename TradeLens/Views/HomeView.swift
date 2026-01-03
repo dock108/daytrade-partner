@@ -21,7 +21,7 @@ struct HomeView: View {
 
                 ScrollView {
                     VStack(spacing: 0) {
-                        if viewModel.response == nil && !viewModel.isLoading {
+                        if viewModel.lastQuery.isEmpty && !viewModel.isLoading {
                             // Landing state — centered search
                             Spacer()
                                 .frame(height: geometry.size.height * 0.18)
@@ -53,6 +53,9 @@ struct HomeView: View {
 
                             if viewModel.isLoading {
                                 loadingState
+                                    .padding(.top, 40)
+                            } else if let errorMessage = viewModel.errorMessage {
+                                errorState(message: errorMessage)
                                     .padding(.top, 40)
                             } else if let response = viewModel.response {
                                 articleView(response: response)
@@ -346,23 +349,54 @@ struct HomeView: View {
         .padding(.vertical, 60)
     }
 
+    private func errorState(message: String) -> some View {
+        VStack(spacing: 16) {
+            VStack(spacing: 6) {
+                Text("We hit a snag")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(.white)
+
+                Text(message)
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color.white.opacity(0.6))
+                    .multilineTextAlignment(.center)
+            }
+
+            Button {
+                viewModel.submit()
+            } label: {
+                Text("Retry")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(
+                        Capsule()
+                            .fill(Theme.colors.accentBlue)
+                    )
+            }
+            .buttonStyle(.plain)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 60)
+    }
+
     // MARK: - Article View
 
     private func articleView(response: AIResponse) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             // Query header
             queryHeader(response.query)
+
+            if let tickerSnapshot = viewModel.tickerSnapshot {
+                snapshotHeader(snapshot: tickerSnapshot)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
             
             // Price chart if ticker detected
             if let priceHistory = viewModel.priceHistory {
                 TickerChartView(priceHistory: priceHistory)
                     .transition(.opacity.combined(with: .scale(scale: 0.95)))
-            }
-            
-            // Ticker snapshot card if info available
-            if let tickerInfo = viewModel.tickerInfo {
-                TickerSnapshotCard(info: tickerInfo)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
             }
             
             // Outlook card if applicable
@@ -668,6 +702,38 @@ struct HomeView: View {
         }
         .padding(.bottom, 8)
     }
+
+    private func snapshotHeader(snapshot: BackendModels.TickerSnapshot) -> some View {
+        HStack(spacing: 10) {
+            Text(snapshot.symbol)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    Capsule()
+                        .fill(Color.white.opacity(0.1))
+                )
+
+            Text(snapshot.price, format: .number.precision(.fractionLength(2)))
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.white)
+
+            Text(changePercentText(snapshot.changePercent))
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(changePercentColor(snapshot.changePercent))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color.white.opacity(0.05))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
+                )
+        )
+    }
     
     private var simpleModeIndicator: some View {
         HStack(spacing: 4) {
@@ -683,6 +749,15 @@ struct HomeView: View {
             Capsule()
                 .fill(Theme.colors.accentGreenMuted.opacity(0.15))
         )
+    }
+
+    private func changePercentText(_ percent: Double) -> String {
+        let sign = percent >= 0 ? "+" : ""
+        return "\(sign)\(String(format: "%.2f", percent))%"
+    }
+
+    private func changePercentColor(_ percent: Double) -> Color {
+        percent >= 0 ? Theme.colors.accentGreen : Theme.colors.accentRed
     }
 
     private func sectionCard(section: AIResponse.Section) -> some View {
@@ -706,7 +781,7 @@ struct HomeView: View {
                 .padding(.top, 2)
             
             VStack(alignment: .leading, spacing: 6) {
-                Text(section.type.rawValue)
+                Text(section.type.displayTitle)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(section.type.accentColor.opacity(0.7))
                     .textCase(.uppercase)
@@ -750,7 +825,7 @@ struct HomeView: View {
                         .foregroundStyle(section.type.accentColor)
                 }
                 
-                Text(section.type.rawValue)
+                Text(section.type.displayTitle)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(section.type.accentColor)
                     .textCase(.uppercase)
@@ -758,11 +833,13 @@ struct HomeView: View {
             }
             
             // Content
-            Text(section.content)
-                .font(.system(size: 15, weight: .regular))
-                .foregroundStyle(Color.white.opacity(0.85))
-                .lineSpacing(5)
-                .fixedSize(horizontal: false, vertical: true)
+            if !section.content.isEmpty {
+                Text(section.content)
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundStyle(Color.white.opacity(0.85))
+                    .lineSpacing(5)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             
             // Bullet points if present
             if let bullets = section.bulletPoints, !bullets.isEmpty {
