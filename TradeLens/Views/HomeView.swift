@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @ObservedObject private var userSettings = UserSettings.shared
+    @ObservedObject private var preferencesManager = UserPreferencesManager.shared
     @FocusState private var isSearchFocused: Bool
     @Namespace private var animation
 
@@ -415,7 +416,7 @@ struct HomeView: View {
             }
             
             // Section cards (with special handling for digest)
-            ForEach(Array(response.sections.enumerated()), id: \.element.id) { _, section in
+            ForEach(Array(orderedSections(for: response).enumerated()), id: \.element.id) { _, section in
                 if section.type == .digest {
                     DigestCard(section: section)
                         .transition(.asymmetric(
@@ -479,22 +480,57 @@ struct HomeView: View {
 
     private func outlookInsightCards(outlook: BackendModels.Outlook) -> some View {
         VStack(alignment: .leading, spacing: 16) {
+            if isRiskAverse {
+                ExpectedRangeCard(
+                    expectedSwingPercent: outlook.typicalRangePercent,
+                    volatilityLabel: outlook.volatilityLabel,
+                    isRiskAverse: true
+                )
+            }
+
             if !viewModel.upcomingCatalysts.isEmpty {
-                UpcomingCatalystsCard(catalysts: viewModel.upcomingCatalysts)
+                UpcomingCatalystsCard(
+                    catalysts: viewModel.upcomingCatalysts,
+                    highlightVolatility: isSpeculative
+                )
             }
 
             RecentNewsCard(newsItems: viewModel.recentNewsItems)
 
-            ExpectedRangeCard(
-                expectedSwingPercent: outlook.typicalRangePercent,
-                volatilityLabel: outlook.volatilityLabel
-            )
+            if !isRiskAverse {
+                ExpectedRangeCard(
+                    expectedSwingPercent: outlook.typicalRangePercent,
+                    volatilityLabel: outlook.volatilityLabel,
+                    isRiskAverse: false
+                )
+            }
 
             if let insight = viewModel.patternInsight {
                 PatternInsightCard(insightText: insight)
             }
         }
         .padding(.top, 8)
+    }
+
+    private var isRiskAverse: Bool {
+        preferencesManager.preferences.riskTolerance == .low
+    }
+
+    private var isSpeculative: Bool {
+        preferencesManager.preferences.riskTolerance == .high
+    }
+
+    private func orderedSections(for response: AIResponse) -> [AIResponse.Section] {
+        let sections = response.sections
+        guard isRiskAverse,
+              let riskIndex = sections.firstIndex(where: { $0.type == .riskOpportunity }) else {
+            return sections
+        }
+
+        var reordered = sections
+        let riskSection = reordered.remove(at: riskIndex)
+        reordered.insert(riskSection, at: 0)
+        return reordered
     }
     
     // MARK: - Guided Suggestions
