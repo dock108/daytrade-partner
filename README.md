@@ -21,5 +21,3 @@ Create an Xcode Archive (`Product > Archive`) and distribute the build through t
 Extended architecture notes, development guidelines, and project structure live in [`docs/PROJECT_GUIDE.md`](docs/PROJECT_GUIDE.md).
 
 ---
-
-Built with ♥️ using SwiftUI

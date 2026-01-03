@@ -7,30 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0211D00796E10272DBB14559 /* BackendConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4266B835822850D9CD722A6 /* BackendConfig.swift */; };
+		219A183334FEBB535B90A380 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A50B43ABF0F6B206233244B /* APIClient.swift */; };
+		46B015FC6B1D159E97D22EAE /* QueryParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03846330796FF502A0F61F13 /* QueryParser.swift */; };
+		853DB544E24AE25958B7A11E /* MiniChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A2A1512058864FBBBC34F2 /* MiniChartView.swift */; };
+		A7201AA482BD37877A08D955 /* HomeArticleComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47BF8FC5BCFCBB9CF7D5C34D /* HomeArticleComponents.swift */; };
+		E7F7E07D28886B96DBB89890 /* BackendModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CBB30F7D6466BF25EF629C /* BackendModels.swift */; };
 		TL001 /* TradeLensApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL002 /* TradeLensApp.swift */; };
 		TL003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL004 /* ContentView.swift */; };
 		TL005 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = TL006 /* Assets.xcassets */; };
 		TL007 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = TL008 /* Preview Assets.xcassets */; };
 		TL009 /* Trade.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL010 /* Trade.swift */; };
-		TL011 /* TradeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL012 /* TradeService.swift */; };
-		TL013 /* TradeListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL014 /* TradeListViewModel.swift */; };
 		TL015 /* CurrencyFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL016 /* CurrencyFormatter.swift */; };
-		TL200 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL201 /* AppError.swift */; };
 		TL100 /* UserSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL102 /* UserSummary.swift */; };
 		TL101 /* TradeModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL104 /* TradeModelsTests.swift */; };
-		TL202 /* ImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL206 /* ImportService.swift */; };
-		TL203 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL207 /* SettingsViewModel.swift */; };
+		TL200 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL201 /* AppError.swift */; };
 		TL204 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL208 /* SettingsView.swift */; };
 		TL205 /* MockTrades.csv in Resources */ = {isa = PBXBuildFile; fileRef = TL209 /* MockTrades.csv */; };
 		TL300 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL301 /* DashboardView.swift */; };
 		TL302 /* TradeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL303 /* TradeDetailView.swift */; };
 		TL304 /* TradeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL305 /* TradeRowView.swift */; };
 		TL306 /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL307 /* InsightsView.swift */; };
-		TL310 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL311 /* DashboardViewModel.swift */; };
-		TL312 /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL313 /* InsightsViewModel.swift */; };
 		TL314 /* TradeDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL315 /* TradeDetailViewModel.swift */; };
 		TL318 /* AIServiceStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL319 /* AIServiceStub.swift */; };
-		TL440 /* AIContentProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL441 /* AIContentProvider.swift */; };
 		TL320 /* InsightsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL321 /* InsightsService.swift */; };
 		TL322 /* MockTradeDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL323 /* MockTradeDataService.swift */; };
 		TL324 /* TradeAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL325 /* TradeAnalyticsService.swift */; };
@@ -54,6 +53,7 @@
 		TL434 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL435 /* Theme.swift */; };
 		TL436 /* ScreenContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL437 /* ScreenContainerView.swift */; };
 		TL438 /* InfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL439 /* InfoCardView.swift */; };
+		TL440 /* AIContentProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL441 /* AIContentProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,39 +61,38 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = TL033 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = TL029 /* TradeLens */;
+			remoteGlobalIDString = TL029;
 			remoteInfo = TradeLens;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		TL017 /* TradeLens.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TradeLens.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		03846330796FF502A0F61F13 /* QueryParser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QueryParser.swift; sourceTree = "<group>"; };
+		27A2A1512058864FBBBC34F2 /* MiniChartView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MiniChartView.swift; sourceTree = "<group>"; };
+		2A50B43ABF0F6B206233244B /* APIClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		47BF8FC5BCFCBB9CF7D5C34D /* HomeArticleComponents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeArticleComponents.swift; sourceTree = "<group>"; };
+		B5CBB30F7D6466BF25EF629C /* BackendModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackendModels.swift; sourceTree = "<group>"; };
+		D4266B835822850D9CD722A6 /* BackendConfig.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackendConfig.swift; sourceTree = "<group>"; };
 		TL002 /* TradeLensApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeLensApp.swift; sourceTree = "<group>"; };
 		TL004 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		TL006 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		TL008 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		TL010 /* Trade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trade.swift; sourceTree = "<group>"; };
-		TL012 /* TradeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeService.swift; sourceTree = "<group>"; };
-		TL014 /* TradeListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeListViewModel.swift; sourceTree = "<group>"; };
 		TL016 /* CurrencyFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyFormatter.swift; sourceTree = "<group>"; };
-		TL201 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
+		TL017 /* TradeLens.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TradeLens.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		TL018 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		TL102 /* UserSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSummary.swift; sourceTree = "<group>"; };
 		TL103 /* TradeLensTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TradeLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		TL104 /* TradeModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeModelsTests.swift; sourceTree = "<group>"; };
-		TL206 /* ImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportService.swift; sourceTree = "<group>"; };
-		TL207 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		TL201 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		TL208 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		TL209 /* MockTrades.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = MockTrades.csv; sourceTree = "<group>"; };
 		TL301 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		TL303 /* TradeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeDetailView.swift; sourceTree = "<group>"; };
 		TL305 /* TradeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeRowView.swift; sourceTree = "<group>"; };
 		TL307 /* InsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsView.swift; sourceTree = "<group>"; };
-		TL311 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
-		TL313 /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
 		TL315 /* TradeDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeDetailViewModel.swift; sourceTree = "<group>"; };
 		TL319 /* AIServiceStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIServiceStub.swift; sourceTree = "<group>"; };
-		TL441 /* AIContentProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIContentProvider.swift; sourceTree = "<group>"; };
 		TL321 /* InsightsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsService.swift; sourceTree = "<group>"; };
 		TL323 /* MockTradeDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTradeDataService.swift; sourceTree = "<group>"; };
 		TL325 /* TradeAnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeAnalyticsService.swift; sourceTree = "<group>"; };
@@ -117,6 +116,7 @@
 		TL435 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		TL437 /* ScreenContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenContainerView.swift; sourceTree = "<group>"; };
 		TL439 /* InfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoCardView.swift; sourceTree = "<group>"; };
+		TL441 /* AIContentProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIContentProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +137,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3FF3FB002576E1BCE5D85369 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				27A2A1512058864FBBBC34F2 /* MiniChartView.swift */,
+			);
+			name = Shared;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		TL020 = {
 			isa = PBXGroup;
 			children = (
@@ -144,15 +153,6 @@
 				TL022 /* Products */,
 				TL106 /* TradeLensTests */,
 			);
-			sourceTree = "<group>";
-		};
-		TL022 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				TL017 /* TradeLens.app */,
-				TL103 /* TradeLensTests.xctest */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		TL021 /* TradeLens */ = {
@@ -172,6 +172,15 @@
 			path = TradeLens;
 			sourceTree = "<group>";
 		};
+		TL022 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				TL017 /* TradeLens.app */,
+				TL103 /* TradeLensTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		TL023 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -182,6 +191,7 @@
 				TL413 /* TickerInfo.swift */,
 				TL423 /* ConversationHistory.swift */,
 				TL429 /* UserPreferences.swift */,
+				B5CBB30F7D6466BF25EF629C /* BackendModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -189,8 +199,6 @@
 		TL024 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				TL012 /* TradeService.swift */,
-				TL206 /* ImportService.swift */,
 				TL319 /* AIServiceStub.swift */,
 				TL441 /* AIContentProvider.swift */,
 				TL321 /* InsightsService.swift */,
@@ -201,6 +209,8 @@
 				TL419 /* UserSettings.swift */,
 				TL421 /* SpeechRecognitionService.swift */,
 				TL425 /* OutlookEngine.swift */,
+				2A50B43ABF0F6B206233244B /* APIClient.swift */,
+				03846330796FF502A0F61F13 /* QueryParser.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -222,6 +232,8 @@
 				TL303 /* TradeDetailView.swift */,
 				TL305 /* TradeRowView.swift */,
 				TL307 /* InsightsView.swift */,
+				47BF8FC5BCFCBB9CF7D5C34D /* HomeArticleComponents.swift */,
+				3FF3FB002576E1BCE5D85369 /* Shared */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -229,11 +241,7 @@
 		TL026 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				TL014 /* TradeListViewModel.swift */,
 				TL403 /* HomeViewModel.swift */,
-				TL207 /* SettingsViewModel.swift */,
-				TL311 /* DashboardViewModel.swift */,
-				TL313 /* InsightsViewModel.swift */,
 				TL315 /* TradeDetailViewModel.swift */,
 			);
 			path = ViewModels;
@@ -245,6 +253,7 @@
 				TL016 /* CurrencyFormatter.swift */,
 				TL201 /* AppError.swift */,
 				TL435 /* Theme.swift */,
+				D4266B835822850D9CD722A6 /* BackendConfig.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -257,20 +266,20 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		TL210 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				TL209 /* MockTrades.csv */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
 		TL106 /* TradeLensTests */ = {
 			isa = PBXGroup;
 			children = (
 				TL104 /* TradeModelsTests.swift */,
 			);
 			path = TradeLensTests;
+			sourceTree = "<group>";
+		};
+		TL210 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				TL209 /* MockTrades.csv */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -380,21 +389,13 @@
 				TL302 /* TradeDetailView.swift in Sources */,
 				TL304 /* TradeRowView.swift in Sources */,
 				TL306 /* InsightsView.swift in Sources */,
-				TL308 /* AskView.swift in Sources */,
 				TL009 /* Trade.swift in Sources */,
-				TL011 /* TradeService.swift in Sources */,
-				TL202 /* ImportService.swift in Sources */,
 				TL318 /* AIServiceStub.swift in Sources */,
 				TL440 /* AIContentProvider.swift in Sources */,
 				TL320 /* InsightsService.swift in Sources */,
 				TL322 /* MockTradeDataService.swift in Sources */,
 				TL324 /* TradeAnalyticsService.swift in Sources */,
-				TL013 /* TradeListViewModel.swift in Sources */,
-				TL203 /* SettingsViewModel.swift in Sources */,
-				TL310 /* DashboardViewModel.swift in Sources */,
-				TL312 /* InsightsViewModel.swift in Sources */,
 				TL314 /* TradeDetailViewModel.swift in Sources */,
-				TL316 /* AskViewModel.swift in Sources */,
 				TL015 /* CurrencyFormatter.swift in Sources */,
 				TL200 /* AppError.swift in Sources */,
 				TL001 /* TradeLensApp.swift in Sources */,
@@ -419,6 +420,12 @@
 				TL434 /* Theme.swift in Sources */,
 				TL436 /* ScreenContainerView.swift in Sources */,
 				TL438 /* InfoCardView.swift in Sources */,
+				A7201AA482BD37877A08D955 /* HomeArticleComponents.swift in Sources */,
+				E7F7E07D28886B96DBB89890 /* BackendModels.swift in Sources */,
+				219A183334FEBB535B90A380 /* APIClient.swift in Sources */,
+				46B015FC6B1D159E97D22EAE /* QueryParser.swift in Sources */,
+				0211D00796E10272DBB14559 /* BackendConfig.swift in Sources */,
+				853DB544E24AE25958B7A11E /* MiniChartView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -672,20 +679,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		TL034 /* Build configuration list for PBXProject "TradeLens" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				TL035 /* Debug */,
-				TL036 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		TL030 /* Build configuration list for PBXNativeTarget "TradeLens" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				TL037 /* Debug */,
 				TL038 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		TL034 /* Build configuration list for PBXProject "TradeLens" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				TL035 /* Debug */,
+				TL036 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
