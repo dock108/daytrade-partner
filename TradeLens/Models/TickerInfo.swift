@@ -44,3 +44,5 @@ struct TickerInfo: Identifiable {
 
 
 
+
+
