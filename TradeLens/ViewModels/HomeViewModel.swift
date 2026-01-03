@@ -164,13 +164,9 @@ final class HomeViewModel: ObservableObject {
         lastQuery = trimmed
         response = nil
         
-        // Detect ticker and load price data immediately (non-blocking)
+        // Detect ticker (data will be loaded from backend stores)
         detectedTicker = QueryParser.detectTicker(in: trimmed)
-        if let ticker = detectedTicker {
-            priceHistory = MockPriceService.priceHistory(for: ticker, range: .oneMonth)
-        } else {
-            priceHistory = nil
-        }
+        priceHistory = nil
         historyPoints = nil
         tickerSnapshot = nil
         
@@ -214,14 +210,30 @@ final class HomeViewModel: ObservableObject {
                 // Get snapshot from store
                 tickerSnapshot = priceStore.snapshot(for: ticker)
                 
-                // Get history from store and map to local model
+                // Get history from store and build PriceHistory for the chart
                 if let storePoints = historyStore.points(for: ticker, range: Constants.historyRange) {
-                    historyPoints = storePoints.map { backendPoint in
+                    // Map backend points to local PricePoint model
+                    let localPoints = storePoints.map { backendPoint in
                         PricePoint(
                             date: backendPoint.date,
                             close: backendPoint.close,
-                            high: backendPoint.close,
-                            low: backendPoint.close
+                            high: backendPoint.close * 1.01, // Estimate high ~1% above close
+                            low: backendPoint.close * 0.99   // Estimate low ~1% below close
+                        )
+                    }
+                    historyPoints = localPoints
+                    
+                    // Build PriceHistory from backend data (single source of truth)
+                    if let snapshot = tickerSnapshot, !localPoints.isEmpty {
+                        let firstClose = localPoints.first?.close ?? snapshot.price
+                        let change = snapshot.price - firstClose
+                        
+                        priceHistory = PriceHistory(
+                            ticker: ticker,
+                            points: localPoints,
+                            currentPrice: snapshot.price,
+                            change: change,
+                            changePercent: snapshot.changePercent
                         )
                     }
                 }
@@ -280,11 +292,10 @@ final class HomeViewModel: ObservableObject {
         errorMessage = nil
         tickerSnapshot = nil
         historyPoints = nil
+        priceHistory = nil
         
         // Reload price data using shared stores
         if let ticker = entry.detectedTicker {
-            priceHistory = MockPriceService.priceHistory(for: ticker, range: .oneMonth)
-            
             Task {
                 // Refresh all data through stores
                 await dataStoreManager.refreshAll(for: ticker)
@@ -292,13 +303,28 @@ final class HomeViewModel: ObservableObject {
                 // Get data from stores
                 tickerSnapshot = priceStore.snapshot(for: ticker)
                 
+                // Build PriceHistory from backend data
                 if let storePoints = historyStore.points(for: ticker, range: Constants.historyRange) {
-                    historyPoints = storePoints.map { backendPoint in
+                    let localPoints = storePoints.map { backendPoint in
                         PricePoint(
                             date: backendPoint.date,
                             close: backendPoint.close,
-                            high: backendPoint.close,
-                            low: backendPoint.close
+                            high: backendPoint.close * 1.01,
+                            low: backendPoint.close * 0.99
+                        )
+                    }
+                    historyPoints = localPoints
+                    
+                    if let snapshot = tickerSnapshot, !localPoints.isEmpty {
+                        let firstClose = localPoints.first?.close ?? snapshot.price
+                        let change = snapshot.price - firstClose
+                        
+                        priceHistory = PriceHistory(
+                            ticker: ticker,
+                            points: localPoints,
+                            currentPrice: snapshot.price,
+                            change: change,
+                            changePercent: snapshot.changePercent
                         )
                     }
                 }
@@ -365,7 +391,46 @@ final class HomeViewModel: ObservableObject {
     
     func updateChartRange(_ range: ChartTimeRange) {
         guard let ticker = detectedTicker else { return }
-        priceHistory = MockPriceService.priceHistory(for: ticker, range: range)
+        
+        // Map chart range to backend range format
+        let backendRange: String
+        switch range {
+        case .oneDay: backendRange = "1D"
+        case .oneMonth: backendRange = "1M"
+        case .sixMonths: backendRange = "6M"
+        case .oneYear: backendRange = "1Y"
+        }
+        
+        Task {
+            // Refresh history for the new range
+            await historyStore.refresh(symbol: ticker, range: backendRange)
+            
+            // Get updated points and rebuild PriceHistory
+            if let storePoints = historyStore.points(for: ticker, range: backendRange) {
+                let localPoints = storePoints.map { backendPoint in
+                    PricePoint(
+                        date: backendPoint.date,
+                        close: backendPoint.close,
+                        high: backendPoint.close * 1.01,
+                        low: backendPoint.close * 0.99
+                    )
+                }
+                historyPoints = localPoints
+                
+                if let snapshot = tickerSnapshot, !localPoints.isEmpty {
+                    let firstClose = localPoints.first?.close ?? snapshot.price
+                    let change = snapshot.price - firstClose
+                    
+                    priceHistory = PriceHistory(
+                        ticker: ticker,
+                        points: localPoints,
+                        currentPrice: snapshot.price,
+                        change: change,
+                        changePercent: snapshot.changePercent
+                    )
+                }
+            }
+        }
     }
 
     func clearRecentSearches() {
