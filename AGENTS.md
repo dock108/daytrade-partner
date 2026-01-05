@@ -1,18 +1,34 @@
-# AGENTS.md — TradeLens (Day Trading Partner)
+# AGENTS.md — Daytrade Partner (TradeLens)
 
 > This file provides context for AI agents (Codex, Cursor, Copilot) working on this codebase.
 
 ## Quick Context
 
-**What is this?** iOS app for day trading analysis and tracking.
+**What is this?** Personal iOS app for analyzing and simulating partner-style trading strategies — built for experimentation and insights, not signals.
 
 **Tech Stack:** Swift, SwiftUI, MVVM architecture
+
+**Backend:** Connects to `daytrade-partner-data` (Python FastAPI) for market data and AI outlooks.
 
 **Key Directories:**
 - `TradeLens/Models/` — Data structures
 - `TradeLens/Views/` — SwiftUI views
 - `TradeLens/ViewModels/` — State and business logic
 - `TradeLens/Services/` — Calculations and data services
+- `TradeLens/DataStores/` — Centralized data management
+
+## What's Production vs. Experimental
+
+| Component | Status |
+|-----------|--------|
+| AI Home Screen | ✅ Production |
+| Outlook data from backend | ✅ Production |
+| Price/history charts | ✅ Production |
+| Dashboard/Insights tabs | 🧪 Experimental (mock data) |
+| `MockTradeDataService` | 🧪 Experimental (UI preview) |
+| `MockPriceService` | 🧪 Experimental (fallback) |
+| `OutlookEngine` | 🧪 Experimental (legacy local synthesis) |
+| `NewsStore` | 🧪 Experimental (sample data only) |
 
 ## Coding Standards
 
@@ -31,6 +47,7 @@ See `.cursorrules` for complete coding standards. Key points:
 - Put business logic in Views
 - Use `print()` in production code
 - Refactor unrelated code while fixing bugs
+- Treat experimental/mock data as production-ready
 
 ## Testing
 
@@ -41,5 +58,3 @@ See `.cursorrules` for complete coding standards. Key points:
 ## Getting Help
 
 If something is unclear, leave a `// TODO:` comment rather than guessing.
-
-

@@ -6,6 +6,18 @@
 
 TradeLens uses a centralized data store architecture to ensure consistent data display across all screens. No view or ViewModel makes direct HTTP calls — all data flows through shared observable stores.
 
+### Production vs. Experimental
+
+| Store | Status | Notes |
+|-------|--------|-------|
+| PriceStore | ✅ Production | Fetches from backend |
+| HistoryStore | ✅ Production | Fetches from backend |
+| OutlookStore | ✅ Production | Fetches from backend |
+| AIResponseStore | ✅ Production | Fetches from backend |
+| NewsStore | 🧪 Experimental | Returns sample data (backend not implemented) |
+
+The `MockPriceService` provides fallback data when the backend is unavailable — it's not the primary data source.
+
 ## Architecture Diagram
 
 ```
@@ -133,16 +145,18 @@ let outlook = await OutlookStore.shared.fetchOutlook(
 )
 ```
 
-### NewsStore
+### NewsStore (🧪 Experimental)
 
 **Purpose:** Market news and articles
 
 **Location:** `TradeLens/DataStores/NewsStore.swift`
 
+**Status:** Experimental — returns sample data only
+
 **Key Features:**
 - 10-minute refresh window
 - Currently returns sample data (backend news endpoint not implemented)
-- Ready for future API integration
+- Ready for future API integration when backend supports it
 
 ### DataStoreManager
 
@@ -228,3 +242,4 @@ TradeLens/
 - [ ] Implement news API when backend supports it
 - [ ] Add offline caching with persistence
 - [ ] Implement data prefetching for common symbols
+- [ ] Replace mock trade data with real brokerage import

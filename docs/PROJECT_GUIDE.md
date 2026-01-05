@@ -1,5 +1,7 @@
 # TradeLens Project Guide
 
+> **Note:** This project is a personal experimentation tool for analyzing trading patterns and strategies. Many components are experimental — see status labels below.
+
 ## Project Structure
 
 The project follows a clean MVVM architecture with centralized data stores for single-source-of-truth data management.
@@ -31,9 +33,9 @@ TradeLens/
     ├── Services/               # Business logic and API clients
     │   ├── APIClient.swift     # Backend HTTP client
     │   ├── QueryParser.swift   # Query parsing (ticker detection, timeframe)
-    │   ├── OutlookEngine.swift # Legacy local outlook synthesis
-    │   ├── MockTradeDataService.swift # Mock trade generation
-    │   ├── MockPriceService.swift # Fallback price data
+    │   ├── OutlookEngine.swift # 🧪 EXPERIMENTAL: Legacy local outlook synthesis
+    │   ├── MockTradeDataService.swift # 🧪 EXPERIMENTAL: Mock trade generation for UI
+    │   ├── MockPriceService.swift # 🧪 EXPERIMENTAL: Fallback price data
     │   ├── SpeechRecognitionService.swift # Voice input
     │   └── UserSettings.swift  # Settings persistence
     │
@@ -133,18 +135,21 @@ The app centers around an AI home screen (`HomeView`) that:
 - Supports voice input via `SpeechRecognitionService`
 - Maintains conversation history locally
 
-### Sample Data Mode
+### 🧪 Sample Data Mode (Experimental)
 Dashboard and Insights tabs currently show sample/preview data:
-- Clearly labeled as "Sample Data Preview"
-- Demonstrates what personal tracking will look like
-- Uses only public market data and AI explanations
-- Trade import via brokerage connections is a planned feature
+- Clearly labeled as "Sample Data Preview" in the UI
+- Uses `MockTradeDataService` to generate realistic fake trades
+- Demonstrates what personal tracking would look like with real data
+- **Not production data** — exists for UI development and experimentation
+- Trade import via brokerage connections is a planned future feature
 
 ### Outlook Data
 Market outlooks are fetched from the backend via `OutlookStore`:
 - Uses `/outlook/{ticker}` only
 - Cached for up to 5 minutes
 - UI renders backend text directly (no local synthesis)
+
+> **Note:** The legacy `OutlookEngine.swift` exists for offline/fallback scenarios but is considered experimental. Production outlook data comes from the `daytrade-partner-data` backend.
 
 ### Theming System
 `Theme.swift` provides:
