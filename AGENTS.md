@@ -42,7 +42,7 @@ See `.cursorrules` for complete coding standards. Key points:
 
 ## Do NOT
 
-- Manually edit `TradeLens.xcodeproj/project.pbxproj`
+- Avoid editing `TradeLens.xcodeproj/project.pbxproj` unless necessary to restore a broken build
 - Add dependencies without justification
 - Put business logic in Views
 - Use `print()` in production code

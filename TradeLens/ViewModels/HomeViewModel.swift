@@ -440,6 +440,7 @@ final class HomeViewModel: ObservableObject {
                         change: change,
                         changePercent: snapshot.changePercent
                     )
+                }
             }
         }
     }
@@ -486,7 +487,6 @@ final class HomeViewModel: ObservableObject {
 
         return "Similar setups have tended to drift sideways into earnings"
     }
-}
 
     func clearRecentSearches() {
         recentSearches = []

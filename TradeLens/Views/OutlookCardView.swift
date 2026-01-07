@@ -692,6 +692,7 @@ struct WatchButtonStyle: ButtonStyle {
         OutlookCardView(outlook: BackendModels.Outlook(
             symbol: "NVDA",
             timeframeDays: 30,
+            sentimentSummary: "Positive",
             historicalHitRate: 0.68,
             typicalRangePercent: 0.12,
             volatilityLabel: "High",

@@ -246,3 +246,4 @@ final class OutlookStore: ObservableObject {
         }
     }
 }
+

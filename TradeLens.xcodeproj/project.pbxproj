@@ -50,6 +50,10 @@
 		TL434 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL435 /* Theme.swift */; };
 		TL436 /* ScreenContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL437 /* ScreenContainerView.swift */; };
 		TL438 /* InfoCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL439 /* InfoCardView.swift */; };
+		TL440 /* DataSyncBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL441 /* DataSyncBannerView.swift */; };
+		TL442 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL443 /* SafariView.swift */; };
+		TL444 /* ConsistencyCheckerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL445 /* ConsistencyCheckerView.swift */; };
+		TL446 /* OutlookInsightCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = TL447 /* OutlookInsightCards.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -109,6 +113,10 @@
 		TL435 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		TL437 /* ScreenContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenContainerView.swift; sourceTree = "<group>"; };
 		TL439 /* InfoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoCardView.swift; sourceTree = "<group>"; };
+		TL441 /* DataSyncBannerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DataSyncBannerView.swift; sourceTree = "<group>"; };
+		TL443 /* SafariView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
+		TL445 /* ConsistencyCheckerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ConsistencyCheckerView.swift; sourceTree = "<group>"; };
+		TL447 /* OutlookInsightCards.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OutlookInsightCards.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +154,8 @@
 			isa = PBXGroup;
 			children = (
 				27A2A1512058864FBBBC34F2 /* MiniChartView.swift */,
+				TL441 /* DataSyncBannerView.swift */,
+				TL443 /* SafariView.swift */,
 			);
 			name = Shared;
 			path = Shared;
@@ -223,6 +233,8 @@
 				TL401 /* HomeView.swift */,
 				TL411 /* TickerChartView.swift */,
 				TL427 /* OutlookCardView.swift */,
+				TL447 /* OutlookInsightCards.swift */,
+				TL445 /* ConsistencyCheckerView.swift */,
 				TL431 /* OnboardingView.swift */,
 				TL433 /* HistoricalRangeView.swift */,
 				TL437 /* ScreenContainerView.swift */,
@@ -414,6 +426,10 @@
 				46B015FC6B1D159E97D22EAE /* QueryParser.swift in Sources */,
 				0211D00796E10272DBB14559 /* BackendConfig.swift in Sources */,
 				853DB544E24AE25958B7A11E /* MiniChartView.swift in Sources */,
+				TL440 /* DataSyncBannerView.swift in Sources */,
+				TL442 /* SafariView.swift in Sources */,
+				TL444 /* ConsistencyCheckerView.swift in Sources */,
+				TL446 /* OutlookInsightCards.swift in Sources */,
 				233F02092114604E5DDB2B6D /* PriceStore.swift in Sources */,
 				A72B64853F1505107D621138 /* HistoryStore.swift in Sources */,
 				9845E92FA5DABBC7034CBBBF /* OutlookStore.swift in Sources */,

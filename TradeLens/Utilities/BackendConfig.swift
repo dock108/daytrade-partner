@@ -11,7 +11,9 @@ struct BackendConfig {
     let baseURL: String
 
     /// Local development backend (Python FastAPI server)
-    static let localhost = BackendConfig(baseURL: "http://127.0.0.1:8000")
+    ///
+    /// Note: `daytrade-partner-data` defaults to port 8080 in local dev.
+    static let localhost = BackendConfig(baseURL: "http://127.0.0.1:8080")
     
     /// Production API (when deployed)
     static let production = BackendConfig(baseURL: "https://api.daytrade-partner.com")

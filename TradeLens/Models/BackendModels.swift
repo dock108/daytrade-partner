@@ -82,3 +82,14 @@ extension BackendModels {
         let message: String
     }
 }
+
+// MARK: - UI Models for Outlook Insights
+
+/// UI-focused model for catalyst insight cards
+struct CatalystInsight: Identifiable {
+    let id = UUID()
+    let date: Date
+    let category: String
+    let summary: String
+    let whyItMatters: String
+}

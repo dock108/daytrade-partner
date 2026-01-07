@@ -131,5 +131,5 @@ private struct DebugInfoRow: View {
         ConsistencyCheckerView(snapshot: nil)
     }
     .padding()
-    .background(Theme.colors.background)
+    .background(Theme.colors.backgroundPrimary)
 }
