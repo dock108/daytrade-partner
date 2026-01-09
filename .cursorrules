@@ -90,7 +90,7 @@ iOS app for day trading analysis and tracking.
 - `TradeLens/ViewModels/` — Trading logic and state
 - `TradeLens/Services/` — Data services and calculations
 
-### Protected Files
-- `TradeLens.xcodeproj/project.pbxproj` — Don't manually edit
+### Files to Handle With Care
+- `TradeLens.xcodeproj/project.pbxproj` — Prefer editing via Xcode; manual edits are OK when you know what you’re doing (e.g. merge conflict resolution). Keep diffs minimal and validate with `xcodebuild`.
 
 
